@@ -13,14 +13,14 @@ import lombok.Setter;
 public class ChangePasswordRequest {
 
     @NotBlank(message = "OldPassword is required")
-    String oldPassword;
+    private String oldPassword;
 
     @NotBlank
     @Size(min = 8, message = "Password must be at least 8 characters")
-    String newPassword;
+    private String newPassword;
 
     @NotBlank(message = "Confirm password is required")
-    String confirmNewPassword;
+    private String confirmNewPassword;
 
     public String getOldPassword() {
         return oldPassword;

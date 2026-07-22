@@ -1,14 +1,13 @@
 package com.application.Servease.auth.service;
 
 
-import com.application.Servease.auth.dto.AuthResponse;
-import com.application.Servease.auth.dto.LoginRequest;
-import com.application.Servease.auth.dto.RegisterRequest;
+import com.application.Servease.auth.dto.*;
 
 
-import com.application.Servease.common.exception.DuplicateEmailException;
-import com.application.Servease.common.exception.DuplicatePhoneException;
-import com.application.Servease.common.exception.InvalidCredentialsException;
+import com.application.Servease.auth.entity.PasswordResetOtp;
+import com.application.Servease.auth.repository.PasswordResetOtpRepository;
+import com.application.Servease.common.exception.*;
+import com.application.Servease.common.service.EmailService;
 import com.application.Servease.entity.User;
 import com.application.Servease.entity.enums.UserRole;
 import com.application.Servease.entity.enums.UserStatus;
@@ -17,8 +16,15 @@ import com.application.Servease.security.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
+
+
+
 
 
 @Service
@@ -27,17 +33,24 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
 
     private final JwtService jwtService;
 
+    private static final int OTP_EXPIRY_MINUTES = 5;
+    private static final int OTP_RESEND_MINUTES = 1;
 
-    public AuthService( UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
+
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder, EmailService emailService, PasswordResetOtpRepository passwordResetOtpRepository,
                        JwtService jwtService) {
 
 
         this.userRepository = userRepository;
         this.passwordEncoder = (BCryptPasswordEncoder) passwordEncoder;
+        this.emailService = emailService;
+        this.passwordResetOtpRepository = passwordResetOtpRepository;
         this.jwtService = jwtService;
     }
 
@@ -131,6 +144,132 @@ public class AuthService {
 
         return response;
     }
+
+
+
+
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+
+        // Step 1: Find User
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found."));
+
+        // Step 2: Check if OTP already exists
+        Optional<PasswordResetOtp> existingOtp =
+                passwordResetOtpRepository.findByUser(user);
+
+        if (existingOtp.isPresent()) {
+
+            PasswordResetOtp otpEntity = existingOtp.get();
+
+            // Step 3: Prevent OTP spam (1 minute)
+            if (otpEntity.getCreatedAt()
+                    .plusMinutes(1)
+                    .isAfter(LocalDateTime.now())) {
+
+                throw new OtpRequestTooFrequentException(
+                        "Please wait 1 minute before requesting another OTP.");
+            }
+
+            // Step 4: Delete old OTP
+            passwordResetOtpRepository.delete(otpEntity);
+            passwordResetOtpRepository.flush();
+        }
+
+        // Step 5: Generate 6-digit OTP
+        SecureRandom random = new SecureRandom();
+        String otp = String.valueOf(100000 + random.nextInt(900000));
+
+        // Step 6: Create OTP entity
+        PasswordResetOtp passwordResetOtp = new PasswordResetOtp();
+
+        passwordResetOtp.setUser(user);
+        passwordResetOtp.setOtpHash(passwordEncoder.encode(otp));
+        passwordResetOtp.setCreatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+
+        passwordResetOtp.setCreatedAt(now);
+        passwordResetOtp.setExpiryTime(now.plusMinutes(OTP_EXPIRY_MINUTES));
+        passwordResetOtp.setVerified(false);
+
+        // Step 7: Save OTP
+        passwordResetOtpRepository.save(passwordResetOtp);
+
+        // Step 8: Send Email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+    }
+
+    @Transactional
+    public void verifyOtp(VerifyOtpRequest request) {
+
+        // Step 1: Find User
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found."));
+
+        // Step 2: Find OTP
+        PasswordResetOtp passwordResetOtp = passwordResetOtpRepository
+                .findByUser(user)
+                .orElseThrow(() ->
+                        new InvalidOtpException("OTP not found."));
+
+        // Step 3: Check Expiry
+        if (passwordResetOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
+
+            passwordResetOtpRepository.delete(passwordResetOtp);
+
+            throw new OtpExpiredException("OTP has expired.");
+        }
+
+        // Step 4: Verify OTP
+        if (!passwordEncoder.matches(request.getOtp(),
+                passwordResetOtp.getOtpHash())) {
+
+            throw new InvalidOtpException("Invalid OTP.");
+        }
+
+        // Step 5: Mark as Verified
+        passwordResetOtp.setVerified(true);
+
+        passwordResetOtpRepository.save(passwordResetOtp);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+
+        // Step 1: Check if user exists
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found."));
+
+        // Step 2: Find OTP
+        PasswordResetOtp passwordResetOtp = passwordResetOtpRepository
+                .findByUser(user)
+                .orElseThrow(() ->
+                        new InvalidOtpException("OTP verification required."));
+
+        // Step 3: Check OTP verification
+        if (!passwordResetOtp.isVerified()) {
+            throw new InvalidOtpException("Please verify your OTP first.");
+        }
+
+        // Step 4: Check password confirmation
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new PasswordMismatchException("Passwords do not match.");
+        }
+
+        // Step 5: Update password
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
+
+        // Step 6: Delete OTP
+        passwordResetOtpRepository.delete(passwordResetOtp);
+        passwordResetOtpRepository.flush();
+    }
+
 
     }
 

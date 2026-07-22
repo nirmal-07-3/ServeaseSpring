@@ -1,10 +1,10 @@
 package com.application.Servease.auth.controller;
 
-import com.application.Servease.auth.dto.AuthResponse;
-import com.application.Servease.auth.dto.LoginRequest;
-import com.application.Servease.auth.dto.RegisterRequest;
+import com.application.Servease.auth.dto.*;
 import com.application.Servease.auth.service.AuthService;
 import com.application.Servease.common.dto.ApiResponse;
+import com.application.Servease.common.service.EmailService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, EmailService emailService) {
         this.authService = authService;
+        this.emailService = emailService;
     }
 
 
@@ -51,13 +53,52 @@ public class AuthController {
     }
 
 
-    @RestController
-    @RequestMapping("/api/test")
-    public class TestController {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
 
-        @GetMapping("/hello")
-        public String hello() {
-            return "JWT Authentication Working!";
-        }
+        authService.forgotPassword(request);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "OTP sent successfully to your email.",
+                        null
+                )
+        );
     }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<Void>> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+
+        authService.verifyOtp(request);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "OTP verified successfully.",
+                        null
+                )
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Password reset successfully.",
+                        null
+                )
+        );
+    }
+
+
+
+
 }

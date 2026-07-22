@@ -22,6 +22,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     private User getAuthenticatedUser() {
 
@@ -31,17 +34,6 @@ public class UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-    }
-    private final UserMapper userMapper ;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    public UserService(UserRepository userRepository,
-                       UserMapper userMapper, PasswordEncoder passwordEncoder) {
-
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public UserProfileResponse getCurrentUser() {
@@ -65,45 +57,30 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setProfileImage(request.getProfileImage());
 
-
         userRepository.save(user);
-        return  userMapper.toProfileResponse(user);
+
+        return userMapper.toProfileResponse(user);
     }
 
-    public void changePassword(ChangePasswordRequest request){
+    public void changePassword(ChangePasswordRequest request) {
 
-
-
-
-        if(!Objects.equals(request.getNewPassword(), request.getConfirmNewPassword())){
-            throw new PasswordMismatchException("ConfirmNewPassword Must Be Same As new Password");
+        if (!Objects.equals(request.getNewPassword(), request.getConfirmNewPassword())) {
+            throw new PasswordMismatchException("Confirm password must match the new password");
         }
 
         User user = getAuthenticatedUser();
 
-
-        if (!passwordEncoder.matches(
-                request.getOldPassword(),
-                user.getPasswordHash())) {
-
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
             throw new InvalidCredentialsException("Old password is incorrect");
         }
 
-
-
-        if (passwordEncoder.matches(
-                request.getNewPassword(),
-                user.getPasswordHash())) {
-
-            throw new PasswordMismatchException("New password cannot be the same as the current password");
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+            throw new PasswordMismatchException(
+                    "New password cannot be the same as the current password");
         }
 
-
-        user.setPasswordHash(
-                passwordEncoder.encode(request.getNewPassword())
-        );
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
 
         userRepository.save(user);
-
     }
 }
