@@ -5,11 +5,13 @@ import com.application.Servease.user.dto.ChangePasswordRequest;
 import com.application.Servease.user.dto.UpdateProfileRequest;
 import com.application.Servease.user.dto.UserProfileResponse;
 import com.application.Servease.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User", description = "User Profile APIs")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor

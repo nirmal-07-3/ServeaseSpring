@@ -4,10 +4,12 @@ import com.application.Servease.auth.dto.*;
 import com.application.Servease.auth.service.AuthService;
 import com.application.Servease.common.dto.ApiResponse;
 import com.application.Servease.common.service.EmailService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Authentication", description = "Authentication APIs")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

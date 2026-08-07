@@ -5,6 +5,7 @@ import com.application.Servease.category.dto.CreateCategoryRequest;
 import com.application.Servease.category.dto.UpdateCategoryRequest;
 import com.application.Servease.category.service.CategoryService;
 import com.application.Servease.common.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+@Tag(name = "Admin - Category", description = "Category Management APIs")
 @RestController
 @RequestMapping("/api/admin/categories")
 @RequiredArgsConstructor

@@ -6,6 +6,7 @@ import com.application.Servease.provider.dto.*;
 import com.application.Servease.provider.enums.DocumentType;
 import com.application.Servease.provider.service.ProviderService;
 import com.application.Servease.user.dto.UserProfileResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Tag(name = "Provider", description = "Provider Management APIs")
 @RestController
     @RequestMapping("/api/providers")
     @RequiredArgsConstructor
