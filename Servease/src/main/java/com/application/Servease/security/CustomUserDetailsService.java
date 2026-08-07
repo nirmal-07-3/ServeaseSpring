@@ -1,7 +1,7 @@
 package com.application.Servease.security;
 
-import com.application.Servease.entity.User;
-import com.application.Servease.repository.UserRepository;
+import com.application.Servease.user.entity.User;
+import com.application.Servease.user.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

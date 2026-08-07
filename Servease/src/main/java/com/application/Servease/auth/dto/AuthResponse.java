@@ -1,6 +1,6 @@
 package com.application.Servease.auth.dto;
 
-import com.application.Servease.entity.enums.UserRole;
+import com.application.Servease.user.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

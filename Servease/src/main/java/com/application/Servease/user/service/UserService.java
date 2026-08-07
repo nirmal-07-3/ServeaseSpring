@@ -4,8 +4,8 @@ import com.application.Servease.common.exception.DuplicatePhoneException;
 import com.application.Servease.common.exception.InvalidCredentialsException;
 import com.application.Servease.common.exception.PasswordMismatchException;
 import com.application.Servease.common.exception.UserNotFoundException;
-import com.application.Servease.entity.User;
-import com.application.Servease.repository.UserRepository;
+import com.application.Servease.user.entity.User;
+import com.application.Servease.user.repository.UserRepository;
 import com.application.Servease.user.dto.ChangePasswordRequest;
 import com.application.Servease.user.dto.UpdateProfileRequest;
 import com.application.Servease.user.dto.UserProfileResponse;
@@ -26,7 +26,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    private User getAuthenticatedUser() {
+    public User getAuthenticatedUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

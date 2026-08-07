@@ -1,7 +1,7 @@
 package com.application.Servease.user.dto;
 
-import com.application.Servease.entity.enums.UserRole;
-import com.application.Servease.entity.enums.UserStatus;
+import com.application.Servease.user.enums.UserRole;
+import com.application.Servease.user.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

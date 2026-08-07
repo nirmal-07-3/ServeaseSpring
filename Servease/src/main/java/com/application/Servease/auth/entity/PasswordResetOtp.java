@@ -1,6 +1,6 @@
 package com.application.Servease.auth.entity;
 
-import com.application.Servease.entity.User;
+import com.application.Servease.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

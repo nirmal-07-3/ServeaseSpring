@@ -1,9 +1,8 @@
 package com.application.Servease.auth.dto;
 
-import com.application.Servease.entity.enums.UserRole;
+import com.application.Servease.user.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;

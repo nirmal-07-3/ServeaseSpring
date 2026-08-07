@@ -1,6 +1,6 @@
 package com.application.Servease.security;
 
-import com.application.Servease.entity.enums.UserRole;
+import com.application.Servease.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

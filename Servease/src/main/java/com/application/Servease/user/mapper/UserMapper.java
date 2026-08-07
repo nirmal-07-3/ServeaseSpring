@@ -1,6 +1,6 @@
 package com.application.Servease.user.mapper;
 
-import com.application.Servease.entity.User;
+import com.application.Servease.user.entity.User;
 import com.application.Servease.user.dto.UserProfileResponse;
 import org.springframework.stereotype.Component;
 

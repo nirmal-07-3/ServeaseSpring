@@ -3,7 +3,6 @@ package com.application.Servease.config;
 import com.application.Servease.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,7 +38,25 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // Public
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/categories/**"
+                        ).permitAll()
+
+                        // Admin
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
+
+                        // Provider
+                        .requestMatchers("/api/providers/**")
+                        .hasAnyRole("PROVIDER", "ADMIN")
+
+                        // Customer
+                        .requestMatchers("/api/users/**")
+                        .hasAnyRole("CUSTOMER", "PROVIDER", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
 

@@ -31,4 +31,5 @@ public class VerifyOtpRequest {
 
     @NonNull
     private String otp;
+
 }
