@@ -42,7 +42,9 @@ public class SecurityConfig {
                         // Public
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/categories/**"
+                                "/api/categories/**",
+                                "/api/subcategories/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
 
                         // Admin

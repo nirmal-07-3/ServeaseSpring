@@ -112,4 +112,12 @@ public class CategoryServiceImpl implements CategoryService {
         return null;
     }
 
+    @Override
+    public Category getCategoryEntity(Long id) {
+
+        return categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException("Category not found."));
+    }
+
 }

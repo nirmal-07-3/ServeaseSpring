@@ -1,11 +1,14 @@
 package com.application.Servease.category.entity;
 
+import com.application.Servease.subcategory.entity.SubCategory;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -40,6 +43,16 @@ public class Category {
 
     @Builder.Default
     private Boolean active = true;
+
+    // One Category -> Many SubCategories
+    @OneToMany(
+            mappedBy = "category",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<SubCategory> subCategories = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

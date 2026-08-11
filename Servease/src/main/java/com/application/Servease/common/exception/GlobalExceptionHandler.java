@@ -60,6 +60,7 @@ public class GlobalExceptionHandler {
             DuplicatePhoneException.class,
             DuplicateDocumentException.class,
             CategoryAlreadyExistsException.class,
+            SubCategoryAlreadyExistsException.class,
             ProviderAlreadyExistsException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(
@@ -80,7 +81,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UserNotFoundException.class,
             ProviderNotFoundException.class,
-            CategoryNotFoundException.class
+            CategoryNotFoundException.class,
+            SubCategoryNotFoundException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleNotFound(
             RuntimeException ex) {

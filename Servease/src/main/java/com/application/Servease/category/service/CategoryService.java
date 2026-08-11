@@ -1,6 +1,7 @@
 package com.application.Servease.category.service;
 
 import com.application.Servease.category.dto.*;
+import com.application.Servease.category.entity.Category;
 
 import java.util.List;
 
@@ -17,4 +18,5 @@ public interface CategoryService {
     List<CategoryResponse> getAllCategories();
 
     CategoryResponse getCategoryById(Long id);
+    Category getCategoryEntity(Long id);
 }
