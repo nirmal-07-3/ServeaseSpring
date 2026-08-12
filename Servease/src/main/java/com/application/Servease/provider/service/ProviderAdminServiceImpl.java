@@ -7,6 +7,9 @@ import com.application.Servease.provider.enums.VerificationStatus;
 import com.application.Servease.provider.mapper.ProviderMapper;
 import com.application.Servease.provider.repository.ProviderProfileRepository;
 import com.application.Servease.provider.service.ProviderAdminService;
+import com.application.Servease.user.entity.User;
+import com.application.Servease.user.enums.UserStatus;
+import com.application.Servease.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,8 @@ public class ProviderAdminServiceImpl
     private final ProviderProfileRepository providerProfileRepository;
 
     private final ProviderMapper providerMapper;
+
+    private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -47,6 +52,12 @@ public class ProviderAdminServiceImpl
                 VerificationStatus.APPROVED
         );
 
+        User user = provider.getUser();
+
+        user.setStatus(UserStatus.ACTIVE);
+
+        userRepository.save(user);
+
         ProviderProfile saved =
                 providerProfileRepository.save(provider);
 
@@ -63,6 +74,12 @@ public class ProviderAdminServiceImpl
         provider.setVerificationStatus(
                 VerificationStatus.REJECTED
         );
+
+        User user = provider.getUser();
+
+        user.setStatus(UserStatus.BLOCKED);
+
+        userRepository.save(user);
 
         ProviderProfile saved =
                 providerProfileRepository.save(provider);

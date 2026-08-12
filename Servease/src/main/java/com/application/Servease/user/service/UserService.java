@@ -5,6 +5,7 @@ import com.application.Servease.common.exception.InvalidCredentialsException;
 import com.application.Servease.common.exception.PasswordMismatchException;
 import com.application.Servease.common.exception.UserNotFoundException;
 import com.application.Servease.user.entity.User;
+import com.application.Servease.user.enums.UserRole;
 import com.application.Servease.user.repository.UserRepository;
 import com.application.Servease.user.dto.ChangePasswordRequest;
 import com.application.Servease.user.dto.UpdateProfileRequest;
@@ -34,6 +35,13 @@ public class UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    public User updateRole(User user, UserRole role) {
+
+        user.setRole(role);
+
+        return userRepository.save(user);
     }
 
     public UserProfileResponse getCurrentUser() {

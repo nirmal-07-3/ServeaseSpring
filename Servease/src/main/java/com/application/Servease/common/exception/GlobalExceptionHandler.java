@@ -62,7 +62,8 @@ public class GlobalExceptionHandler {
             CategoryAlreadyExistsException.class,
             SubCategoryAlreadyExistsException.class,
             ProviderAlreadyExistsException.class,
-            ProviderServiceAlreadyExistsException.class
+            ProviderServiceAlreadyExistsException.class,
+            BookingConflictException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(
             RuntimeException ex) {
@@ -84,7 +85,8 @@ public class GlobalExceptionHandler {
             ProviderNotFoundException.class,
             CategoryNotFoundException.class,
             SubCategoryNotFoundException.class,
-            ProviderServiceNotFoundException.class
+            ProviderServiceNotFoundException.class,
+            BookingNotFoundException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleNotFound(
             RuntimeException ex) {
@@ -106,7 +108,8 @@ public class GlobalExceptionHandler {
             OtpExpiredException.class,
             OtpRequestTooFrequentException.class,
             PasswordMismatchException.class,
-            InvalidAvailabilityException.class
+            InvalidAvailabilityException.class,
+            InvalidBookingStatusException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(
             RuntimeException ex) {

@@ -18,13 +18,17 @@ import com.application.Servease.provider.repository.ProviderAvailabilityReposito
 import com.application.Servease.provider.repository.ProviderDocumentRepository;
 import com.application.Servease.provider.repository.ProviderProfileRepository;
 import com.application.Servease.user.entity.User;
+import com.application.Servease.user.enums.UserRole;
+import com.application.Servease.user.repository.UserRepository;
 import com.application.Servease.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +47,9 @@ public class ProviderServiceImpl implements ProviderService {
     private final ProviderAvailabilityMapper providerAvailabilityMapper;
 
     @Override
-    public ProviderProfileResponse becomeProvider(BecomeProviderRequest request) {
+    @Transactional
+    public ProviderProfileResponse becomeProvider(
+            BecomeProviderRequest request) {
 
         User user = userService.getAuthenticatedUser();
 
@@ -53,17 +59,31 @@ public class ProviderServiceImpl implements ProviderService {
             );
         }
 
-        ProviderProfile provider = providerMapper.toEntity(request);
+        ProviderProfile provider =
+                providerMapper.toEntity(request);
 
         provider.setUser(user);
-        provider.setVerificationStatus(VerificationStatus.PENDING);
+        provider.setVerificationStatus(
+                VerificationStatus.PENDING
+        );
         provider.setProfileCompleted(false);
         provider.setAverageRating(0.0);
         provider.setTotalReviews(0);
         provider.setTotalBookings(0);
         provider.setCountry("India");
 
-        ProviderProfile savedProvider = providerProfileRepository.save(provider);
+        // Change USER role from CUSTOMER to PROVIDER
+        user.setRole(UserRole.PROVIDER);
+
+        // Save updated user
+        userService.updateRole(
+                user,
+                UserRole.PROVIDER
+        );
+
+        // Save provider profile
+        ProviderProfile savedProvider =
+                providerProfileRepository.save(provider);
 
         return providerMapper.toResponse(savedProvider);
     }
@@ -199,4 +219,25 @@ public class ProviderServiceImpl implements ProviderService {
                 .map(providerAvailabilityMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public Optional<ProviderAvailability> findByProviderAndDayOfWeek(ProviderProfile provider, DayOfWeek dayOfWeek) {
+        return Optional.empty();
+    }
+
+
+    @Override
+
+    public Optional<ProviderAvailability> getAvailabilityForDay(
+            ProviderProfile provider,
+            DayOfWeek dayOfWeek) {
+
+        return providerAvailabilityRepository
+                .findByProviderAndDayOfWeek(
+                        provider,
+                        dayOfWeek
+                );
+    }
+
+
 }
