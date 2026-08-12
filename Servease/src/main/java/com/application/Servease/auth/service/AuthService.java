@@ -8,6 +8,9 @@ import com.application.Servease.auth.entity.PasswordResetOtp;
 import com.application.Servease.auth.repository.PasswordResetOtpRepository;
 import com.application.Servease.common.exception.*;
 import com.application.Servease.common.service.EmailService;
+import com.application.Servease.provider.entity.ProviderProfile;
+import com.application.Servease.provider.enums.VerificationStatus;
+import com.application.Servease.provider.repository.ProviderProfileRepository;
 import com.application.Servease.user.entity.User;
 import com.application.Servease.user.enums.UserRole;
 import com.application.Servease.user.enums.UserStatus;
@@ -35,6 +38,7 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final PasswordResetOtpRepository passwordResetOtpRepository;
+    private final ProviderProfileRepository providerProfileRepository;
 
     private final JwtService jwtService;
 
@@ -42,18 +46,23 @@ public class AuthService {
     private static final int OTP_RESEND_MINUTES = 1;
 
 
-    public AuthService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder, EmailService emailService, PasswordResetOtpRepository passwordResetOtpRepository,
-                       JwtService jwtService) {
-
+    public AuthService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            EmailService emailService,
+            PasswordResetOtpRepository passwordResetOtpRepository,
+            JwtService jwtService,
+            ProviderProfileRepository providerProfileRepository) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = (BCryptPasswordEncoder) passwordEncoder;
         this.emailService = emailService;
         this.passwordResetOtpRepository = passwordResetOtpRepository;
         this.jwtService = jwtService;
+        this.providerProfileRepository = providerProfileRepository;
     }
 
+    @Transactional
     public void register(RegisterRequest request) {
 
         // Check if email already exists
@@ -74,7 +83,9 @@ public class AuthService {
         user.setPhone(request.getPhone());
 
         // Encrypt password
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(
+                passwordEncoder.encode(request.getPassword())
+        );
 
         // Set role
         user.setRole(request.getRole());
@@ -89,11 +100,29 @@ public class AuthService {
         // Default values
         user.setEmailVerified(false);
         user.setPhoneVerified(false);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
 
-        // Save user
-        userRepository.save(user);
+        // Save user first
+        User savedUser = userRepository.save(user);
+
+        // If registered as PROVIDER,
+        // automatically create ProviderProfile
+        if (request.getRole() == UserRole.PROVIDER) {
+
+            ProviderProfile providerProfile =
+                    ProviderProfile.builder()
+                            .user(savedUser)
+                            .businessName(savedUser.getName())
+                            .profileCompleted(false)
+                            .verificationStatus(
+                                    VerificationStatus.PENDING
+                            )
+                            .averageRating(0.0)
+                            .totalReviews(0)
+                            .totalBookings(0)
+                            .build();
+
+            providerProfileRepository.save(providerProfile);
+        }
     }
 
 

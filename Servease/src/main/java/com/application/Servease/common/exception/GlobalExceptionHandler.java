@@ -61,7 +61,8 @@ public class GlobalExceptionHandler {
             DuplicateDocumentException.class,
             CategoryAlreadyExistsException.class,
             SubCategoryAlreadyExistsException.class,
-            ProviderAlreadyExistsException.class
+            ProviderAlreadyExistsException.class,
+            ProviderServiceAlreadyExistsException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(
             RuntimeException ex) {
@@ -82,7 +83,8 @@ public class GlobalExceptionHandler {
             UserNotFoundException.class,
             ProviderNotFoundException.class,
             CategoryNotFoundException.class,
-            SubCategoryNotFoundException.class
+            SubCategoryNotFoundException.class,
+            ProviderServiceNotFoundException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleNotFound(
             RuntimeException ex) {
@@ -134,5 +136,17 @@ public class GlobalExceptionHandler {
                         null
                 )
         );
+    }
+
+    @ExceptionHandler(ProviderNotApprovedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleProviderNotApproved(
+            ProviderNotApprovedException ex) {
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null
+                ));
     }
 }
