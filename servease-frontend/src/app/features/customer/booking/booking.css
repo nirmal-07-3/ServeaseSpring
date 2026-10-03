@@ -1,0 +1,853 @@
+.booking-page {
+
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 90% 5%,
+      rgba(59, 130, 246, 0.07),
+      transparent 28%
+    ),
+    #f7f9fc;
+
+  color: #172033;
+
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.booking-header {
+
+  background: #ffffff;
+
+  border-bottom:
+    1px solid rgba(15,23,42,0.06);
+
+}
+
+
+.header-inner {
+
+  width: min(1100px, 88%);
+
+  min-height: 72px;
+
+  margin: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+}
+
+
+.back-link {
+
+  color: #64748b;
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+}
+
+
+.back-link:hover {
+
+  color: #2563eb;
+
+}
+
+
+.brand {
+
+  color: #2563eb;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.18em;
+
+}
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.booking-content {
+
+  width: min(1100px, 88%);
+
+  margin: auto;
+
+  padding: 60px 0 100px;
+
+}
+
+
+.page-heading {
+
+  max-width: 700px;
+
+  margin-bottom: 38px;
+
+}
+
+
+.eyebrow {
+
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #2563eb;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.2em;
+
+}
+
+
+.page-heading h1 {
+
+  margin: 0;
+
+  color: #111827;
+
+  font-size: clamp(36px, 5vw, 52px);
+
+  line-height: 1.05;
+
+  letter-spacing: -0.045em;
+
+}
+
+
+.page-heading p {
+
+  margin: 17px 0 0;
+
+  color: #64748b;
+
+  line-height: 1.7;
+
+}
+
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+
+.booking-layout {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(300px, 0.75fr);
+
+  gap: 24px;
+
+  align-items: start;
+
+}
+
+
+.form-card,
+.summary-card {
+
+  background: #ffffff;
+
+  border:
+    1px solid rgba(15,23,42,0.07);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 12px 40px rgba(15,23,42,0.045);
+
+}
+
+
+.form-card {
+
+  padding: 34px;
+
+}
+
+
+.summary-card {
+
+  position: sticky;
+
+  top: 25px;
+
+  padding: 30px;
+
+}
+
+
+/* ============================================================
+   FORM SECTIONS
+============================================================ */
+
+.card-heading {
+
+  display: flex;
+
+  gap: 15px;
+
+  align-items: flex-start;
+
+  margin-bottom: 25px;
+
+}
+
+
+.card-heading > span {
+
+  color: #2563eb;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+
+}
+
+
+.card-heading h2 {
+
+  margin: 0 0 5px;
+
+  color: #172033;
+
+  font-size: 18px;
+
+}
+
+
+.card-heading p {
+
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+
+}
+
+
+.address-heading {
+
+  margin-top: 38px;
+
+}
+
+
+/* ============================================================
+   FORM
+============================================================ */
+
+.form-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 17px;
+
+}
+
+
+.field {
+
+  margin-bottom: 18px;
+
+}
+
+
+.field label {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+
+  color: #334155;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+}
+
+
+.field label span {
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+
+.field input,
+.field textarea {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border:
+    1px solid #dce2ea;
+
+  border-radius: 11px;
+
+  padding: 13px 14px;
+
+  background: #ffffff;
+
+  color: #172033;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+}
+
+
+.field textarea {
+
+  resize: vertical;
+
+  min-height: 90px;
+
+}
+
+
+.field input:focus,
+.field textarea:focus {
+
+  border-color: #60a5fa;
+
+  box-shadow:
+    0 0 0 4px rgba(37,99,235,0.08);
+
+}
+
+
+.field input::placeholder,
+.field textarea::placeholder {
+
+  color: #b0bac8;
+
+}
+
+
+/* ============================================================
+   SUBMIT
+============================================================ */
+
+.confirm-button {
+
+  width: 100%;
+
+  margin-top: 10px;
+
+  padding: 15px 20px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+}
+
+
+.confirm-button:hover:not(:disabled) {
+
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 25px rgba(37,99,235,0.20);
+
+}
+
+
+.confirm-button:disabled {
+
+  opacity: 0.65;
+
+  cursor: not-allowed;
+
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+.summary-label {
+
+  display: block;
+
+  margin-bottom: 20px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+
+}
+
+
+.summary-icon {
+
+  width: 62px;
+
+  height: 62px;
+
+  margin-bottom: 20px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #dbeafe
+    );
+
+  color: #2563eb;
+
+  font-size: 27px;
+
+}
+
+
+.provider {
+
+  color: #2563eb;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+}
+
+
+.summary-card h2 {
+
+  margin: 7px 0 10px;
+
+  color: #172033;
+
+  font-size: 21px;
+
+}
+
+
+.summary-card > p {
+
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+.summary-divider {
+
+  height: 1px;
+
+  margin: 24px 0;
+
+  background: #edf0f5;
+
+}
+
+
+.summary-row {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 13px;
+
+}
+
+
+.summary-row span {
+
+  color: #718096;
+
+  font-size: 12px;
+
+}
+
+
+.summary-row strong {
+
+  color: #172033;
+
+  font-size: 14px;
+
+}
+
+
+.trust {
+
+  display: flex;
+
+  gap: 12px;
+
+}
+
+
+.trust-icon {
+
+  width: 32px;
+
+  height: 32px;
+
+  flex-shrink: 0;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 9px;
+
+  background: #ecfdf5;
+
+  color: #059669;
+
+  font-weight: 800;
+
+}
+
+
+.trust strong {
+
+  color: #172033;
+
+  font-size: 13px;
+
+}
+
+
+.trust p {
+
+  margin: 3px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.form-error {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+
+  padding: 13px 15px;
+
+  border:
+    1px solid #fecaca;
+
+  border-radius: 11px;
+
+  background: #fef2f2;
+
+  color: #b91c1c;
+
+  font-size: 13px;
+
+}
+
+
+.form-error > span {
+
+  width: 20px;
+
+  height: 20px;
+
+  display: grid;
+
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #dc2626;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+.loading-state {
+
+  min-height: 500px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 16px;
+
+  color: #94a3b8;
+
+}
+
+
+.spinner {
+
+  width: 42px;
+
+  height: 42px;
+
+  border:
+    3px solid #dbeafe;
+
+  border-top-color: #2563eb;
+
+  border-radius: 50%;
+
+  animation:
+    spin 0.8s linear infinite;
+
+}
+
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* ============================================================
+   ERROR PAGE
+============================================================ */
+
+.error-state {
+
+  max-width: 500px;
+
+  margin: 80px auto;
+
+  padding: 45px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px solid #fee2e2;
+
+  border-radius: 22px;
+
+}
+
+
+.error-icon {
+
+  width: 52px;
+
+  height: 52px;
+
+  margin: 0 auto 18px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #fef2f2;
+
+  color: #dc2626;
+
+  font-weight: 800;
+
+}
+
+
+.error-state h2 {
+
+  margin: 0 0 8px;
+
+}
+
+
+.error-state p {
+
+  margin: 0 0 22px;
+
+  color: #64748b;
+
+}
+
+
+.error-state button {
+
+  padding: 11px 20px;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 800px) {
+
+  .booking-content {
+
+    width: 92%;
+
+  }
+
+
+  .booking-layout {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .summary-card {
+
+    position: static;
+
+  }
+
+}
+
+
+@media (max-width: 550px) {
+
+  .form-card,
+  .summary-card {
+
+    padding: 24px;
+
+    border-radius: 20px;
+
+  }
+
+
+  .form-grid {
+
+    grid-template-columns: 1fr;
+
+    gap: 0;
+
+  }
+
+
+  .page-heading h1 {
+
+    font-size: 38px;
+
+  }
+
+}

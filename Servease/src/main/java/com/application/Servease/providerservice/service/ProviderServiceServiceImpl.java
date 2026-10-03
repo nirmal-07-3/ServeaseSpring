@@ -212,9 +212,7 @@ public class ProviderServiceServiceImpl
                                         "Provider service not found."
                                 ));
 
-        providerService.setActive(false);
-
-        providerServiceRepository.save(providerService);
+        providerServiceRepository.delete(providerService);
     }
 
     @Override

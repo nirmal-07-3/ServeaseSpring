@@ -1,0 +1,88 @@
+<div class="app-shell">
+
+  <!-- Mobile overlay -->
+  <div
+    class="sidebar-overlay"
+    [class.visible]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+
+  <!-- Sidebar -->
+  <app-sidebar
+    [isOpen]="sidebarOpen"
+    (close)="closeSidebar()"
+  ></app-sidebar>
+
+
+  <!-- Main area -->
+  <div class="main-area">
+
+    <!-- Top bar -->
+    <header class="topbar">
+
+      <button
+        class="menu-button"
+        type="button"
+        (click)="toggleSidebar()"
+        aria-label="Open navigation"
+      >
+        ☰
+      </button>
+
+
+      <div class="topbar-spacer"></div>
+
+
+      <!-- Notification -->
+      <button
+        class="icon-button"
+        type="button"
+        aria-label="Notifications"
+      >
+        <span>♧</span>
+        <span class="notification-dot"></span>
+      </button>
+
+
+      <!-- User -->
+      <button
+        class="user-button"
+        type="button"
+      >
+
+        <div class="avatar">
+          U
+        </div>
+
+        <div class="user-info">
+
+          <span class="user-name">
+            User
+          </span>
+
+          <span class="user-role">
+            Account
+          </span>
+
+        </div>
+
+        <span class="chevron">
+          ˅
+        </span>
+
+      </button>
+
+    </header>
+
+
+    <!-- Page content -->
+    <main class="page-content">
+
+      <router-outlet></router-outlet>
+
+    </main>
+
+  </div>
+
+</div>

@@ -1,0 +1,343 @@
+<div class="auth-page">
+
+  <!-- LEFT BRAND PANEL -->
+  <section class="brand-panel">
+
+    <div class="brand-logo">
+      <div class="logo-mark">S</div>
+      <span>Servease</span>
+    </div>
+
+    <div class="brand-content">
+
+      <div class="eyebrow">
+        YOUR SERVICES. SIMPLIFIED.
+      </div>
+
+      <h1>
+        Find trusted
+        <br>
+        professionals
+        <br>
+        <span>for every need.</span>
+      </h1>
+
+      <p>
+        Discover reliable local service providers,
+        compare your options and book the right
+        professional with confidence.
+      </p>
+
+      <div class="benefits">
+
+        <div class="benefit">
+          <span class="benefit-icon">✓</span>
+          <span>Verified service providers</span>
+        </div>
+
+        <div class="benefit">
+          <span class="benefit-icon">✓</span>
+          <span>Simple and secure booking</span>
+        </div>
+
+        <div class="benefit">
+          <span class="benefit-icon">✓</span>
+          <span>Reliable local services</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="decor decor-one"></div>
+    <div class="decor decor-two"></div>
+
+  </section>
+
+
+  <!-- RIGHT FORM PANEL -->
+  <section class="form-panel">
+
+    <div class="form-container">
+
+      <div class="form-header">
+
+        <h2>Create your account</h2>
+
+        <p>
+          Join Servease and get started today.
+        </p>
+
+      </div>
+
+
+      <!-- ERROR -->
+      <div
+        class="alert error-alert"
+        *ngIf="errorMessage"
+      >
+        <span class="alert-icon">!</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+
+      <!-- SUCCESS -->
+      <div
+        class="alert success-alert"
+        *ngIf="successMessage"
+      >
+        <span class="alert-icon">✓</span>
+        <span>{{ successMessage }}</span>
+      </div>
+
+
+      <form
+        class="register-form"
+        (ngSubmit)="register()"
+        #registerForm="ngForm"
+      >
+
+        <!-- NAME -->
+        <div class="form-group">
+
+          <label for="name">
+            Full name
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              ◯
+            </span>
+
+            <input
+              id="name"
+              type="text"
+              name="name"
+              [(ngModel)]="name"
+              placeholder="Enter your full name"
+              autocomplete="name"
+              required
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- EMAIL -->
+        <div class="form-group">
+
+          <label for="email">
+            Email address
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              @
+            </span>
+
+            <input
+              id="email"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- PHONE -->
+        <div class="form-group">
+
+          <label for="phone">
+            Phone number
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              ☎
+            </span>
+
+            <input
+              id="phone"
+              type="tel"
+              name="phone"
+              [(ngModel)]="phone"
+              placeholder="10-digit phone number"
+              maxlength="10"
+              autocomplete="tel"
+              required
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- ACCOUNT TYPE -->
+        <div class="form-group">
+
+          <label for="role">
+            Account type
+          </label>
+
+          <div class="input-wrapper select-wrapper">
+
+            <span class="input-icon">
+              ◉
+            </span>
+
+            <select
+              id="role"
+              name="role"
+              [(ngModel)]="role"
+              required
+            >
+              <option value="CUSTOMER">
+                Customer
+              </option>
+
+              <option value="PROVIDER">
+                Service Provider
+              </option>
+            </select>
+
+            <span class="select-arrow">
+              ▾
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- PASSWORD -->
+        <div class="form-group">
+
+          <label for="password">
+            Password
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              •
+            </span>
+
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Create a password"
+              autocomplete="new-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="show-button"
+              (click)="togglePassword()"
+            >
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- CONFIRM PASSWORD -->
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm password
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              •
+            </span>
+
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="show-button"
+              (click)="toggleConfirmPassword()"
+            >
+              {{ showConfirmPassword ? 'Hide' : 'Show' }}
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- REGISTER BUTTON -->
+        <button
+          type="submit"
+          class="register-button"
+          [disabled]="loading"
+        >
+
+          <span *ngIf="!loading">
+            Create account
+          </span>
+
+          <span
+            *ngIf="loading"
+            class="button-loading"
+          >
+            <span class="spinner"></span>
+            Creating account...
+          </span>
+
+        </button>
+
+      </form>
+
+
+      <!-- LOGIN LINK -->
+      <div class="login-link">
+
+        <span>
+          Already have an account?
+        </span>
+
+        <a routerLink="/login">
+          Sign in
+        </a>
+
+      </div>
+
+
+      <div class="terms">
+
+        By creating an account, you agree to
+        Servease's terms and conditions.
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>

@@ -1,0 +1,605 @@
+<div class="verification-page">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+
+  <div class="page-header">
+
+    <div class="header-left">
+
+      <a
+        routerLink="/provider/dashboard"
+        class="back-link"
+      >
+        <span class="back-icon">←</span>
+
+        Back to dashboard
+      </a>
+
+
+      <div class="title-block">
+
+        <div class="title-icon">
+          ✓
+        </div>
+
+        <div>
+
+          <h1>Verification</h1>
+
+          <p>
+            Submit and manage your business verification documents.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="refreshDocuments()"
+      [disabled]="loading || uploading"
+    >
+
+      <span
+        class="refresh-icon"
+        [class.spinning]="loading"
+      >
+        ↻
+      </span>
+
+      Refresh
+
+    </button>
+
+  </div>
+
+
+  <!-- ============================================================
+       MESSAGES
+  ============================================================ -->
+
+  <div
+    *ngIf="successMessage"
+    class="message success-message"
+  >
+
+    <span class="message-icon">✓</span>
+
+    <span>{{ successMessage }}</span>
+
+  </div>
+
+
+  <div
+    *ngIf="errorMessage"
+    class="message error-message"
+  >
+
+    <span class="message-icon">!</span>
+
+    <span>{{ errorMessage }}</span>
+
+  </div>
+
+
+  <!-- ============================================================
+       SUMMARY
+  ============================================================ -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        📄
+      </div>
+
+      <div>
+
+        <span class="summary-label">
+          Total documents
+        </span>
+
+        <strong>
+          {{ documents.length }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon verified-icon">
+        ✓
+      </div>
+
+      <div>
+
+        <span class="summary-label">
+          Verified
+        </span>
+
+        <strong>
+          {{ verifiedCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon pending-icon">
+        ◷
+      </div>
+
+      <div>
+
+        <span class="summary-label">
+          Pending review
+        </span>
+
+        <strong>
+          {{ pendingCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+
+  <div class="content-grid">
+
+
+    <!-- ==========================================================
+         EXISTING DOCUMENTS
+    =========================================================== -->
+
+    <section class="documents-section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>Your documents</h2>
+
+          <p>
+            Documents you have already submitted.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Loading -->
+
+      <div
+        *ngIf="loading"
+        class="loading-state"
+      >
+
+        <div class="spinner"></div>
+
+        <p>
+          Loading your documents...
+        </p>
+
+      </div>
+
+
+      <!-- Documents -->
+
+      <div
+        *ngIf="!loading && documents.length > 0"
+        class="documents-list"
+      >
+
+        <article
+          class="document-card"
+          *ngFor="let document of documents"
+        >
+
+          <div class="document-main">
+
+            <div class="document-icon">
+
+              <span
+                *ngIf="document.documentType === 'AADHAR'"
+              >
+                A
+              </span>
+
+              <span
+                *ngIf="document.documentType === 'PAN'"
+              >
+                P
+              </span>
+
+              <span
+                *ngIf="document.documentType === 'GST'"
+              >
+                G
+              </span>
+
+              <span
+                *ngIf="document.documentType === 'SHOP_LICENSE'"
+              >
+                S
+              </span>
+
+              <span
+                *ngIf="document.documentType === 'OTHER'"
+              >
+                D
+              </span>
+
+            </div>
+
+
+            <div class="document-info">
+
+              <div class="document-title-row">
+
+                <h3>
+                  {{ getDocumentLabel(document.documentType) }}
+                </h3>
+
+
+                <span
+                  class="status-badge"
+                  [class.verified]="document.verified"
+                  [class.pending]="!document.verified"
+                >
+
+                  <span class="status-dot"></span>
+
+                  {{ getDocumentStatus(document) }}
+
+                </span>
+
+              </div>
+
+
+              <p class="document-number">
+
+                {{ maskDocumentNumber(document.documentNumber) }}
+
+              </p>
+
+
+              <p class="uploaded-date">
+
+                Uploaded
+                {{ formatDate(document.uploadedAt) }}
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="view-button"
+            (click)="viewDocument(document)"
+          >
+
+            View
+
+            <span>↗</span>
+
+          </button>
+
+        </article>
+
+      </div>
+
+
+      <!-- Empty -->
+
+      <div
+        *ngIf="!loading && documents.length === 0"
+        class="empty-state"
+      >
+
+        <div class="empty-icon">
+          📄
+        </div>
+
+        <h3>
+          No documents submitted
+        </h3>
+
+        <p>
+          Upload your verification documents to complete your provider profile.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================
+         UPLOAD SECTION
+    =========================================================== -->
+
+    <section class="upload-section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>Upload document</h2>
+
+          <p>
+            Add a new verification document.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="upload-form">
+
+
+        <!-- ======================================================
+             DOCUMENT TYPE
+        ======================================================= -->
+
+        <div class="form-group">
+
+          <label for="documentType">
+            Document type
+          </label>
+
+          <select
+            id="documentType"
+            [(ngModel)]="selectedDocumentType"
+            (ngModelChange)="onDocumentTypeChange()"
+            [disabled]="uploading"
+          >
+
+            <option
+              *ngFor="let type of documentTypes"
+              [value]="type.value"
+              [disabled]="hasDocumentType(type.value)"
+            >
+
+              {{ type.label }}
+
+              <span
+                *ngIf="hasDocumentType(type.value)"
+              >
+                — Already uploaded
+              </span>
+
+            </option>
+
+          </select>
+
+
+          <div
+            *ngIf="selectedTypeAlreadyUploaded()"
+            class="field-warning"
+          >
+
+            <span>!</span>
+
+            You have already uploaded this document type.
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================================
+             DOCUMENT NUMBER
+        ======================================================= -->
+
+        <div class="form-group">
+
+          <label for="documentNumber">
+            Document number
+          </label>
+
+          <input
+            id="documentNumber"
+            type="text"
+            [(ngModel)]="documentNumber"
+            placeholder="Enter document number"
+            autocomplete="off"
+            [disabled]="
+              uploading ||
+              selectedTypeAlreadyUploaded()
+            "
+          />
+
+          <span class="field-hint">
+
+            Enter the number exactly as shown on your document.
+
+          </span>
+
+        </div>
+
+
+        <!-- ======================================================
+             FILE
+        ======================================================= -->
+
+        <div class="form-group">
+
+          <label>
+            Document file
+          </label>
+
+
+          <label
+            for="documentFile"
+            class="file-upload"
+            [class.disabled]="
+              uploading ||
+              selectedTypeAlreadyUploaded()
+            "
+          >
+
+            <div class="file-upload-icon">
+              ↑
+            </div>
+
+
+            <div class="file-upload-content">
+
+              <strong
+                *ngIf="!selectedFileName"
+              >
+                Choose a file
+              </strong>
+
+              <strong
+                *ngIf="selectedFileName"
+                class="selected-file"
+              >
+                {{ selectedFileName }}
+              </strong>
+
+
+              <span>
+                PDF, JPG, JPEG or PNG · Max 5 MB
+              </span>
+
+            </div>
+
+
+            <span class="browse-button">
+              Browse
+            </span>
+
+          </label>
+
+
+          <input
+            id="documentFile"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            (change)="onFileSelected($event)"
+            [disabled]="
+              uploading ||
+              selectedTypeAlreadyUploaded()
+            "
+            hidden
+          />
+
+        </div>
+
+
+        <!-- ======================================================
+             UPLOAD BUTTON
+        ======================================================= -->
+
+        <button
+          type="button"
+          class="upload-button"
+          (click)="uploadDocument()"
+          [disabled]="
+            uploading ||
+            loading ||
+            selectedTypeAlreadyUploaded()
+          "
+        >
+
+          <span
+            *ngIf="uploading"
+            class="button-spinner"
+          ></span>
+
+          <span
+            *ngIf="!uploading"
+          >
+            Upload document
+          </span>
+
+          <span
+            *ngIf="uploading"
+          >
+            Uploading...
+          </span>
+
+        </button>
+
+
+        <!-- ======================================================
+             SECURITY NOTE
+        ======================================================= -->
+
+        <div class="security-note">
+
+          <span class="security-icon">
+            🔒
+          </span>
+
+          <div>
+
+            <strong>
+              Your documents are protected
+            </strong>
+
+            <p>
+              Documents are submitted securely for provider verification.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ============================================================
+       INFORMATION
+  ============================================================ -->
+
+  <div class="verification-info">
+
+    <div class="info-icon">
+      i
+    </div>
+
+    <div>
+
+      <h3>About document verification</h3>
+
+      <p>
+        Submitted documents are reviewed as part of the provider
+        verification process. A document marked as
+        <strong>Pending review</strong> has been uploaded successfully
+        but has not yet been individually verified.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

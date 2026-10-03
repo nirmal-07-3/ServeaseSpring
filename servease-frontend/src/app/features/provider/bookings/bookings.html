@@ -1,0 +1,566 @@
+<div class="provider-bookings">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+
+  <header class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/provider/dashboard"
+        class="back-link"
+      >
+        ← Dashboard
+      </a>
+
+      <span class="eyebrow">
+        PROVIDER PORTAL
+      </span>
+
+      <h1>Bookings</h1>
+
+      <p>
+        Manage your customer bookings and appointments.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading || actionLoading"
+      (click)="refreshBookings()"
+    >
+      ↻ Refresh
+    </button>
+
+  </header>
+
+
+  <!-- ============================================================
+       SUCCESS
+  ============================================================ -->
+
+  <div
+    *ngIf="successMessage"
+    class="alert success-alert"
+  >
+
+    <span class="alert-icon">✓</span>
+
+    <span>{{ successMessage }}</span>
+
+    <button
+      type="button"
+      class="alert-close"
+      (click)="successMessage = ''"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <!-- ============================================================
+       ERROR
+  ============================================================ -->
+
+  <div
+    *ngIf="errorMessage"
+    class="alert error-alert"
+  >
+
+    <span class="alert-icon">!</span>
+
+    <span>{{ errorMessage }}</span>
+
+    <button
+      type="button"
+      class="alert-close"
+      (click)="errorMessage = ''"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <!-- ============================================================
+       STATISTICS
+  ============================================================ -->
+
+  <section class="stats-grid">
+
+    <article class="stat-card">
+
+      <span class="stat-label">
+        Total bookings
+      </span>
+
+      <strong>
+        {{ totalBookings }}
+      </strong>
+
+    </article>
+
+
+    <article class="stat-card">
+
+      <span class="stat-label">
+        Pending
+      </span>
+
+      <strong>
+        {{ pendingBookings }}
+      </strong>
+
+    </article>
+
+
+    <article class="stat-card">
+
+      <span class="stat-label">
+        Accepted
+      </span>
+
+      <strong>
+        {{ acceptedBookings }}
+      </strong>
+
+    </article>
+
+
+    <article class="stat-card">
+
+      <span class="stat-label">
+        Completed
+      </span>
+
+      <strong>
+        {{ completedBookings }}
+      </strong>
+
+    </article>
+
+  </section>
+
+
+  <!-- ============================================================
+       MAIN CARD
+  ============================================================ -->
+
+  <section class="bookings-card">
+
+    <div class="card-header">
+
+      <div>
+
+        <span class="section-label">
+          CUSTOMER BOOKINGS
+        </span>
+
+        <h2>
+          Your bookings
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         LOADING
+    ============================================================ -->
+
+    <div
+      *ngIf="loading"
+      class="loading-state"
+    >
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading bookings...
+      </p>
+
+    </div>
+
+
+    <!-- ============================================================
+         EMPTY
+    ============================================================ -->
+
+    <div
+      *ngIf="!loading && bookings.length === 0"
+      class="empty-state"
+    >
+
+      <div class="empty-icon">
+        ▣
+      </div>
+
+      <h3>
+        No bookings yet
+      </h3>
+
+      <p>
+        Customer bookings will appear here when someone books one of your services.
+      </p>
+
+    </div>
+
+
+    <!-- ============================================================
+         BOOKINGS
+    ============================================================ -->
+
+    <div
+      *ngIf="!loading && bookings.length > 0"
+      class="bookings-list"
+    >
+
+      <article
+        class="booking-card"
+        *ngFor="let booking of bookings"
+      >
+
+        <!-- TOP -->
+
+        <div class="booking-top">
+
+          <div>
+
+            <span class="booking-id">
+              Booking #{{ booking.id }}
+            </span>
+
+            <h3>
+              {{ booking.serviceTitle }}
+            </h3>
+
+            <p class="subcategory">
+              {{ booking.subCategoryName }}
+            </p>
+
+          </div>
+
+
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(booking.status)"
+          >
+            {{ getStatusLabel(booking.status) }}
+          </span>
+
+        </div>
+
+
+        <!-- DETAILS -->
+
+        <div class="booking-details">
+
+          <div class="detail-item">
+
+            <span class="detail-label">
+              Date
+            </span>
+
+            <strong>
+              {{ formatDate(booking.bookingDate) }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span class="detail-label">
+              Time
+            </span>
+
+            <strong>
+              {{ formatTime(booking.bookingTime) }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span class="detail-label">
+              Amount
+            </span>
+
+            <strong>
+              ₹{{ formatPrice(booking.agreedPrice) }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span class="detail-label">
+              Customer ID
+            </span>
+
+            <strong>
+              #{{ booking.customerId }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- ADDRESS -->
+
+        <div class="booking-address">
+
+          <span class="detail-label">
+            Service location
+          </span>
+
+          <p>
+            {{ booking.address }},
+            {{ booking.city }},
+            {{ booking.state }}
+            - {{ booking.pincode }}
+          </p>
+
+        </div>
+
+
+        <!-- NOTE -->
+
+        <div
+          *ngIf="booking.customerNote"
+          class="customer-note"
+        >
+
+          <span class="detail-label">
+            Customer note
+          </span>
+
+          <p>
+            {{ booking.customerNote }}
+          </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="booking-actions">
+
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="viewBooking(booking)"
+          >
+            View details
+          </button>
+
+
+          <button
+            *ngIf="canReject(booking)"
+            type="button"
+            class="danger-button"
+            [disabled]="actionLoading"
+            (click)="rejectBooking(booking)"
+          >
+            Reject
+          </button>
+
+
+          <button
+            *ngIf="canAccept(booking)"
+            type="button"
+            class="primary-button"
+            [disabled]="actionLoading"
+            (click)="acceptBooking(booking)"
+          >
+            Accept
+          </button>
+
+
+          <button
+            *ngIf="canStart(booking)"
+            type="button"
+            class="primary-button"
+            [disabled]="actionLoading"
+            (click)="startBooking(booking)"
+          >
+            Start service
+          </button>
+
+
+          <button
+            *ngIf="canComplete(booking)"
+            type="button"
+            class="primary-button"
+            [disabled]="actionLoading"
+            (click)="completeBooking(booking)"
+          >
+            Complete
+          </button>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       DETAILS MODAL
+  ============================================================ -->
+
+  <div
+    *ngIf="selectedBooking"
+    class="modal-backdrop"
+    (click)="closeBooking()"
+  >
+
+    <div
+      class="details-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="modal-header">
+
+        <div>
+
+          <span class="section-label">
+            BOOKING DETAILS
+          </span>
+
+          <h2>
+            Booking #{{ selectedBooking.id }}
+          </h2>
+
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeBooking()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="modal-status">
+
+        <span
+          class="status-badge"
+          [ngClass]="getStatusClass(selectedBooking.status)"
+        >
+          {{ getStatusLabel(selectedBooking.status) }}
+        </span>
+
+      </div>
+
+
+      <div class="modal-details">
+
+        <div>
+          <span>Service</span>
+          <strong>
+            {{ selectedBooking.serviceTitle }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Category</span>
+          <strong>
+            {{ selectedBooking.subCategoryName }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Date</span>
+          <strong>
+            {{ formatDate(selectedBooking.bookingDate) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Time</span>
+          <strong>
+            {{ formatTime(selectedBooking.bookingTime) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Agreed price</span>
+          <strong>
+            ₹{{ formatPrice(selectedBooking.agreedPrice) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Customer ID</span>
+          <strong>
+            #{{ selectedBooking.customerId }}
+          </strong>
+        </div>
+
+      </div>
+
+
+      <div class="modal-section">
+
+        <span class="detail-label">
+          Service location
+        </span>
+
+        <p>
+          {{ selectedBooking.address }},
+          {{ selectedBooking.city }},
+          {{ selectedBooking.state }}
+          - {{ selectedBooking.pincode }}
+        </p>
+
+      </div>
+
+
+      <div
+        *ngIf="selectedBooking.customerNote"
+        class="modal-section"
+      >
+
+        <span class="detail-label">
+          Customer note
+        </span>
+
+        <p>
+          {{ selectedBooking.customerNote }}
+        </p>
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="closeBooking()"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

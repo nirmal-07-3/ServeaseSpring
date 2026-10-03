@@ -5,11 +5,14 @@ import com.application.Servease.category.dto.CreateCategoryRequest;
 import com.application.Servease.category.dto.UpdateCategoryRequest;
 import com.application.Servease.category.service.CategoryService;
 import com.application.Servease.common.dto.ApiResponse;
+import com.application.Servease.common.storage.StorageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ import java.util.List;
 public class AdminCategoryController {
 
     private final CategoryService categoryService;
+    private final StorageService storageService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryResponse>>
@@ -128,6 +132,25 @@ public class AdminCategoryController {
                         "Category fetched successfully.",
 
                         response
+                )
+        );
+    }
+
+    @PostMapping(
+            value = "/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ApiResponse<String>> uploadCategoryImage(
+            @RequestParam("file") MultipartFile file) {
+
+        String imagePath =
+                storageService.uploadFile(file, "categories");
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Category image uploaded successfully.",
+                        imagePath
                 )
         );
     }

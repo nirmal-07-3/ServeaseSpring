@@ -1,0 +1,652 @@
+/* ================================
+   MY BOOKINGS PAGE
+================================ */
+
+.bookings-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 24px 70px;
+  color: #111827;
+}
+
+
+/* ================================
+   PAGE HEADER
+================================ */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+.page-header p {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+
+/* ================================
+   BUTTONS
+================================ */
+
+.refresh-btn,
+.primary-btn,
+.secondary-btn,
+.cancel-btn {
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 17px;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.refresh-btn:hover {
+  background: #e5e7eb;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.refresh-btn span {
+  font-size: 17px;
+}
+
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  background: #111827;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.primary-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  background: #f3f4f6;
+  color: #111827;
+  text-decoration: none;
+}
+
+.secondary-btn:hover {
+  background: #e5e7eb;
+}
+
+
+.cancel-btn {
+  padding: 11px 18px;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.cancel-btn:hover {
+  background: #ffe4e6;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ================================
+   STATE CARDS
+================================ */
+
+.state-card {
+  padding: 65px 25px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+}
+
+.state-card h3 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+}
+
+.state-card p {
+  max-width: 480px;
+  margin: 0 auto 22px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+
+/* ================================
+   LOADING
+================================ */
+
+.spinner {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto;
+
+  border: 4px solid #e5e7eb;
+  border-top-color: #111827;
+
+  border-radius: 50%;
+
+  animation: bookings-spin 0.8s linear infinite;
+}
+
+@keyframes bookings-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ================================
+   EMPTY / ERROR
+================================ */
+
+.empty-icon,
+.state-icon {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f3f4f6;
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.error-state .state-icon {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+
+/* ================================
+   BOOKING LIST
+================================ */
+
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* ================================
+   BOOKING CARD
+================================ */
+
+.booking-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  padding: 26px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.booking-card:hover {
+  border-color: #d1d5db;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.06);
+
+  transform: translateY(-1px);
+}
+
+
+/* ================================
+   BOOKING HEADER
+================================ */
+
+.booking-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.booking-heading {
+  min-width: 0;
+}
+
+.booking-id {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.booking-top h2 {
+  margin: 0;
+
+  font-size: 21px;
+  line-height: 1.3;
+
+  font-weight: 750;
+}
+
+.provider {
+  margin: 6px 0 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+
+/* ================================
+   STATUS BADGES
+================================ */
+
+.status-badge {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px 12px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+
+/* Pending */
+
+.status-badge.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+
+/* Accepted */
+
+.status-badge.accepted {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+
+/* In Progress */
+
+.status-badge.in-progress {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+
+/* Completed */
+
+.status-badge.completed {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+
+/* Rejected */
+
+.status-badge.rejected {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+
+/* Cancelled */
+
+.status-badge.cancelled {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+
+/* ================================
+   BOOKING INFORMATION
+================================ */
+
+.booking-info {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin: 26px 0;
+
+  padding: 20px 0;
+
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.info-label {
+  color: #9ca3af;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+.info-item strong {
+  color: #111827;
+
+  font-size: 14px;
+  font-weight: 650;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ================================
+   BOOKING TRACKING
+================================ */
+
+.tracking {
+  margin-top: 22px;
+}
+
+.tracking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.tracking-header h3 {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.details-link {
+  color: #111827;
+
+  font-size: 13px;
+  font-weight: 650;
+
+  text-decoration: none;
+}
+
+.details-link:hover {
+  text-decoration: underline;
+}
+
+
+/* ================================
+   TIMELINE
+================================ */
+
+.timeline {
+  display: flex;
+  align-items: flex-start;
+
+  width: 100%;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 100px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+  font-weight: 650;
+
+  text-align: center;
+}
+
+.timeline-step.completed {
+  color: #111827;
+}
+
+.timeline-dot {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f3f4f6;
+  color: #9ca3af;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  border: 2px solid #e5e7eb;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.timeline-step.completed .timeline-dot {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.timeline-line {
+  flex: 1;
+
+  min-width: 20px;
+
+  height: 2px;
+
+  margin-top: 14px;
+
+  background: #e5e7eb;
+
+  transition: background 0.2s ease;
+}
+
+.timeline-line.active {
+  background: #111827;
+}
+
+
+/* ================================
+   REJECTED / CANCELLED
+================================ */
+
+.special-status {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding: 15px 16px;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+}
+
+.special-status strong {
+  font-size: 14px;
+}
+
+.special-status span {
+  line-height: 1.5;
+}
+
+.rejected-message {
+  background: #fff1f2;
+  color: #9f1239;
+}
+
+.cancelled-message {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+
+/* ================================
+   ACTIONS
+================================ */
+
+.booking-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 850px) {
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .booking-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 620px) {
+
+  .bookings-page {
+    padding: 25px 15px 50px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .booking-card {
+    padding: 20px;
+  }
+
+  .booking-top {
+    flex-direction: column;
+  }
+
+  .status-badge {
+    align-self: flex-start;
+  }
+
+  .booking-info {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tracking {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .timeline {
+    min-width: 520px;
+  }
+
+  .timeline-step {
+    min-width: 100px;
+  }
+
+  .booking-actions {
+    flex-direction: column;
+  }
+
+  .secondary-btn,
+  .cancel-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+}

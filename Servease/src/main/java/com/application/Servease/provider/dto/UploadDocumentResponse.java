@@ -1,28 +1,28 @@
-package com.application.Servease.provider.dto;
+    package com.application.Servease.provider.dto;
 
-import com.application.Servease.provider.enums.DocumentType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+    import com.application.Servease.provider.enums.DocumentType;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+    import java.time.LocalDateTime;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class UploadDocumentResponse {
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class UploadDocumentResponse {
 
-    private Long id;
+        private Long id;
 
-    private DocumentType documentType;
+        private DocumentType documentType;
 
-    private String documentNumber;
+        private String documentNumber;
 
-    private String documentUrl;
+        private String documentUrl;
 
-    private Boolean verified;
+        private Boolean verified;
 
-    private LocalDateTime uploadedAt;
-}
+        private LocalDateTime uploadedAt;
+    }

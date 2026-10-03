@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Servease - Login</title>
+
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <h1>Servease</h1>
+        </div>
+
+        <div class="auth-header">
+            <h2>Welcome Back 👋</h2>
+            <p>Login to continue to Servease</p>
+        </div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label for="email">Email</label>
+
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                >
+            </div>
+
+            <div class="form-group">
+
+                <div class="label-row">
+                    <label for="password">Password</label>
+
+                    <a href="/forgot-password.html">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                >
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <button
+                    type="submit"
+                    id="loginButton"
+                    class="primary-button">
+                Login
+            </button>
+
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <p class="register-text">
+            Don't have an account?
+            <a href="/register.html">Create Account</a>
+        </p>
+
+    </div>
+
+</div>
+
+<script src="/js/auth.js"></script>
+
+</body>
+</html>

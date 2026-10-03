@@ -1,0 +1,295 @@
+<div class="details-page">
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <a
+        class="back-link"
+        [routerLink]="[
+          '/services',
+          categoryId,
+          subCategoryId
+        ]"
+      >
+        ← Back to services
+      </a>
+
+
+      <span class="eyebrow">
+        SERVEASE
+      </span>
+
+
+      <h1 *ngIf="service">
+        {{ service.title }}
+      </h1>
+
+
+      <p *ngIf="service">
+        Professional service from
+        {{ service.providerBusinessName }}
+      </p>
+
+    </div>
+
+
+    <div class="hero-decoration">
+      ✦
+    </div>
+
+  </section>
+
+
+  <!-- LOADING -->
+
+  <div
+    class="loading-state"
+    *ngIf="loading"
+  >
+
+    <div class="spinner"></div>
+
+    <p>
+      Loading service details...
+    </p>
+
+  </div>
+
+
+  <!-- ERROR -->
+
+  <div
+    class="error-state"
+    *ngIf="!loading && error"
+  >
+
+    <div class="error-icon">
+      !
+    </div>
+
+
+    <h3>
+      Unable to load service
+    </h3>
+
+
+    <p>
+      {{ error }}
+    </p>
+
+
+    <button
+      type="button"
+      (click)="retry()"
+    >
+      Try again
+    </button>
+
+  </div>
+
+
+  <!-- DETAILS -->
+
+  <main
+    class="details-content"
+    *ngIf="
+      !loading &&
+      !error &&
+      service
+    "
+  >
+
+    <section class="service-panel">
+
+      <!-- SERVICE IDENTITY -->
+
+      <div class="identity">
+
+        <div class="service-icon">
+          ϟ
+        </div>
+
+
+        <div>
+
+          <span class="provider">
+            {{ service.providerBusinessName }}
+          </span>
+
+
+          <h2>
+            {{ service.title }}
+          </h2>
+
+
+          <p>
+            {{ service.description }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- PRICE -->
+
+      <div class="price-box">
+
+        <span>
+          Starting price
+        </span>
+
+        <strong>
+          ₹{{ formatPrice(service.basePrice) }}
+        </strong>
+
+      </div>
+
+
+      <!-- FEATURES -->
+
+      <div class="feature-grid">
+
+        <div class="feature">
+
+          <span class="feature-icon">
+            ◷
+          </span>
+
+          <div>
+
+            <span>
+              Estimated duration
+            </span>
+
+            <strong>
+              {{ formatDuration(
+              service.estimatedDurationMinutes
+              ) }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="feature">
+
+          <span class="feature-icon">
+            ◎
+          </span>
+
+          <div>
+
+            <span>
+              Service area
+            </span>
+
+            <strong>
+              {{ formatRadius(
+              service.serviceRadiusKm
+              ) }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="feature">
+
+          <span class="feature-icon">
+            ✓
+          </span>
+
+          <div>
+
+            <span>
+              Availability
+            </span>
+
+            <strong>
+              Available
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PROVIDER -->
+
+      <div class="provider-section">
+
+        <span class="section-label">
+          SERVICE PROVIDER
+        </span>
+
+
+        <div class="provider-card">
+
+          <div class="provider-avatar">
+            {{ service.providerBusinessName.charAt(0) }}
+          </div>
+
+
+          <div>
+
+            <strong>
+              {{ service.providerBusinessName }}
+            </strong>
+
+            <p>
+              Professional service provider
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTION -->
+
+      <div class="booking-action">
+
+        <div>
+
+          <span>
+            Ready to book?
+          </span>
+
+          <strong>
+            Schedule this service
+          </strong>
+
+        </div>
+
+
+        <a
+          class="book-button"
+          [routerLink]="[
+    '/services',
+    categoryId,
+    subCategoryId,
+    serviceId,
+    'book'
+  ]"
+        >
+          Book this service
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

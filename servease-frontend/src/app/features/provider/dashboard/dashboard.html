@@ -1,0 +1,587 @@
+<div class="provider-dashboard">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="dashboard-header">
+
+    <div>
+
+      <span class="eyebrow">
+        PROVIDER PORTAL
+      </span>
+
+      <h1>
+        Welcome back, {{ providerName }}.
+      </h1>
+
+      <p>
+        Here's an overview of your services and bookings.
+      </p>
+
+    </div>
+
+
+    <div class="profile-badge">
+
+      <span class="profile-dot"></span>
+
+      Provider
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       LOADING
+  ====================================================== -->
+
+  <div
+    class="dashboard-state"
+    *ngIf="loading"
+  >
+
+    <div class="dashboard-spinner"></div>
+
+    <span>
+      Loading your dashboard...
+    </span>
+
+  </div>
+
+
+  <!-- =====================================================
+       ERROR
+  ====================================================== -->
+
+  <div
+    class="dashboard-state error"
+    *ngIf="!loading && errorMessage"
+  >
+
+    <span>
+      {{ errorMessage }}
+    </span>
+
+    <button
+      type="button"
+      (click)="refreshDashboard()"
+    >
+      Retry
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       DASHBOARD CONTENT
+  ====================================================== -->
+
+  <ng-container *ngIf="!loading && !errorMessage">
+
+
+    <!-- ===================================================
+         STATISTICS
+    ==================================================== -->
+
+    <section class="stats-grid">
+
+
+      <!-- TOTAL BOOKINGS -->
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          ▣
+        </div>
+
+        <div class="stat-content">
+
+          <span>
+            Total bookings
+          </span>
+
+          <strong>
+            {{ totalBookings }}
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <!-- PENDING -->
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          ◷
+        </div>
+
+        <div class="stat-content">
+
+          <span>
+            Pending bookings
+          </span>
+
+          <strong>
+            {{ pendingBookings }}
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <!-- EARNINGS -->
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          ₹
+        </div>
+
+        <div class="stat-content">
+
+          <span>
+            Completed earnings
+          </span>
+
+          <strong>
+            ₹{{ formatPrice(totalEarnings) }}
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <!-- RATING -->
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          ★
+        </div>
+
+        <div class="stat-content">
+
+          <span>
+            Average rating
+          </span>
+
+          <strong>
+            0.0
+          </strong>
+
+        </div>
+
+      </article>
+
+    </section>
+
+
+    <!-- ===================================================
+         MAIN GRID
+    ==================================================== -->
+
+    <section class="dashboard-grid">
+
+
+      <!-- =================================================
+           RECENT BOOKINGS
+      ================================================== -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <span class="section-label">
+              BOOKINGS
+            </span>
+
+            <h2>
+              Recent bookings
+            </h2>
+
+          </div>
+
+
+          <a
+            routerLink="/provider/bookings"
+            class="panel-link"
+          >
+            View all
+          </a>
+
+        </div>
+
+
+        <!-- NO BOOKINGS -->
+
+        <div
+          class="empty-state"
+          *ngIf="recentBookings.length === 0"
+        >
+
+          <div class="empty-icon">
+            ▣
+          </div>
+
+          <h3>
+            No bookings yet
+          </h3>
+
+          <p>
+            Your recent customer bookings will appear here.
+          </p>
+
+        </div>
+
+
+        <!-- BOOKINGS -->
+
+        <div
+          class="dashboard-bookings"
+          *ngIf="recentBookings.length > 0"
+        >
+
+          @for (
+          booking of recentBookings;
+          track booking.id
+          ) {
+
+          <a
+            class="dashboard-booking"
+            routerLink="/provider/bookings"
+          >
+
+            <div class="booking-icon">
+              ✦
+            </div>
+
+
+            <div class="booking-info">
+
+                <span class="booking-id">
+                  Booking #{{ booking.id }}
+                </span>
+
+              <h3>
+                {{ booking.serviceTitle }}
+              </h3>
+
+              <p>
+                {{ formatDate(booking.bookingDate) }}
+                •
+                {{ formatTime(booking.bookingTime) }}
+              </p>
+
+            </div>
+
+
+            <div class="booking-side">
+
+                <span
+                  class="booking-status"
+                  [ngClass]="getStatusClass(booking.status)"
+                >
+                  {{ getStatusLabel(booking.status) }}
+                </span>
+
+              <strong>
+                ₹{{ formatPrice(booking.agreedPrice) }}
+              </strong>
+
+            </div>
+
+
+            <span class="booking-arrow">
+                →
+              </span>
+
+          </a>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           QUICK ACTIONS
+      ================================================== -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <span class="section-label">
+              MANAGE
+            </span>
+
+            <h2>
+              Quick actions
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="quick-actions">
+
+
+          <!-- PROFILE -->
+
+          <a
+            routerLink="/provider/profile"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ◉
+            </span>
+
+            <div>
+
+              <strong>
+                Manage profile
+              </strong>
+
+              <span>
+                Update your business information
+              </span>
+
+            </div>
+
+            <span class="arrow">
+              →
+            </span>
+
+          </a>
+
+
+          <!-- SERVICES -->
+
+          <a
+            routerLink="/provider/services"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ◇
+            </span>
+
+            <div>
+
+              <strong>
+                Manage services
+              </strong>
+
+              <span>
+                Add or update your services
+              </span>
+
+            </div>
+
+            <span class="arrow">
+              →
+            </span>
+
+          </a>
+
+
+          <!-- BOOKINGS -->
+
+          <a
+            routerLink="/provider/bookings"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ▣
+            </span>
+
+            <div>
+
+              <strong>
+                Manage bookings
+              </strong>
+
+              <span>
+                View and manage customer bookings
+              </span>
+
+            </div>
+
+            <span class="arrow">
+              →
+            </span>
+
+          </a>
+
+
+          <!-- AVAILABILITY -->
+
+          <a
+            routerLink="/provider/availability"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ◷
+            </span>
+
+            <div>
+
+              <strong>
+                Manage availability
+              </strong>
+
+              <span>
+                Set your weekly working schedule
+              </span>
+
+            </div>
+
+            <span class="arrow">
+              →
+            </span>
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         TODAY'S SCHEDULE
+    ==================================================== -->
+
+    <section class="panel schedule-panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <span class="section-label">
+            SCHEDULE
+          </span>
+
+          <h2>
+            Today's schedule
+          </h2>
+
+        </div>
+
+
+        <a
+          routerLink="/provider/availability"
+          class="panel-link"
+        >
+          Manage availability
+        </a>
+
+      </div>
+
+
+      <!-- NO APPOINTMENTS -->
+
+      <div
+        class="schedule-empty"
+        *ngIf="todaysBookings.length === 0"
+      >
+
+        <div class="schedule-icon">
+          ◷
+        </div>
+
+        <div>
+
+          <h3>
+            No appointments scheduled
+          </h3>
+
+          <p>
+            Your appointments for today will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- TODAY'S BOOKINGS -->
+
+      <div
+        class="today-bookings"
+        *ngIf="todaysBookings.length > 0"
+      >
+
+        @for (
+        booking of todaysBookings;
+        track booking.id
+        ) {
+
+        <div class="today-booking">
+
+          <div class="today-time">
+
+            <strong>
+              {{ formatTime(booking.bookingTime) }}
+            </strong>
+
+          </div>
+
+
+          <div class="today-line"></div>
+
+
+          <div class="today-info">
+
+            <strong>
+              {{ booking.serviceTitle }}
+            </strong>
+
+            <span>
+                Booking #{{ booking.id }}
+              </span>
+
+            <small>
+              {{ booking.address }},
+              {{ booking.city }}
+            </small>
+
+          </div>
+
+
+          <span
+            class="booking-status"
+            [ngClass]="getStatusClass(booking.status)"
+          >
+              {{ getStatusLabel(booking.status) }}
+            </span>
+
+        </div>
+
+        }
+
+      </div>
+
+    </section>
+
+
+  </ng-container>
+
+</div>

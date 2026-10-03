@@ -1,0 +1,320 @@
+<div class="admin-dashboard">
+
+  <!-- Header -->
+
+  <section class="dashboard-header">
+
+    <div>
+      <span class="eyebrow">
+        ADMINISTRATION
+      </span>
+
+      <h1>
+        Welcome back, {{ adminName }}.
+      </h1>
+
+      <p>
+        Here's what's happening across Servease today.
+      </p>
+    </div>
+
+    <div class="header-action">
+      <span class="status-dot"></span>
+      System operational
+    </div>
+
+  </section>
+
+
+  <!-- Statistics -->
+
+  <section class="stats-grid">
+
+    @for (stat of stats; track stat.label) {
+
+    <article class="stat-card">
+
+      <div class="stat-top">
+
+        <div class="stat-icon">
+          {{ stat.icon }}
+        </div>
+
+        <span
+          class="stat-change"
+          [class.negative]="!stat.positive"
+        >
+            {{ stat.change }}
+          </span>
+
+      </div>
+
+      <div class="stat-value">
+        {{ stat.value }}
+      </div>
+
+      <div class="stat-label">
+        {{ stat.label }}
+      </div>
+
+    </article>
+
+    }
+
+  </section>
+
+
+  <!-- Main content -->
+
+  <div class="content-grid">
+
+
+    <!-- Activity -->
+
+    <section class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <span class="section-eyebrow">
+            PLATFORM
+          </span>
+
+          <h2>
+            Recent activity
+          </h2>
+        </div>
+
+        <button type="button">
+          View all
+        </button>
+
+      </div>
+
+
+      <div class="activity-list">
+
+        @for (
+        activity of activities;
+        track activity.title
+        ) {
+
+        <article class="activity-item">
+
+          <div class="activity-icon">
+            {{ activity.icon }}
+          </div>
+
+          <div class="activity-content">
+
+            <h3>
+              {{ activity.title }}
+            </h3>
+
+            <p>
+              {{ activity.description }}
+            </p>
+
+          </div>
+
+          <span class="activity-time">
+              {{ activity.time }}
+            </span>
+
+        </article>
+
+        }
+
+      </div>
+
+    </section>
+
+
+    <!-- Pending actions -->
+
+    <aside class="panel pending-panel">
+
+      <div class="panel-header">
+
+        <div>
+          <span class="section-eyebrow">
+            ATTENTION
+          </span>
+
+          <h2>
+            Pending actions
+          </h2>
+        </div>
+
+      </div>
+
+
+      <div class="pending-list">
+
+        <a
+          routerLink="/admin/providers"
+          class="pending-item"
+        >
+
+          <div class="pending-icon">
+            ♙
+          </div>
+
+          <div>
+            <strong>
+              Provider verification
+            </strong>
+
+            <span>
+              12 providers waiting
+            </span>
+          </div>
+
+          <span class="arrow">
+            →
+          </span>
+
+        </a>
+
+
+        <a
+          routerLink="/admin/services"
+          class="pending-item"
+        >
+
+          <div class="pending-icon">
+            ◈
+          </div>
+
+          <div>
+            <strong>
+              Service requests
+            </strong>
+
+            <span>
+              5 requests to review
+            </span>
+          </div>
+
+          <span class="arrow">
+            →
+          </span>
+
+        </a>
+
+
+        <a
+          routerLink="/admin/users"
+          class="pending-item"
+        >
+
+          <div class="pending-icon">
+            ◉
+          </div>
+
+          <div>
+            <strong>
+              User reports
+            </strong>
+
+            <span>
+              3 reports need attention
+            </span>
+          </div>
+
+          <span class="arrow">
+            →
+          </span>
+
+        </a>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+
+  <!-- Quick management -->
+
+  <section class="management-section">
+
+    <div class="section-heading">
+
+      <span class="section-eyebrow">
+        MANAGEMENT
+      </span>
+
+      <h2>
+        Quick access
+      </h2>
+
+    </div>
+
+
+    <div class="management-grid">
+
+      <a
+        routerLink="/admin/users"
+        class="management-card"
+      >
+        <span class="management-icon">◉</span>
+
+        <div>
+          <h3>Users</h3>
+          <p>Manage customers and accounts</p>
+        </div>
+
+        <span class="arrow">→</span>
+      </a>
+
+
+      <a
+        routerLink="/admin/providers"
+        class="management-card"
+      >
+        <span class="management-icon">♙</span>
+
+        <div>
+          <h3>Providers</h3>
+          <p>Verify and manage providers</p>
+        </div>
+
+        <span class="arrow">→</span>
+      </a>
+
+
+      <a
+        routerLink="/admin/services"
+        class="management-card"
+      >
+        <span class="management-icon">◈</span>
+
+        <div>
+          <h3>Services</h3>
+          <p>Manage categories and services</p>
+        </div>
+
+        <span class="arrow">→</span>
+      </a>
+
+
+      <a
+        routerLink="/admin/bookings"
+        class="management-card"
+      >
+        <span class="management-icon">▣</span>
+
+        <div>
+          <h3>Bookings</h3>
+          <p>Monitor platform bookings</p>
+        </div>
+
+        <span class="arrow">→</span>
+      </a>
+
+    </div>
+
+  </section>
+
+</div>

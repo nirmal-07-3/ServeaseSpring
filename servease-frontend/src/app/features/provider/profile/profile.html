@@ -1,0 +1,486 @@
+<div class="profile-page">
+
+  <!-- ==================== HEADER ==================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/provider/dashboard"
+        class="back-link"
+      >
+        ← Dashboard
+      </a>
+
+      <h1>Provider Profile</h1>
+
+      <p>
+        Manage your business information and professional profile.
+      </p>
+
+    </div>
+
+
+    <!-- Verification Status -->
+
+    <div
+      class="verification-badge"
+      [class.approved]="profile.verificationStatus === 'APPROVED'"
+      [class.rejected]="profile.verificationStatus === 'REJECTED'"
+    >
+
+      <span class="status-dot"></span>
+
+      {{ getVerificationLabel() }}
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================== MESSAGES ==================== -->
+
+  <div
+    *ngIf="errorMessage"
+    class="alert alert-error"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <div
+    *ngIf="successMessage"
+    class="alert alert-success"
+  >
+    {{ successMessage }}
+  </div>
+
+
+  <!-- ==================== PROFILE CONTENT ==================== -->
+
+  <ng-container *ngIf="!loading">
+
+    <div class="profile-layout">
+
+
+      <!-- ================================================== -->
+      <!-- MAIN PROFILE FORM -->
+      <!-- ================================================== -->
+
+      <section class="profile-card">
+
+
+        <!-- Card Header -->
+
+        <div class="card-header">
+
+          <div>
+
+            <span class="section-label">
+              BUSINESS INFORMATION
+            </span>
+
+            <h2>
+              Your professional profile
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <!-- Form -->
+
+        <form
+          (ngSubmit)="saveProfile()"
+          #profileForm="ngForm"
+          novalidate
+        >
+
+
+          <!-- ==================== BUSINESS NAME ==================== -->
+
+          <div class="form-group">
+
+            <label for="businessName">
+              Business name
+            </label>
+
+            <input
+              id="businessName"
+              type="text"
+              name="businessName"
+              [(ngModel)]="profile.businessName"
+              placeholder="Enter your business name"
+              required
+            >
+
+          </div>
+
+
+          <!-- ==================== DESCRIPTION ==================== -->
+
+          <div class="form-group">
+
+            <label for="description">
+              Business description
+            </label>
+
+            <textarea
+              id="description"
+              name="description"
+              [(ngModel)]="profile.description"
+              placeholder="Tell customers about your services and experience..."
+              rows="5"
+              maxlength="1000"
+              required
+            ></textarea>
+
+            <span class="field-hint">
+              Maximum 1000 characters
+            </span>
+
+          </div>
+
+
+          <!-- ==================== EXPERIENCE ==================== -->
+
+          <div class="form-group">
+
+            <label for="experienceYears">
+              Years of experience
+            </label>
+
+            <input
+              id="experienceYears"
+              type="number"
+              name="experienceYears"
+              [(ngModel)]="profile.experienceYears"
+              min="0"
+              placeholder="e.g. 5"
+              required
+            >
+
+          </div>
+
+
+          <!-- ==================== DIVIDER ==================== -->
+
+          <div class="form-divider"></div>
+
+
+          <!-- ==================== LOCATION ==================== -->
+
+          <div class="card-subheading">
+
+            <h3>
+              Location
+            </h3>
+
+            <p>
+              Help customers know where you provide your services.
+            </p>
+
+          </div>
+
+
+          <!-- ==================== ADDRESS ==================== -->
+
+          <div class="form-group">
+
+            <label for="address">
+              Address
+            </label>
+
+            <textarea
+              id="address"
+              name="address"
+              [(ngModel)]="profile.address"
+              placeholder="Enter your complete address"
+              rows="3"
+              required
+            ></textarea>
+
+          </div>
+
+
+          <!-- ==================== CITY / STATE ==================== -->
+
+          <div class="form-row">
+
+
+            <!-- City -->
+
+            <div class="form-group">
+
+              <label for="city">
+                City
+              </label>
+
+              <input
+                id="city"
+                type="text"
+                name="city"
+                [(ngModel)]="profile.city"
+                placeholder="City"
+                required
+              >
+
+            </div>
+
+
+            <!-- State -->
+
+            <div class="form-group">
+
+              <label for="state">
+                State
+              </label>
+
+              <input
+                id="state"
+                type="text"
+                name="state"
+                [(ngModel)]="profile.state"
+                placeholder="State"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- ==================== COUNTRY / PINCODE ==================== -->
+
+          <div class="form-row">
+
+
+            <!-- Country -->
+
+            <div class="form-group">
+
+              <label for="country">
+                Country
+              </label>
+
+              <input
+                id="country"
+                type="text"
+                name="country"
+                [(ngModel)]="profile.country"
+                placeholder="Country"
+                readonly
+              >
+
+            </div>
+
+
+            <!-- Pincode -->
+
+            <div class="form-group">
+
+              <label for="pincode">
+                Pincode
+              </label>
+
+              <input
+                id="pincode"
+                type="text"
+                name="pincode"
+                [(ngModel)]="profile.pincode"
+                placeholder="Pincode"
+                maxlength="6"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- ==================== SAVE BUTTON ==================== -->
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="save-button"
+              [disabled]="saving"
+            >
+
+              <span *ngIf="!saving">
+                Save profile
+              </span>
+
+              <span *ngIf="saving">
+                Saving...
+              </span>
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- ================================================== -->
+      <!-- SIDEBAR -->
+      <!-- ================================================== -->
+
+      <aside class="profile-sidebar">
+
+
+        <!-- ==================== PROFILE STATUS ==================== -->
+
+        <section class="side-card">
+
+          <span class="section-label">
+            PROFILE STATUS
+          </span>
+
+
+          <div class="completion-row">
+
+            <div>
+
+              <strong>
+                {{
+                profile.profileCompleted
+                ? 'Complete'
+                : 'Incomplete'
+                }}
+              </strong>
+
+              <span>
+                {{
+                  profile.profileCompleted
+                    ? 'Your profile is ready.'
+                    : 'Complete your information.'
+                }}
+              </span>
+
+            </div>
+
+
+            <div class="completion-icon">
+
+              {{
+              profile.profileCompleted
+              ? '✓'
+              : '!'
+              }}
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- ==================== VERIFICATION ==================== -->
+
+        <section class="side-card">
+
+          <span class="section-label">
+            VERIFICATION
+          </span>
+
+
+          <h3>
+            {{ getVerificationLabel() }}
+          </h3>
+
+
+          <p>
+            Your provider verification status is managed by
+            the Servease administration team.
+          </p>
+
+        </section>
+
+
+
+        <!-- ==================== PERFORMANCE ==================== -->
+
+        <section class="side-card">
+
+          <span class="section-label">
+            PERFORMANCE
+          </span>
+
+
+          <!-- Rating -->
+
+          <div class="mini-stat">
+
+            <span>
+              Average rating
+            </span>
+
+            <strong>
+              {{ profile.averageRating || 0 | number:'1.1-1' }}
+            </strong>
+
+          </div>
+
+
+          <!-- Reviews -->
+
+          <div class="mini-stat">
+
+            <span>
+              Total reviews
+            </span>
+
+            <strong>
+              {{ profile.totalReviews || 0 }}
+            </strong>
+
+          </div>
+
+
+          <!-- Bookings -->
+
+          <div class="mini-stat">
+
+            <span>
+              Total bookings
+            </span>
+
+            <strong>
+              {{ profile.totalBookings || 0 }}
+            </strong>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+    </div>
+
+  </ng-container>
+
+
+  <!-- ==================== LOADING ==================== -->
+
+  <div
+    *ngIf="loading"
+    class="state-card"
+  >
+
+    <div class="loader"></div>
+
+    <p>
+      Loading your profile...
+    </p>
+
+  </div>
+
+</div>

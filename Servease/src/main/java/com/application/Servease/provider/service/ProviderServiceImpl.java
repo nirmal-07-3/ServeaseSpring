@@ -19,7 +19,6 @@ import com.application.Servease.provider.repository.ProviderDocumentRepository;
 import com.application.Servease.provider.repository.ProviderProfileRepository;
 import com.application.Servease.user.entity.User;
 import com.application.Servease.user.enums.UserRole;
-import com.application.Servease.user.repository.UserRepository;
 import com.application.Servease.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +42,8 @@ public class ProviderServiceImpl implements ProviderService {
     private final StorageService storageService;
 
     private final ProviderAvailabilityRepository providerAvailabilityRepository;
-
     private final ProviderAvailabilityMapper providerAvailabilityMapper;
+
 
     @Override
     @Transactional
@@ -88,31 +87,90 @@ public class ProviderServiceImpl implements ProviderService {
         return providerMapper.toResponse(savedProvider);
     }
 
-    @Override
-    public ProviderProfileResponse updateProviderProfile(UpdateProviderProfileRequest request) {
-        return null;
-    }
 
+    @Override
+    @Transactional
+    public ProviderProfileResponse updateProviderProfile(
+            UpdateProviderProfileRequest request) {
+
+        ProviderProfile provider =
+                getAuthenticatedProvider();
+
+        provider.setBusinessName(
+                request.getBusinessName()
+        );
+
+        provider.setDescription(
+                request.getDescription()
+        );
+
+        provider.setExperienceYears(
+                request.getExperienceYears()
+        );
+
+        provider.setAddress(
+                request.getAddress()
+        );
+
+        provider.setCity(
+                request.getCity()
+        );
+
+        provider.setState(
+                request.getState()
+        );
+
+        provider.setPincode(
+                request.getPincode()
+        );
+
+        provider.setLatitude(
+                request.getLatitude()
+        );
+
+        provider.setLongitude(
+                request.getLongitude()
+        );
+
+        provider.setProfileCompleted(true);
+
+        ProviderProfile updatedProvider =
+                providerProfileRepository.save(provider);
+
+        return providerMapper.toResponse(
+                updatedProvider
+        );
+    }
 
 
     private ProviderProfile getAuthenticatedProvider() {
 
-        User user = userService.getAuthenticatedUser();
+        User user =
+                userService.getAuthenticatedUser();
 
-        return providerProfileRepository.findByUser(user)
+        return providerProfileRepository
+                .findByUser(user)
                 .orElseThrow(() ->
-                        new ProviderNotFoundException("Provider profile not found"));
+                        new ProviderNotFoundException(
+                                "Provider profile not found"
+                        )
+                );
     }
+
 
     @Override
     public ProviderProfileResponse getMyProviderProfile() {
 
-        ProviderProfile provider = getAuthenticatedProvider();
+        ProviderProfile provider =
+                getAuthenticatedProvider();
 
         return providerMapper.toResponse(provider);
     }
 
 
+    // ============================================================
+    // UPLOAD DOCUMENT
+    // ============================================================
 
     @Override
     @Transactional
@@ -121,56 +179,97 @@ public class ProviderServiceImpl implements ProviderService {
             DocumentType documentType,
             String documentNumber) {
 
-        ProviderProfile provider = getAuthenticatedProvider();
+        ProviderProfile provider =
+                getAuthenticatedProvider();
 
         // Check duplicate document
         if (providerDocumentRepository
-                .findByProviderAndDocumentType(provider, documentType)
+                .findByProviderAndDocumentType(
+                        provider,
+                        documentType
+                )
                 .isPresent()) {
 
             throw new DuplicateDocumentException(
-                    documentType + " document already uploaded."
+                    documentType +
+                            " document already uploaded."
             );
         }
 
         // Upload file
-        String filePath = storageService.uploadFile(
-                file,
-                "providers/documents"
-        );
+        String filePath =
+                storageService.uploadFile(
+                        file,
+                        "providers/documents"
+                );
 
         // Create entity
-        ProviderDocument document = new ProviderDocument();
+        ProviderDocument document =
+                new ProviderDocument();
 
         document.setProvider(provider);
         document.setDocumentType(documentType);
-        document.setDocumentNumber(documentNumber);
-        document.setDocumentUrl(filePath);
+        document.setDocumentNumber(
+                documentNumber
+        );
+        document.setDocumentUrl(
+                filePath
+        );
         document.setVerified(false);
 
         ProviderDocument savedDocument =
-                providerDocumentRepository.save(document);
+                providerDocumentRepository.save(
+                        document
+                );
 
-        return providerDocumentMapper.toResponse(savedDocument);
+        return providerDocumentMapper.toResponse(
+                savedDocument
+        );
     }
 
 
+    // ============================================================
+    // GET MY DOCUMENTS
+    // ============================================================
+
+    @Override
+    public List<UploadDocumentResponse> getMyDocuments() {
+
+        ProviderProfile provider =
+                getAuthenticatedProvider();
+
+        return providerDocumentRepository
+                .findByProvider(provider)
+                .stream()
+                .map(providerDocumentMapper::toResponse)
+                .toList();
+    }
+
+
+    // ============================================================
+    // AVAILABILITY
+    // ============================================================
 
     @Override
     @Transactional
     public void saveOrUpdateAvailability(
             List<SaveAvailabilityRequest> requests) {
 
-        ProviderProfile provider = getAuthenticatedProvider();
+        ProviderProfile provider =
+                getAuthenticatedProvider();
 
-        for (SaveAvailabilityRequest request : requests) {
+        for (SaveAvailabilityRequest request :
+                requests) {
 
             ProviderAvailability availability =
                     providerAvailabilityRepository
                             .findByProviderAndDayOfWeek(
                                     provider,
-                                    request.getDayOfWeek())
-                            .orElse(new ProviderAvailability());
+                                    request.getDayOfWeek()
+                            )
+                            .orElse(
+                                    new ProviderAvailability()
+                            );
 
             availability.setProvider(provider);
 
@@ -186,16 +285,22 @@ public class ProviderServiceImpl implements ProviderService {
 
             } else {
 
-                if (request.getStartTime() == null ||
-                        request.getEndTime() == null) {
+                if (
+                        request.getStartTime() == null ||
+                                request.getEndTime() == null
+                ) {
 
                     throw new InvalidAvailabilityException(
                             "Start time and end time are required."
                     );
                 }
 
-                if (!request.getStartTime()
-                        .isBefore(request.getEndTime())) {
+                if (
+                        !request.getStartTime()
+                                .isBefore(
+                                        request.getEndTime()
+                                )
+                ) {
 
                     throw new InvalidAvailabilityException(
                             "End time must be after start time."
@@ -203,7 +308,9 @@ public class ProviderServiceImpl implements ProviderService {
                 }
             }
 
-            providerAvailabilityRepository.save(availability);
+            providerAvailabilityRepository.save(
+                    availability
+            );
         }
     }
 
@@ -211,7 +318,8 @@ public class ProviderServiceImpl implements ProviderService {
     @Override
     public List<AvailabilityResponse> getAvailability() {
 
-        ProviderProfile provider = getAuthenticatedProvider();
+        ProviderProfile provider =
+                getAuthenticatedProvider();
 
         return providerAvailabilityRepository
                 .findByProvider(provider)
@@ -220,15 +328,20 @@ public class ProviderServiceImpl implements ProviderService {
                 .toList();
     }
 
+
     @Override
-    public Optional<ProviderAvailability> findByProviderAndDayOfWeek(ProviderProfile provider, DayOfWeek dayOfWeek) {
+    public Optional<ProviderAvailability>
+    findByProviderAndDayOfWeek(
+            ProviderProfile provider,
+            DayOfWeek dayOfWeek) {
+
         return Optional.empty();
     }
 
 
     @Override
-
-    public Optional<ProviderAvailability> getAvailabilityForDay(
+    public Optional<ProviderAvailability>
+    getAvailabilityForDay(
             ProviderProfile provider,
             DayOfWeek dayOfWeek) {
 
@@ -238,6 +351,5 @@ public class ProviderServiceImpl implements ProviderService {
                         dayOfWeek
                 );
     }
-
 
 }

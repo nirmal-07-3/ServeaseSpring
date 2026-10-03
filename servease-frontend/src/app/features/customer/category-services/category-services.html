@@ -1,0 +1,233 @@
+<div class="category-page">
+
+  <!-- =========================================================
+       HERO
+  ========================================================== -->
+
+  <section class="hero">
+
+    <div class="hero-glow glow-one"></div>
+    <div class="hero-glow glow-two"></div>
+
+    <div class="hero-content">
+
+      <a
+        routerLink="/services"
+        class="back-link"
+      >
+        <span>←</span>
+        All categories
+      </a>
+
+
+      <span class="eyebrow">
+        SERVEASE
+      </span>
+
+
+      <h1>
+        {{ categoryName }}
+      </h1>
+
+
+      <p>
+        Choose the type of service you need and
+        find trusted professionals near you.
+      </p>
+
+    </div>
+
+
+    <div class="hero-symbol">
+      ✦
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       CONTENT
+  ========================================================== -->
+
+  <main class="content">
+
+
+    <div class="section-heading">
+
+      <div>
+
+        <span class="section-eyebrow">
+          EXPLORE SERVICES
+        </span>
+
+        <h2>
+          What do you need?
+        </h2>
+
+      </div>
+
+
+      <span
+        class="service-count"
+        *ngIf="!loading && !error"
+      >
+        {{ subCategories.length }}
+        services
+      </span>
+
+    </div>
+
+
+    <!-- =======================================================
+         LOADING
+    ======================================================== -->
+
+    <div
+      class="loading-state"
+      *ngIf="loading"
+    >
+
+      <div class="spinner"></div>
+
+      <p>
+        Finding available services...
+      </p>
+
+    </div>
+
+
+    <!-- =======================================================
+         ERROR
+    ======================================================== -->
+
+    <div
+      class="error-state"
+      *ngIf="!loading && error"
+    >
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <h3>
+        Something went wrong
+      </h3>
+
+      <p>
+        {{ error }}
+      </p>
+
+      <button
+        type="button"
+        (click)="retry()"
+      >
+        Try again
+      </button>
+
+    </div>
+
+
+    <!-- =======================================================
+         SERVICES
+    ======================================================== -->
+
+    <div
+      class="service-grid"
+      *ngIf="
+        !loading &&
+        !error &&
+        subCategories.length > 0
+      "
+    >
+
+      <a
+        *ngFor="
+          let service of subCategories;
+          let i = index
+        "
+        class="service-card"
+        [routerLink]="[
+          '/services',
+          categoryId,
+          service.id
+        ]"
+      >
+
+        <div class="card-number">
+          {{ (i + 1).toString().padStart(2, '0') }}
+        </div>
+
+
+        <div class="service-icon">
+
+          {{ getIcon(service) }}
+
+        </div>
+
+
+        <div class="service-content">
+
+          <h3>
+            {{ service.name }}
+          </h3>
+
+          <p>
+            {{ service.description }}
+          </p>
+
+        </div>
+
+
+        <div class="service-arrow">
+
+          <span>
+            →
+          </span>
+
+        </div>
+
+      </a>
+
+    </div>
+
+
+    <!-- =======================================================
+         EMPTY
+    ======================================================== -->
+
+    <div
+      class="empty-state"
+      *ngIf="
+        !loading &&
+        !error &&
+        subCategories.length === 0
+      "
+    >
+
+      <div class="empty-icon">
+        ✦
+      </div>
+
+      <h3>
+        No services available
+      </h3>
+
+      <p>
+        There are currently no services available
+        in this category.
+      </p>
+
+
+      <a
+        routerLink="/services"
+        class="back-button"
+      >
+        Browse other categories
+      </a>
+
+    </div>
+
+
+  </main>
+
+</div>

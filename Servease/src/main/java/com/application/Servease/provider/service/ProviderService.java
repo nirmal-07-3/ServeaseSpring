@@ -12,13 +12,15 @@ import java.util.Optional;
 
 public interface ProviderService {
 
-    ProviderProfileResponse becomeProvider(BecomeProviderRequest request);
-
-
+    ProviderProfileResponse becomeProvider(
+            BecomeProviderRequest request
+    );
 
     ProviderProfileResponse getMyProviderProfile();
 
-    ProviderProfileResponse updateProviderProfile(UpdateProviderProfileRequest request);
+    ProviderProfileResponse updateProviderProfile(
+            UpdateProviderProfileRequest request
+    );
 
     UploadDocumentResponse uploadDocument(
             MultipartFile file,
@@ -26,10 +28,11 @@ public interface ProviderService {
             String documentNumber
     );
 
+    List<UploadDocumentResponse> getMyDocuments();
 
-
-
-    void saveOrUpdateAvailability(List<SaveAvailabilityRequest> requests);
+    void saveOrUpdateAvailability(
+            List<SaveAvailabilityRequest> requests
+    );
 
     List<AvailabilityResponse> getAvailability();
 

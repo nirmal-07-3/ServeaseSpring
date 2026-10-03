@@ -103,6 +103,22 @@ import java.util.List;
     }
 
 
+    @GetMapping("/documents")
+    public ResponseEntity<ApiResponse<List<UploadDocumentResponse>>>
+    getMyDocuments() {
+
+        List<UploadDocumentResponse> response =
+                providerService.getMyDocuments();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Provider documents fetched successfully.",
+                        response
+                )
+        );
+    }
+
     @PutMapping("/availability")
     public ResponseEntity<ApiResponse<Void>>
     saveOrUpdateAvailability(

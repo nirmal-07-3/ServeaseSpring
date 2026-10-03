@@ -1,0 +1,639 @@
+/* =========================================================
+   SERVEASE - AUTHENTICATION UI
+   Shared by:
+   Login
+   Register
+   Forgot Password
+   Verify OTP
+   Reset Password
+   ========================================================= */
+
+
+/* =========================
+   RESET
+   ========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   BODY
+   ========================= */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+
+    background:
+            radial-gradient(
+                    circle at top left,
+                    rgba(37, 99, 235, 0.10),
+                    transparent 35%
+            ),
+            radial-gradient(
+                    circle at bottom right,
+                    rgba(99, 102, 241, 0.08),
+                    transparent 35%
+            ),
+            linear-gradient(
+                    135deg,
+                    #f8faff,
+                    #eef4ff
+            );
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #111827;
+}
+
+
+/* =========================
+   CONTAINER
+   ========================= */
+
+.auth-container {
+    width: 100%;
+    padding: 24px;
+}
+
+
+/* =========================
+   CARD
+   ========================= */
+
+.auth-card {
+    width: 100%;
+    max-width: 430px;
+
+    margin: auto;
+    padding: 40px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border: 1px solid rgba(229, 231, 235, 0.8);
+
+    border-radius: 20px;
+
+    box-shadow:
+            0 25px 60px rgba(15, 23, 42, 0.10);
+
+    animation: cardAppear 0.4s ease;
+}
+
+
+@keyframes cardAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================
+   BRAND
+   ========================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-bottom: 28px;
+}
+
+
+/* Your verify page uses brand-logo */
+.brand-logo,
+.brand-icon {
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    box-shadow:
+            0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+
+.brand span {
+
+    font-size: 26px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+
+/* =========================
+   HEADER
+   ========================= */
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+.auth-header h2 {
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
+
+    color: #111827;
+}
+
+
+.auth-header p {
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
+   DIRECT PAGE HEADINGS
+   Supports verify-otp.html
+   ========================= */
+
+.auth-card > h1 {
+
+    text-align: center;
+
+    font-size: 26px;
+
+    margin-bottom: 8px;
+
+    color: #111827;
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    margin-bottom: 28px;
+}
+
+
+/* =========================
+   FORM
+   ========================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+.label-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+
+.label-row a {
+
+    font-size: 13px;
+
+    color: #2563eb;
+
+    text-decoration: none;
+}
+
+
+.label-row a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   INPUT
+   ========================= */
+
+input {
+
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.2s ease;
+}
+
+
+input::placeholder {
+    color: #9ca3af;
+}
+
+
+input:hover {
+    border-color: #9ca3af;
+}
+
+
+input:focus {
+
+    border-color: #2563eb;
+
+    box-shadow:
+            0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================
+   SELECT
+   ========================= */
+
+select {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+select:hover {
+    border-color: #9ca3af;
+}
+
+select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+            0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+/* =========================
+   OTP INPUT
+   ========================= */
+
+#otp {
+
+    text-align: center;
+
+    letter-spacing: 8px;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    padding: 15px;
+}
+
+
+#otp::placeholder {
+
+    letter-spacing: 1px;
+
+    font-size: 14px;
+
+    font-weight: normal;
+}
+
+
+/* =========================
+   BUTTON
+   ========================= */
+
+button,
+.primary-button {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+
+button:hover,
+.primary-button:hover {
+
+    background: #1d4ed8;
+
+    box-shadow:
+            0 8px 18px rgba(37, 99, 235, 0.20);
+
+    transform: translateY(-1px);
+}
+
+
+button:active,
+.primary-button:active {
+
+    transform: translateY(0);
+}
+
+
+button:disabled,
+.primary-button:disabled {
+
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =========================
+   DIVIDER
+   ========================= */
+
+.divider {
+
+    display: flex;
+
+    align-items: center;
+
+    margin: 25px 0;
+}
+
+
+.divider::before,
+.divider::after {
+
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background: #e5e7eb;
+}
+
+
+.divider span {
+
+    margin: 0 12px;
+
+    font-size: 12px;
+
+    color: #9ca3af;
+}
+
+
+/* =========================
+   REGISTER TEXT
+   ========================= */
+
+.register-text {
+
+    text-align: center;
+
+    font-size: 14px;
+
+    color: #6b7280;
+}
+
+
+.register-text a {
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.register-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   BACK LINK
+   ========================= */
+
+.back-login,
+.back-link {
+
+    text-align: center;
+
+    margin-top: 24px;
+}
+
+
+.back-login a,
+.back-link a {
+
+    color: #2563eb;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+
+.back-login a:hover,
+.back-link a:hover {
+
+    color: #1d4ed8;
+
+    text-decoration: underline;
+}
+
+
+/* =========================
+   MESSAGE
+   ========================= */
+
+.message {
+
+    display: none;
+
+    margin-bottom: 15px;
+
+    padding: 11px 12px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+}
+
+
+.message.error {
+
+    display: block;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    border: 1px solid #fecaca;
+}
+
+
+.message.success {
+
+    display: block;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    border: 1px solid #bbf7d0;
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 480px) {
+
+    .auth-container {
+        padding: 16px;
+    }
+
+
+    .auth-card {
+
+        padding: 30px 22px;
+
+        border-radius: 16px;
+    }
+
+
+    .brand {
+        margin-bottom: 24px;
+    }
+
+
+    .brand-logo,
+    .brand-icon {
+
+        width: 40px;
+        height: 40px;
+
+        font-size: 20px;
+    }
+
+
+    .brand span {
+        font-size: 23px;
+    }
+
+
+    .auth-card > h1,
+    .auth-header h2 {
+
+        font-size: 22px;
+    }
+
+
+    #otp {
+
+        letter-spacing: 6px;
+
+        font-size: 20px;
+    }
+}

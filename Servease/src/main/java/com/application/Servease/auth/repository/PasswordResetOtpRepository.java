@@ -13,4 +13,5 @@ public interface PasswordResetOtpRepository extends JpaRepository<PasswordResetO
     boolean existsByUser(User user);
 
     void deleteByUser(User user);
+
 }

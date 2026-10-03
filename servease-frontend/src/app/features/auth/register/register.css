@@ -1,0 +1,695 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.auth-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: #f7f9fc;
+}
+
+
+/* =========================================================
+   LEFT BRAND PANEL
+========================================================= */
+
+.brand-panel {
+  position: relative;
+  width: 53.5%;
+  min-height: 100vh;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 72px 84px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #203477 0%,
+      #2443a7 45%,
+      #245de2 100%
+    );
+}
+
+
+/* LOGO */
+
+.brand-logo {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logo-mark {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #2759d8;
+
+  font-size: 25px;
+  font-weight: 800;
+}
+
+
+/* BRAND CONTENT */
+
+.brand-content {
+  position: relative;
+  z-index: 3;
+
+  max-width: 570px;
+
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.eyebrow {
+  margin-bottom: 23px;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.brand-content h1 {
+  margin: 0;
+
+  font-size: clamp(50px, 4.3vw, 70px);
+  line-height: 0.99;
+
+  font-weight: 750;
+
+  letter-spacing: -3px;
+}
+
+.brand-content h1 span {
+  color: rgba(255, 255, 255, 0.57);
+}
+
+.brand-content p {
+  max-width: 540px;
+
+  margin: 29px 0 0;
+
+  font-size: 17px;
+  line-height: 1.7;
+
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.78);
+}
+
+
+/* BENEFITS */
+
+.benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  margin-top: 38px;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.benefit-icon {
+  width: 23px;
+  height: 23px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+
+/* DECORATIVE CIRCLES */
+
+.decor {
+  position: absolute;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 50%;
+}
+
+.decor-one {
+  width: 430px;
+  height: 430px;
+
+  top: -125px;
+  right: -185px;
+}
+
+.decor-two {
+  width: 320px;
+  height: 320px;
+
+  bottom: -225px;
+  left: -160px;
+}
+
+
+/* =========================================================
+   RIGHT FORM PANEL
+========================================================= */
+
+.form-panel {
+  width: 46.5%;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  overflow-y: auto;
+
+  background: #f7f9fc;
+}
+
+.form-container {
+  width: min(520px, 100%);
+
+  padding: 55px 70px 40px;
+}
+
+
+/* HEADER */
+
+.form-header {
+  margin-bottom: 27px;
+}
+
+.form-header h2 {
+  margin: 0;
+
+  color: #101828;
+
+  font-size: 34px;
+  line-height: 1.2;
+
+  font-weight: 750;
+
+  letter-spacing: -1.3px;
+}
+
+.form-header p {
+  margin: 9px 0 0;
+
+  color: #667085;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  margin-bottom: 18px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.error-alert {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #b42318;
+}
+
+.success-alert {
+  border: 1px solid #b7ebc6;
+  background: #f0fff4;
+  color: #16794c;
+}
+
+.alert-icon {
+  width: 20px;
+  height: 20px;
+
+  flex: 0 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 17px;
+}
+
+.form-group {
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #101828;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+
+/* INPUT */
+
+.input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  width: 100%;
+  height: 50px;
+
+  padding: 0 16px 0 43px;
+
+  border: 1px solid #d9dee8;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #101828;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.input-wrapper input::placeholder {
+  color: #98a2b3;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+  border-color: #2d63df;
+
+  box-shadow:
+    0 0 0 3px rgba(45, 99, 223, 0.10);
+}
+
+
+/* INPUT ICON */
+
+.input-icon {
+  position: absolute;
+
+  left: 16px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  z-index: 2;
+
+  width: 18px;
+
+  display: flex;
+  justify-content: center;
+
+  color: #98a2b3;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  pointer-events: none;
+}
+
+
+/* SELECT */
+
+.select-wrapper select {
+  appearance: none;
+
+  cursor: pointer;
+
+  padding-right: 42px;
+}
+
+.select-arrow {
+  position: absolute;
+
+  right: 17px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #667085;
+
+  pointer-events: none;
+}
+
+
+/* SHOW PASSWORD */
+
+.show-button {
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #245ee5;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.show-button:hover {
+  color: #1748bc;
+}
+
+
+/* =========================================================
+   REGISTER BUTTON
+========================================================= */
+
+.register-button {
+  width: 100%;
+  height: 50px;
+
+  margin-top: 5px;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: #2d63df;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.register-button:hover:not(:disabled) {
+  background: #2455c7;
+
+  box-shadow:
+    0 7px 18px rgba(45, 99, 223, 0.20);
+
+  transform: translateY(-1px);
+}
+
+.register-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.register-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+
+/* BUTTON LOADING */
+
+.button-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   LOGIN LINK
+========================================================= */
+
+.login-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+
+  margin-top: 23px;
+
+  color: #667085;
+
+  font-size: 13px;
+}
+
+.login-link a {
+  color: #245ee5;
+
+  font-weight: 650;
+
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+
+/* TERMS */
+
+.terms {
+  max-width: 390px;
+
+  margin: 19px auto 0;
+
+  text-align: center;
+
+  color: #98a2b3;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+  .brand-panel {
+    width: 50%;
+
+    padding: 55px 55px;
+  }
+
+  .form-panel {
+    width: 50%;
+  }
+
+  .form-container {
+    padding: 45px 45px 35px;
+  }
+
+  .brand-content h1 {
+    font-size: 51px;
+  }
+}
+
+
+@media (max-width: 800px) {
+
+  .auth-page {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .brand-panel {
+    width: 100%;
+    min-height: 400px;
+
+    padding: 35px 35px;
+  }
+
+  .form-panel {
+    width: 100%;
+    min-height: auto;
+
+    overflow: visible;
+  }
+
+  .brand-content {
+    margin-top: 70px;
+    margin-bottom: 20px;
+  }
+
+  .brand-content h1 {
+    font-size: 47px;
+  }
+
+  .form-container {
+    width: 100%;
+
+    padding: 45px 35px;
+  }
+
+  .auth-page {
+    flex-direction: column;
+  }
+}
+
+
+@media (max-width: 500px) {
+
+  .brand-panel {
+    min-height: 350px;
+
+    padding: 28px 24px;
+  }
+
+  .brand-logo {
+    font-size: 21px;
+  }
+
+  .logo-mark {
+    width: 38px;
+    height: 38px;
+
+    font-size: 22px;
+  }
+
+  .brand-content {
+    margin-top: 50px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+  }
+
+  .brand-content h1 {
+    font-size: 39px;
+
+    letter-spacing: -1.8px;
+  }
+
+  .brand-content p {
+    margin-top: 20px;
+
+    font-size: 14px;
+  }
+
+  .benefits {
+    display: none;
+  }
+
+  .form-container {
+    padding: 35px 24px;
+  }
+
+  .form-header h2 {
+    font-size: 29px;
+  }
+}

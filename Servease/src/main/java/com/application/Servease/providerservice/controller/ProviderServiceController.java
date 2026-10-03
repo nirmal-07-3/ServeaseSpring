@@ -119,7 +119,7 @@ public class ProviderServiceController {
 
     @Operation(
             summary = "Delete my service",
-            description = "Soft deletes the provider service"
+            description = "Permanently deletes the provider service"
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteService(

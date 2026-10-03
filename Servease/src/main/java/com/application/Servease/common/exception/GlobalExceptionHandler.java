@@ -63,7 +63,8 @@ public class GlobalExceptionHandler {
             SubCategoryAlreadyExistsException.class,
             ProviderAlreadyExistsException.class,
             ProviderServiceAlreadyExistsException.class,
-            BookingConflictException.class
+            BookingConflictException.class,
+            PaymentConflictException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(
             RuntimeException ex) {
@@ -86,7 +87,9 @@ public class GlobalExceptionHandler {
             CategoryNotFoundException.class,
             SubCategoryNotFoundException.class,
             ProviderServiceNotFoundException.class,
-            BookingNotFoundException.class
+            BookingNotFoundException.class,
+            PaymentNotFoundException.class,
+            ProviderNotFoundException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleNotFound(
             RuntimeException ex) {
@@ -141,15 +144,5 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ProviderNotApprovedException.class)
-    public ResponseEntity<ApiResponse<Object>> handleProviderNotApproved(
-            ProviderNotApprovedException ex) {
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ApiResponse<>(
-                        false,
-                        ex.getMessage(),
-                        null
-                ));
-    }
 }

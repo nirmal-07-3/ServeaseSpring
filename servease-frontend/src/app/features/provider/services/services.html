@@ -1,0 +1,469 @@
+<div class="services-page">
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/provider/dashboard"
+        class="back-link"
+      >
+        ← Dashboard
+      </a>
+
+      <h1>
+        My Services
+      </h1>
+
+      <p>
+        Manage the services you offer to customers.
+      </p>
+
+    </div>
+
+    <a
+      routerLink="/provider/services/create"
+      class="add-button"
+    >
+      + Add service
+    </a>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- TOP ERROR MESSAGE -->
+  <!-- ===================================================== -->
+
+  <div
+    *ngIf="errorMessage"
+    class="alert alert-error"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- TOP SUCCESS MESSAGE -->
+  <!-- ===================================================== -->
+
+  <div
+    *ngIf="successMessage"
+    class="alert alert-success"
+  >
+    {{ successMessage }}
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- STATISTICS -->
+  <!-- ===================================================== -->
+
+  <div class="stats-grid">
+
+    <!-- Total -->
+
+    <div class="stat-card">
+
+      <span class="stat-label">
+        Total services
+      </span>
+
+      <strong>
+        {{ services.length }}
+      </strong>
+
+    </div>
+
+
+    <!-- Active -->
+
+    <div class="stat-card">
+
+      <span class="stat-label">
+        Active services
+      </span>
+
+      <strong>
+        {{ activeServices }}
+      </strong>
+
+    </div>
+
+
+    <!-- Inactive -->
+
+    <div class="stat-card">
+
+      <span class="stat-label">
+        Inactive services
+      </span>
+
+      <strong>
+        {{ inactiveServices }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- SERVICES CARD -->
+  <!-- ===================================================== -->
+
+  <section class="services-card">
+
+
+    <!-- CARD HEADER -->
+
+    <div class="card-header">
+
+      <div>
+
+        <span class="section-label">
+          YOUR SERVICES
+        </span>
+
+        <h2>
+          Services you provide
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================== -->
+    <!-- EMPTY STATE -->
+    <!-- =================================================== -->
+
+    <div
+      *ngIf="services.length === 0 && !loading"
+      class="empty-card"
+    >
+
+      <div class="empty-icon">
+        +
+      </div>
+
+      <h2>
+        No services yet
+      </h2>
+
+      <p>
+        Add your first service so customers can discover what you offer.
+      </p>
+
+      <a
+        routerLink="/provider/services/create"
+        class="add-button"
+      >
+        + Add your first service
+      </a>
+
+    </div>
+
+
+    <!-- =================================================== -->
+    <!-- SERVICES LIST -->
+    <!-- =================================================== -->
+
+    <div
+      *ngIf="services.length > 0"
+      class="services-list"
+    >
+
+
+      <!-- ================================================= -->
+      <!-- SINGLE SERVICE -->
+      <!-- ================================================= -->
+
+      <div
+        class="service-row"
+        *ngFor="let service of services"
+      >
+
+
+        <!-- =============================================== -->
+        <!-- SERVICE INFORMATION -->
+        <!-- =============================================== -->
+
+        <div>
+
+          <!-- TITLE + STATUS -->
+
+          <div class="service-title-row">
+
+            <h3>
+              {{ service.title }}
+            </h3>
+
+            <span
+              class="status-badge"
+              [class.active]="service.active"
+              [class.inactive]="!service.active"
+            >
+              {{ service.active ? 'Active' : 'Inactive' }}
+            </span>
+
+          </div>
+
+
+          <!-- DESCRIPTION -->
+
+          <p class="service-description">
+            {{ service.description }}
+          </p>
+
+
+          <!-- SERVICE META -->
+
+          <div class="service-meta">
+
+            <span>
+              Subcategory:
+              <strong>
+                {{ service.subCategoryName }}
+              </strong>
+            </span>
+
+
+            <span>
+              Duration:
+              <strong>
+                {{ formatDuration(service.estimatedDurationMinutes) }}
+              </strong>
+            </span>
+
+
+            <span>
+              Radius:
+              <strong>
+                {{ formatRadius(service.serviceRadiusKm) }}
+              </strong>
+            </span>
+
+          </div>
+
+
+          <!-- ============================================= -->
+          <!-- ACTION BUTTONS -->
+          <!-- ============================================= -->
+
+          <div class="service-actions">
+
+
+            <!-- EDIT -->
+
+            <button
+              type="button"
+              class="action-button"
+              [routerLink]="[
+                '/provider/services/edit',
+                service.id
+              ]"
+            >
+              Edit
+            </button>
+
+
+            <!-- =========================================== -->
+            <!-- ACTIVATE / DEACTIVATE -->
+            <!-- =========================================== -->
+
+            <button
+              type="button"
+              class="action-button"
+              [disabled]="
+                statusLoadingId === service.id ||
+                deleteLoadingId !== null
+              "
+              (click)="updateStatus(service)"
+            >
+
+              <!-- Normal text -->
+
+              <span
+                *ngIf="statusLoadingId !== service.id"
+              >
+                {{
+                  service.active
+                    ? 'Deactivate'
+                    : 'Activate'
+                }}
+              </span>
+
+
+              <!-- Loading text -->
+
+              <span
+                *ngIf="statusLoadingId === service.id"
+              >
+                {{
+                  service.active
+                    ? 'Deactivating...'
+                    : 'Activating...'
+                }}
+              </span>
+
+            </button>
+
+
+            <!-- =========================================== -->
+            <!-- DELETE -->
+            <!-- =========================================== -->
+
+            <button
+              type="button"
+              class="action-button danger"
+              [disabled]="
+                statusLoadingId !== null ||
+                deleteLoadingId !== null
+              "
+              (click)="deleteService(service)"
+            >
+
+              <span
+                *ngIf="deleteLoadingId !== service.id"
+              >
+                Delete
+              </span>
+
+              <span
+                *ngIf="deleteLoadingId === service.id"
+              >
+                Deleting...
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =============================================== -->
+        <!-- PRICE -->
+        <!-- =============================================== -->
+
+        <div class="service-price">
+
+          <span>
+            Starting from
+          </span>
+
+          <strong>
+            ₹{{ service.basePrice | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================================================== -->
+  <!-- DELETE CONFIRMATION MODAL -->
+  <!-- IMPORTANT: OUTSIDE *ngFor -->
+  <!-- ===================================================== -->
+
+  <div
+    class="modal-backdrop"
+    *ngIf="showDeleteModal && serviceToDelete"
+    (click)="cancelDelete()"
+  >
+
+    <div
+      class="delete-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+
+      <!-- WARNING ICON -->
+
+      <div class="delete-modal-icon">
+        !
+      </div>
+
+
+      <!-- TITLE -->
+
+      <h2>
+        Delete service?
+      </h2>
+
+
+      <!-- DESCRIPTION -->
+
+      <p>
+        Are you sure you want to delete
+        <strong>
+          {{ serviceToDelete?.title }}
+        </strong>?
+      </p>
+
+
+      <!-- WARNING -->
+
+      <p class="delete-warning">
+        This action cannot be undone.
+      </p>
+
+
+      <!-- ================================================ -->
+      <!-- MODAL BUTTONS -->
+      <!-- ================================================ -->
+
+      <div class="delete-modal-actions">
+
+
+        <!-- CANCEL -->
+
+        <button
+          type="button"
+          class="cancel-button"
+          [disabled]="deleteLoadingId !== null"
+          (click)="cancelDelete()"
+        >
+          Cancel
+        </button>
+
+
+        <!-- CONFIRM DELETE -->
+
+        <button
+          type="button"
+          class="confirm-delete-button"
+          [disabled]="deleteLoadingId !== null"
+          (click)="confirmDelete()"
+        >
+
+          <span
+            *ngIf="deleteLoadingId === null"
+          >
+            Delete
+          </span>
+
+          <span
+            *ngIf="deleteLoadingId !== null"
+          >
+            Deleting...
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

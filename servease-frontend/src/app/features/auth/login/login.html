@@ -1,0 +1,232 @@
+<div class="login-page">
+
+  <div class="login-wrapper">
+
+    <!-- Left visual section -->
+    <section class="login-visual">
+
+      <div class="visual-content">
+
+        <div class="brand">
+          <div class="brand-mark">S</div>
+
+          <span>Servease</span>
+        </div>
+
+        <div class="visual-text">
+
+          <span class="eyebrow">
+            YOUR SERVICES. SIMPLIFIED.
+          </span>
+
+          <h1>
+            Find trusted professionals
+            <span>for every need.</span>
+          </h1>
+
+          <p>
+            Discover reliable local service providers,
+            compare your options and book the right
+            professional with confidence.
+          </p>
+
+        </div>
+
+        <div class="visual-features">
+
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Verified service providers</span>
+          </div>
+
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Simple and secure booking</span>
+          </div>
+
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Transparent reviews & ratings</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Login section -->
+    <section class="login-section">
+
+      <div class="login-card">
+
+        <div class="mobile-brand">
+
+          <div class="brand-mark">S</div>
+
+          <span>Servease</span>
+
+        </div>
+
+
+        <div class="login-header">
+
+          <h2>Welcome back</h2>
+
+          <p>
+            Sign in to continue to your account.
+          </p>
+
+        </div>
+
+
+        <!-- Error -->
+        <div
+          *ngIf="errorMessage"
+          class="alert alert-error"
+        >
+          {{ errorMessage }}
+        </div>
+
+
+        <!-- Success -->
+        <div
+          *ngIf="successMessage"
+          class="alert alert-success"
+        >
+          {{ successMessage }}
+        </div>
+
+
+        <form
+          (ngSubmit)="login()"
+          #loginForm="ngForm"
+          novalidate
+        >
+
+          <!-- Email -->
+
+          <div class="form-group">
+
+            <label for="email">
+              Email address
+            </label>
+
+            <div class="input-wrapper">
+
+              <span class="input-icon">
+                @
+              </span>
+
+              <input
+                id="email"
+                type="email"
+                name="email"
+                [(ngModel)]="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- Password -->
+
+          <div class="form-group">
+
+            <div class="label-row">
+
+              <label for="password">
+                Password
+              </label>
+
+              <a routerLink="/forgot-password">
+                Forgot password?
+              </a>
+
+            </div>
+
+
+            <div class="input-wrapper">
+
+              <span class="input-icon">
+                •
+              </span>
+
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="
+                  showPassword
+                    ? 'Hide password'
+                    : 'Show password'
+                "
+              >
+                {{ showPassword ? 'Hide' : 'Show' }}
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Submit -->
+
+          <button
+            type="submit"
+            class="login-button"
+            [disabled]="loading"
+          >
+
+            <span *ngIf="!loading">
+              Sign in
+            </span>
+
+            <span *ngIf="loading">
+              Signing in...
+            </span>
+
+          </button>
+
+        </form>
+
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+
+        <div class="register-prompt">
+
+          <span>
+            Don't have an account?
+          </span>
+
+          <a routerLink="/register">
+            Create an account
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

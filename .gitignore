@@ -1,0 +1,29 @@
+# ================================
+# Servease Root Git Ignore
+# ================================
+
+# Environment / secrets
+.env
+*.env
+!.env.example
+
+# Java / Spring Boot
+Servease/target/
+**/target/
+
+# IDE
+.idea/
+*.iml
+
+# Database backups
+database-backup/
+
+# Uploaded/generated local files
+uploads/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

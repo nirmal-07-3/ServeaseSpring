@@ -1,0 +1,884 @@
+<div class="admin-providers">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+
+  <header class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/admin/dashboard"
+        class="back-link"
+      >
+        ← Dashboard
+      </a>
+
+      <span class="eyebrow">
+        ADMINISTRATION
+      </span>
+
+      <h1>
+        Provider Management
+      </h1>
+
+      <p>
+        Review provider registrations and verify their submitted documents.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading || providerActionLoading"
+      (click)="refreshProviders()"
+    >
+      ↻ Refresh
+    </button>
+
+  </header>
+
+
+  <!-- ============================================================
+       SUCCESS
+  ============================================================ -->
+
+  <div
+    *ngIf="successMessage"
+    class="alert success-alert"
+  >
+
+    <span class="alert-icon">
+      ✓
+    </span>
+
+    <span>
+      {{ successMessage }}
+    </span>
+
+    <button
+      type="button"
+      class="alert-close"
+      (click)="successMessage = ''"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <!-- ============================================================
+       ERROR
+  ============================================================ -->
+
+  <div
+    *ngIf="errorMessage"
+    class="alert error-alert"
+  >
+
+    <span class="alert-icon">
+      !
+    </span>
+
+    <span>
+      {{ errorMessage }}
+    </span>
+
+    <button
+      type="button"
+      class="alert-close"
+      (click)="errorMessage = ''"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <!-- ============================================================
+       SUMMARY
+  ============================================================ -->
+
+  <section class="summary-grid">
+
+    <article class="summary-card">
+
+      <div class="summary-icon">
+        ♙
+      </div>
+
+      <div>
+
+        <span>
+          Pending providers
+        </span>
+
+        <strong>
+          {{ providers.length }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <div class="summary-icon">
+        ✓
+      </div>
+
+      <div>
+
+        <span>
+          Ready for review
+        </span>
+
+        <strong>
+          {{ providers.length }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ============================================================
+       MAIN CARD
+  ============================================================ -->
+
+  <section class="providers-card">
+
+    <div class="card-header">
+
+      <div>
+
+        <span class="section-label">
+          PROVIDER APPLICATIONS
+        </span>
+
+        <h2>
+          Pending registrations
+        </h2>
+
+      </div>
+
+      <span class="count-badge">
+        {{ providers.length }}
+      </span>
+
+    </div>
+
+
+    <!-- ============================================================
+         LOADING
+    ============================================================ -->
+
+    <div
+      *ngIf="loading"
+      class="loading-state"
+    >
+
+      <div class="spinner"></div>
+
+      <h3>
+        Loading providers...
+      </h3>
+
+      <p>
+        Fetching pending provider registrations.
+      </p>
+
+    </div>
+
+
+    <!-- ============================================================
+         EMPTY
+    ============================================================ -->
+
+    <div
+      *ngIf="!loading && providers.length === 0"
+      class="empty-state"
+    >
+
+      <div class="empty-icon">
+        ✓
+      </div>
+
+      <h3>
+        No pending providers
+      </h3>
+
+      <p>
+        There are currently no provider registrations waiting for approval.
+      </p>
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="refreshProviders()"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+
+    <!-- ============================================================
+         PROVIDER LIST
+    ============================================================ -->
+
+    <div
+      *ngIf="!loading && providers.length > 0"
+      class="provider-list"
+    >
+
+      <article
+        class="provider-item"
+        *ngFor="let provider of providers"
+      >
+
+        <!-- PROVIDER INFO -->
+
+        <div class="provider-main">
+
+          <div class="provider-avatar">
+            {{ provider.businessName?.charAt(0)?.toUpperCase() || 'P' }}
+          </div>
+
+          <div class="provider-info">
+
+            <div class="provider-title-row">
+
+              <h3>
+                {{ provider.businessName }}
+              </h3>
+
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(provider.verificationStatus)"
+              >
+                {{ getStatusLabel(provider.verificationStatus) }}
+              </span>
+
+            </div>
+
+            <p class="provider-description">
+              {{ provider.description || 'No description provided.' }}
+            </p>
+
+            <div class="provider-meta">
+
+              <span>
+                📍
+                {{ provider.city || '-' }},
+                {{ provider.state || '-' }}
+              </span>
+
+              <span>
+                Experience:
+                {{ provider.experienceYears ?? 0 }}
+                {{ provider.experienceYears === 1 ? 'year' : 'years' }}
+              </span>
+
+              <span>
+                PIN:
+                {{ provider.pincode || '-' }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="provider-actions">
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="providerActionLoading"
+            (click)="viewProvider(provider)"
+          >
+            View details
+          </button>
+
+          <button
+            type="button"
+            class="danger-button"
+            [disabled]="providerActionLoading"
+            (click)="openRejectModal(provider)"
+          >
+            Reject
+          </button>
+
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="providerActionLoading"
+            (click)="openApproveModal(provider)"
+          >
+            Approve
+          </button>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       PROVIDER DETAILS MODAL
+  ============================================================ -->
+
+  <div
+    *ngIf="showDetails"
+    class="modal-backdrop"
+    (click)="closeDetails()"
+  >
+
+    <section
+      class="details-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- MODAL HEADER -->
+
+      <div class="modal-header">
+
+        <div>
+
+          <span class="section-label">
+            PROVIDER DETAILS
+          </span>
+
+          <h2>
+            {{ selectedProvider?.businessName || 'Provider' }}
+          </h2>
+
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          [disabled]="detailsLoading || providerActionLoading"
+          (click)="closeDetails()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- DETAILS LOADING -->
+
+      <div
+        *ngIf="detailsLoading"
+        class="modal-loading"
+      >
+
+        <div class="spinner"></div>
+
+        <p>
+          Loading provider details...
+        </p>
+
+      </div>
+
+
+      <!-- DETAILS CONTENT -->
+
+      <div
+        *ngIf="!detailsLoading && selectedProvider"
+        class="details-content"
+      >
+
+        <!-- STATUS -->
+
+        <div class="details-status-row">
+
+          <span>
+            Verification status
+          </span>
+
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(selectedProvider.verificationStatus)"
+          >
+            {{ getStatusLabel(selectedProvider.verificationStatus) }}
+          </span>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <section class="detail-section">
+
+          <div class="detail-section-header">
+
+            <div>
+              <span class="section-label">
+                PROFILE
+              </span>
+
+              <h3>
+                Business information
+              </h3>
+            </div>
+
+          </div>
+
+
+          <div class="detail-grid">
+
+            <div class="detail-field">
+
+              <span>
+                Business name
+              </span>
+
+              <strong>
+                {{ selectedProvider.businessName || '-' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-field">
+
+              <span>
+                Experience
+              </span>
+
+              <strong>
+                {{ selectedProvider.experienceYears ?? 0 }}
+                {{ selectedProvider.experienceYears === 1 ? 'year' : 'years' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-field">
+
+              <span>
+                City
+              </span>
+
+              <strong>
+                {{ selectedProvider.city || '-' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-field">
+
+              <span>
+                State
+              </span>
+
+              <strong>
+                {{ selectedProvider.state || '-' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-field">
+
+              <span>
+                Country
+              </span>
+
+              <strong>
+                {{ selectedProvider.country || '-' }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-field">
+
+              <span>
+                Pincode
+              </span>
+
+              <strong>
+                {{ selectedProvider.pincode || '-' }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div class="description-box">
+
+            <span>
+              Description
+            </span>
+
+            <p>
+              {{ selectedProvider.description || 'No description provided.' }}
+            </p>
+
+          </div>
+
+        </section>
+
+
+        <!-- PERFORMANCE -->
+
+        <section class="detail-section">
+
+          <div class="detail-section-header">
+
+            <div>
+              <span class="section-label">
+                PERFORMANCE
+              </span>
+
+              <h3>
+                Platform activity
+              </h3>
+            </div>
+
+          </div>
+
+
+          <div class="performance-grid">
+
+            <div class="performance-card">
+
+              <span>
+                Average rating
+              </span>
+
+              <strong>
+                {{ formatRating(selectedProvider.averageRating) }}
+              </strong>
+
+            </div>
+
+
+            <div class="performance-card">
+
+              <span>
+                Reviews
+              </span>
+
+              <strong>
+                {{ selectedProvider.totalReviews ?? 0 }}
+              </strong>
+
+            </div>
+
+
+            <div class="performance-card">
+
+              <span>
+                Bookings
+              </span>
+
+              <strong>
+                {{ selectedProvider.totalBookings ?? 0 }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- DOCUMENTS -->
+
+        <section class="detail-section">
+
+          <div class="detail-section-header">
+
+            <div>
+              <span class="section-label">
+                VERIFICATION
+              </span>
+
+              <h3>
+                Submitted documents
+              </h3>
+            </div>
+
+            <span class="document-count">
+              {{ selectedProvider.documents?.length || 0 }}
+            </span>
+
+          </div>
+
+
+          <div
+            *ngIf="!selectedProvider.documents || selectedProvider.documents.length === 0"
+            class="no-documents"
+          >
+
+            No verification documents have been submitted.
+
+          </div>
+
+
+          <div
+            *ngIf="selectedProvider.documents && selectedProvider.documents.length > 0"
+            class="documents-list"
+          >
+
+            <article
+              class="document-item"
+              *ngFor="let document of selectedProvider.documents"
+            >
+
+              <div class="document-icon">
+                ▤
+              </div>
+
+              <div class="document-info">
+
+                <strong>
+                  {{ getDocumentLabel(document.documentType) }}
+                </strong>
+
+                <span>
+                  {{ maskDocumentNumber(document.documentNumber) }}
+                </span>
+
+                <small>
+                  Uploaded {{ formatDate(document.uploadedAt) }}
+                </small>
+
+              </div>
+
+
+              <div class="document-actions">
+
+                <span
+                  *ngIf="document.verified"
+                  class="verified-label"
+                >
+                  ✓ Verified
+                </span>
+
+                <button
+                  *ngIf="!document.verified"
+                  type="button"
+                  class="verify-button"
+                  [disabled]="documentActionLoadingId !== null"
+                  (click)="verifyDocument(document)"
+                >
+
+                  <span
+                    *ngIf="documentActionLoadingId === document.id"
+                    class="button-spinner"
+                  ></span>
+
+                  <span>
+                    {{
+                      documentActionLoadingId === document.id
+                        ? 'Verifying...'
+                        : 'Verify'
+                    }}
+                  </span>
+
+                </button>
+
+                <a
+                  *ngIf="document.documentUrl"
+                  class="view-document"
+                  [href]="document.documentUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View
+                </a>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- FOOTER ACTIONS -->
+
+        <div class="modal-footer">
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="providerActionLoading"
+            (click)="closeDetails()"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            class="danger-button"
+            [disabled]="providerActionLoading"
+            (click)="openRejectModal({
+              id: selectedProvider.id,
+              businessName: selectedProvider.businessName,
+              description: selectedProvider.description,
+              city: selectedProvider.city,
+              state: selectedProvider.state,
+              country: selectedProvider.country,
+              pincode: selectedProvider.pincode,
+              experienceYears: selectedProvider.experienceYears,
+              verificationStatus: selectedProvider.verificationStatus || 'PENDING',
+              profileCompleted: selectedProvider.profileCompleted
+            })"
+          >
+            Reject provider
+          </button>
+
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="providerActionLoading"
+            (click)="openApproveModal({
+              id: selectedProvider.id,
+              businessName: selectedProvider.businessName,
+              description: selectedProvider.description,
+              city: selectedProvider.city,
+              state: selectedProvider.state,
+              country: selectedProvider.country,
+              pincode: selectedProvider.pincode,
+              experienceYears: selectedProvider.experienceYears,
+              verificationStatus: selectedProvider.verificationStatus || 'PENDING',
+              profileCompleted: selectedProvider.profileCompleted
+            })"
+          >
+            Approve provider
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ============================================================
+       APPROVE / REJECT CONFIRMATION MODAL
+  ============================================================ -->
+
+  <div
+    *ngIf="showActionModal"
+    class="modal-backdrop"
+    (click)="closeActionModal()"
+  >
+
+    <section
+      class="confirmation-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div
+        class="confirmation-icon"
+        [class.reject]="actionType === 'reject'"
+      >
+        {{ actionType === 'approve' ? '✓' : '!' }}
+      </div>
+
+      <span class="section-label">
+        CONFIRM ACTION
+      </span>
+
+      <h2>
+        {{
+        actionType === 'approve'
+        ? 'Approve provider?'
+        : 'Reject provider?'
+        }}
+      </h2>
+
+      <p>
+
+        Are you sure you want to
+        <strong>
+          {{ actionType === 'approve' ? 'approve' : 'reject' }}
+        </strong>
+
+        <strong>
+          {{ providerToAction?.businessName }}
+        </strong>?
+
+      </p>
+
+      <p
+        *ngIf="actionType === 'approve'"
+        class="confirmation-note"
+      >
+        The provider will be marked as approved and their user account will become active.
+      </p>
+
+      <p
+        *ngIf="actionType === 'reject'"
+        class="confirmation-note"
+      >
+        The provider will be marked as rejected and their user account will be blocked.
+      </p>
+
+
+      <div class="confirmation-actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="providerActionLoading"
+          (click)="closeActionModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          [class.primary-button]="actionType === 'approve'"
+          [class.danger-button]="actionType === 'reject'"
+          [disabled]="providerActionLoading"
+          (click)="confirmProviderAction()"
+        >
+
+          <span
+            *ngIf="providerActionLoading"
+            class="button-spinner"
+          ></span>
+
+          {{
+          providerActionLoading
+          ? 'Processing...'
+          : actionType === 'approve'
+          ? 'Approve provider'
+          : 'Reject provider'
+          }}
+
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

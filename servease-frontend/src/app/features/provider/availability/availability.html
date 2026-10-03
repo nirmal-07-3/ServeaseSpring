@@ -1,0 +1,353 @@
+<div class="availability-page">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+
+  <header class="page-header">
+
+    <div class="header-content">
+
+      <a
+        routerLink="/provider/dashboard"
+        class="back-link"
+      >
+        ← Dashboard
+      </a>
+
+      <span class="eyebrow">
+        PROVIDER PORTAL
+      </span>
+
+      <h1>Availability</h1>
+
+      <p>
+        Set the days and hours when customers can book your services.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="save-button"
+      [disabled]="saving || loading"
+      (click)="saveAvailability()"
+    >
+
+      <span *ngIf="!saving">
+        Save availability
+      </span>
+
+      <span *ngIf="saving">
+        Saving...
+      </span>
+
+    </button>
+
+  </header>
+
+
+  <!-- ============================================================
+       LOADING
+  ============================================================ -->
+
+  <section
+    *ngIf="loading"
+    class="state-card"
+  >
+
+    <div class="spinner"></div>
+
+    <h3>
+      Loading availability...
+    </h3>
+
+    <p>
+      Please wait while we load your schedule.
+    </p>
+
+  </section>
+
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+
+  <ng-container *ngIf="!loading">
+
+
+    <!-- ==========================================================
+         SUCCESS MESSAGE
+    ========================================================== -->
+
+    <div
+      *ngIf="successMessage"
+      class="alert success-alert"
+    >
+
+      <span class="alert-icon">
+        ✓
+      </span>
+
+      <span class="alert-message">
+        {{ successMessage }}
+      </span>
+
+      <button
+        type="button"
+        class="alert-close"
+        (click)="successMessage = ''"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- ==========================================================
+         ERROR MESSAGE
+    ========================================================== -->
+
+    <div
+      *ngIf="errorMessage"
+      class="alert error-alert"
+    >
+
+      <span class="alert-icon">
+        !
+      </span>
+
+      <span class="alert-message">
+        {{ errorMessage }}
+      </span>
+
+      <button
+        type="button"
+        class="alert-close"
+        (click)="errorMessage = ''"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- ==========================================================
+         SUMMARY
+    ========================================================== -->
+
+    <section class="summary-grid">
+
+      <article class="summary-card">
+
+        <div class="summary-icon available-icon">
+          ✓
+        </div>
+
+        <div class="summary-content">
+
+          <span>
+            Available days
+          </span>
+
+          <strong>
+            {{ availableDays }}
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="summary-card">
+
+        <div class="summary-icon unavailable-icon">
+          —
+        </div>
+
+        <div class="summary-content">
+
+          <span>
+            Unavailable days
+          </span>
+
+          <strong>
+            {{ unavailableDays }}
+          </strong>
+
+        </div>
+
+      </article>
+
+    </section>
+
+
+    <!-- ==========================================================
+         WEEKLY SCHEDULE
+    ========================================================== -->
+
+    <section class="schedule-panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <span class="section-label">
+            WEEKLY SCHEDULE
+          </span>
+
+          <h2>
+            Your working hours
+          </h2>
+
+          <p>
+            Customers can book you only during your available hours.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="days-list">
+
+        <div
+          class="day-row"
+          *ngFor="let day of availability"
+          [class.disabled]="!day.available"
+        >
+
+
+          <!-- DAY -->
+
+          <div class="day-information">
+
+            <span class="day-name">
+              {{ formatDay(day.dayOfWeek) }}
+            </span>
+
+          </div>
+
+
+          <!-- TOGGLE -->
+
+          <button
+            type="button"
+            class="availability-toggle"
+            [class.active]="day.available"
+            [attr.aria-pressed]="day.available"
+            [disabled]="saving"
+            (click)="day.available = !day.available;
+                     day.startTime = day.available ? (day.startTime || '09:00') : null;
+                     day.endTime = day.available ? (day.endTime || '18:00') : null"
+          >
+
+            <span class="toggle-track">
+
+              <span class="toggle-thumb"></span>
+
+            </span>
+
+            <span class="toggle-label">
+
+              {{
+                day.available
+                  ? 'Available'
+                  : 'Unavailable'
+              }}
+
+            </span>
+
+          </button>
+
+
+          <!-- TIME FIELDS -->
+
+          <div
+            class="time-fields"
+            [class.hidden]="!day.available"
+          >
+
+            <label class="time-field">
+
+              <span>
+                Start time
+              </span>
+
+              <input
+                type="time"
+                [(ngModel)]="day.startTime"
+                [disabled]="!day.available || saving"
+              >
+
+            </label>
+
+
+            <span class="time-separator">
+              to
+            </span>
+
+
+            <label class="time-field">
+
+              <span>
+                End time
+              </span>
+
+              <input
+                type="time"
+                [(ngModel)]="day.endTime"
+                [disabled]="!day.available || saving"
+              >
+
+            </label>
+
+          </div>
+
+
+          <!-- CLOSED -->
+
+          <span
+            *ngIf="!day.available"
+            class="closed-label"
+          >
+            Closed
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================
+         BOTTOM ACTION
+    ========================================================== -->
+
+    <div class="bottom-actions">
+
+      <button
+        type="button"
+        class="save-button"
+        [disabled]="saving"
+        (click)="saveAvailability()"
+      >
+
+        <span *ngIf="!saving">
+          Save availability
+        </span>
+
+        <span *ngIf="saving">
+          Saving...
+        </span>
+
+      </button>
+
+    </div>
+
+
+  </ng-container>
+
+</div>

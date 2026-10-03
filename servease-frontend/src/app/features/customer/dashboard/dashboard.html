@@ -1,0 +1,566 @@
+<div class="dashboard">
+
+  <!-- =========================
+       HERO
+  ========================== -->
+
+  <section class="welcome-section">
+
+    <div class="welcome-content">
+
+      <span class="eyebrow">
+        SERVEASE
+      </span>
+
+      <h1>
+        Good to see you,
+        <span>{{ userName }}.</span>
+      </h1>
+
+      <p>
+        What can we help you with today?
+      </p>
+
+    </div>
+
+
+    <div class="hero-decoration">
+
+      <div class="decoration-circle circle-one"></div>
+
+      <div class="decoration-circle circle-two"></div>
+
+      <span class="decoration-icon">
+        ✦
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       SEARCH
+  ========================== -->
+
+  <section class="search-section">
+
+    <div class="search-box">
+
+      <span class="search-icon">
+        ⌕
+      </span>
+
+      <input
+        type="text"
+        placeholder="What service do you need?"
+        aria-label="Search for a service"
+      >
+
+      <button
+        type="button"
+        class="search-button"
+      >
+        Search
+      </button>
+
+    </div>
+
+
+    <div class="location-text">
+
+      <span>
+        ⌖
+      </span>
+
+      Services available in your area
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       CATEGORIES
+  ========================== -->
+
+  <section class="dashboard-section">
+
+    <div class="section-header">
+
+      <div>
+
+        <span class="section-eyebrow">
+          EXPLORE
+        </span>
+
+        <h2>
+          Browse services
+        </h2>
+
+      </div>
+
+
+      <a
+        routerLink="/services"
+        class="view-all"
+      >
+        View all
+
+        <span>
+          →
+        </span>
+
+      </a>
+
+    </div>
+
+
+    <div class="category-grid">
+
+      @for (
+      category of categories;
+      track category.name
+      ) {
+
+      <a
+        class="category-card"
+        routerLink="/services"
+      >
+
+        <div class="category-icon">
+
+          {{ category.icon }}
+
+        </div>
+
+
+        <div class="category-info">
+
+          <h3>
+            {{ category.name }}
+          </h3>
+
+          <p>
+            {{ category.description }}
+          </p>
+
+        </div>
+
+
+        <span class="category-arrow">
+            →
+          </span>
+
+      </a>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       RECENT BOOKINGS
+  ========================== -->
+
+  <section class="dashboard-section recent-bookings-section">
+
+    <div class="section-header">
+
+      <div>
+
+        <span class="section-eyebrow">
+          YOUR ACTIVITY
+        </span>
+
+        <h2>
+          Recent bookings
+        </h2>
+
+      </div>
+
+
+      <a
+        routerLink="/bookings"
+        class="view-all"
+      >
+        View all
+
+        <span>
+          →
+        </span>
+
+      </a>
+
+    </div>
+
+
+    <!-- =========================
+         BOOKINGS LOADING
+    ========================== -->
+
+    <div
+      class="recent-bookings-state"
+      *ngIf="bookingsLoading"
+    >
+
+      <div class="small-spinner"></div>
+
+      <span>
+        Loading your bookings...
+      </span>
+
+    </div>
+
+
+    <!-- =========================
+         BOOKINGS ERROR
+    ========================== -->
+
+    <div
+      class="recent-bookings-state error"
+      *ngIf="
+        !bookingsLoading &&
+        bookingsError
+      "
+    >
+
+      <span>
+        {{ bookingsError }}
+      </span>
+
+
+      <button
+        type="button"
+        (click)="loadRecentBookings()"
+      >
+        Retry
+      </button>
+
+    </div>
+
+
+    <!-- =========================
+         NO BOOKINGS
+    ========================== -->
+
+    <div
+      class="recent-bookings-state"
+      *ngIf="
+        !bookingsLoading &&
+        !bookingsError &&
+        recentBookings.length === 0
+      "
+    >
+
+      <div class="empty-booking-icon">
+        ◷
+      </div>
+
+
+      <div>
+
+        <strong>
+          No bookings yet
+        </strong>
+
+        <span>
+          Your recent service bookings will appear here.
+        </span>
+
+      </div>
+
+
+      <a
+        routerLink="/services"
+        class="booking-explore-button"
+      >
+        Explore Services
+      </a>
+
+    </div>
+
+
+    <!-- =========================
+         RECENT BOOKINGS LIST
+    ========================== -->
+
+    <div
+      class="recent-bookings-list"
+      *ngIf="
+        !bookingsLoading &&
+        !bookingsError &&
+        recentBookings.length > 0
+      "
+    >
+
+      @for (
+      booking of recentBookings;
+      track booking.id
+      ) {
+
+      <article class="recent-booking-card">
+
+
+        <!-- BOOKING ICON -->
+
+        <div class="recent-booking-icon">
+          ✦
+        </div>
+
+
+        <!-- BOOKING INFORMATION -->
+
+        <div class="recent-booking-content">
+
+            <span class="recent-booking-id">
+              Booking #{{ booking.id }}
+            </span>
+
+
+          <h3>
+            {{ booking.serviceTitle }}
+          </h3>
+
+
+          <p>
+            {{ booking.providerBusinessName }}
+          </p>
+
+
+          <div class="recent-booking-meta">
+
+              <span>
+                {{ formatDate(booking.bookingDate) }}
+              </span>
+
+            <span class="meta-dot">
+                •
+              </span>
+
+            <span>
+                {{ formatTime(booking.bookingTime) }}
+              </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- STATUS + PRICE -->
+
+        <div class="recent-booking-side">
+
+            <span
+              class="dashboard-status"
+              [ngClass]="
+                getStatusClass(booking.status)
+              "
+            >
+              {{ getStatusLabel(booking.status) }}
+            </span>
+
+
+          <strong>
+            ₹{{ formatPrice(booking.agreedPrice) }}
+          </strong>
+
+        </div>
+
+
+        <!-- VIEW BOOKING -->
+
+        <a
+          [routerLink]="[
+              '/bookings',
+              booking.id
+            ]"
+          class="recent-booking-arrow"
+          aria-label="View booking details"
+        >
+          →
+        </a>
+
+      </article>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       LOWER CONTENT
+  ========================== -->
+
+  <div class="dashboard-grid">
+
+
+    <!-- =========================
+         RECOMMENDED SERVICES
+    ========================== -->
+
+    <section class="dashboard-section recommended-section">
+
+      <div class="section-header">
+
+        <div>
+
+          <span class="section-eyebrow">
+            FOR YOU
+          </span>
+
+          <h2>
+            Recommended services
+          </h2>
+
+        </div>
+
+
+        <a
+          routerLink="/services"
+          class="view-all"
+        >
+          Explore
+
+          <span>
+            →
+          </span>
+
+        </a>
+
+      </div>
+
+
+      <div class="service-list">
+
+        @for (
+        service of recommendedServices;
+        track service.title
+        ) {
+
+        <article class="service-card">
+
+
+          <!-- SERVICE ICON -->
+
+          <div class="service-icon">
+
+            {{ service.icon }}
+
+          </div>
+
+
+          <!-- SERVICE INFORMATION -->
+
+          <div class="service-content">
+
+            <h3>
+              {{ service.title }}
+            </h3>
+
+
+            <p class="provider-name">
+              {{ service.provider }}
+            </p>
+
+
+            <div class="service-meta">
+
+                <span class="rating">
+                  ★ {{ service.rating }}
+                </span>
+
+
+              <span>
+                  ({{ service.reviews }})
+                </span>
+
+
+              <span class="separator">
+                  •
+                </span>
+
+
+              <span>
+                  {{ service.location }}
+                </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- PRICE -->
+
+          <div class="service-price">
+
+              <span>
+                From
+              </span>
+
+            <strong>
+              {{ service.price }}
+            </strong>
+
+          </div>
+
+        </article>
+
+        }
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         QUICK ACTION
+    ========================== -->
+
+    <aside class="quick-card">
+
+      <div class="quick-icon">
+        ◷
+      </div>
+
+
+      <span class="section-eyebrow">
+        QUICK ACCESS
+      </span>
+
+
+      <h2>
+        Need a service
+        right now?
+      </h2>
+
+
+      <p>
+        Find available professionals
+        and book a service in just
+        a few steps.
+      </p>
+
+
+      <a
+        routerLink="/services"
+        class="quick-button"
+      >
+
+        Find a professional
+
+        <span>
+          →
+        </span>
+
+      </a>
+
+    </aside>
+
+  </div>
+
+</div>

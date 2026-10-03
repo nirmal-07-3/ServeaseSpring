@@ -1,0 +1,532 @@
+<div class="booking-details-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()"
+    >
+      ← Back to Bookings
+    </button>
+
+  </div>
+
+
+  <!-- LOADING -->
+  <div
+    class="state-card"
+    *ngIf="loading"
+  >
+
+    <div class="spinner"></div>
+
+    <h3>
+      Loading booking details...
+    </h3>
+
+    <p>
+      Please wait while we fetch your booking.
+    </p>
+
+  </div>
+
+
+  <!-- ERROR -->
+  <div
+    class="state-card error-state"
+    *ngIf="!loading && error"
+  >
+
+    <div class="state-icon">
+      !
+    </div>
+
+    <h3>
+      Unable to load booking
+    </h3>
+
+    <p>
+      {{ error }}
+    </p>
+
+    <button
+      type="button"
+      class="primary-btn"
+      (click)="goBack()"
+    >
+      Back to Bookings
+    </button>
+
+  </div>
+
+
+  <!-- BOOKING -->
+  <div
+    *ngIf="!loading && !error && booking"
+    class="details-container"
+  >
+
+    <!-- TITLE -->
+    <div class="details-header">
+
+      <div>
+
+        <span class="eyebrow">
+          BOOKING #{{ booking.id }}
+        </span>
+
+        <h1>
+          {{ booking.serviceTitle }}
+        </h1>
+
+        <p>
+          {{ booking.providerBusinessName }}
+        </p>
+
+      </div>
+
+
+      <span
+        class="status-badge"
+        [ngClass]="getStatusClass(booking.status)"
+      >
+        {{ getStatusLabel(booking.status) }}
+      </span>
+
+    </div>
+
+
+    <!-- ================= STATUS TRACKING ================= -->
+
+    <div
+      class="tracking-card"
+      *ngIf="isNormalTrackingStatus(booking.status)"
+    >
+
+      <div class="section-title">
+
+        <div>
+          <span class="eyebrow">
+            LIVE STATUS
+          </span>
+
+          <h2>
+            Track Your Booking
+          </h2>
+        </div>
+
+        <span class="current-status">
+          {{ getStatusLabel(booking.status) }}
+        </span>
+
+      </div>
+
+
+      <div class="tracking-timeline">
+
+        <!-- STEP 1 -->
+        <div
+          class="tracking-step"
+          [class.completed]="
+            getProgressStep(booking.status) >= 1
+          "
+          [class.current]="
+            getProgressStep(booking.status) === 1
+          "
+        >
+
+          <div class="step-icon">
+            {{
+            getProgressStep(booking.status) > 1
+            ? '✓'
+            : '1'
+            }}
+          </div>
+
+          <div class="step-content">
+
+            <strong>
+              Booking Placed
+            </strong>
+
+            <span>
+              Your booking request has been submitted.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="vertical-line"
+          [class.active]="
+            getProgressStep(booking.status) >= 2
+          "
+        ></div>
+
+
+        <!-- STEP 2 -->
+        <div
+          class="tracking-step"
+          [class.completed]="
+            getProgressStep(booking.status) >= 2
+          "
+          [class.current]="
+            getProgressStep(booking.status) === 2
+          "
+        >
+
+          <div class="step-icon">
+
+            {{
+            getProgressStep(booking.status) > 2
+            ? '✓'
+            : '2'
+            }}
+
+          </div>
+
+          <div class="step-content">
+
+            <strong>
+              Provider Accepted
+            </strong>
+
+            <span>
+              The provider has accepted your booking.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="vertical-line"
+          [class.active]="
+            getProgressStep(booking.status) >= 3
+          "
+        ></div>
+
+
+        <!-- STEP 3 -->
+        <div
+          class="tracking-step"
+          [class.completed]="
+            getProgressStep(booking.status) >= 3
+          "
+          [class.current]="
+            getProgressStep(booking.status) === 3
+          "
+        >
+
+          <div class="step-icon">
+
+            {{
+            getProgressStep(booking.status) > 3
+            ? '✓'
+            : '3'
+            }}
+
+          </div>
+
+          <div class="step-content">
+
+            <strong>
+              Service In Progress
+            </strong>
+
+            <span>
+              The provider has started the service.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="vertical-line"
+          [class.active]="
+            getProgressStep(booking.status) >= 4
+          "
+        ></div>
+
+
+        <!-- STEP 4 -->
+        <div
+          class="tracking-step"
+          [class.completed]="
+            getProgressStep(booking.status) >= 4
+          "
+          [class.current]="
+            getProgressStep(booking.status) === 4
+          "
+        >
+
+          <div class="step-icon">
+
+            {{
+            getProgressStep(booking.status) >= 4
+            ? '✓'
+            : '4'
+            }}
+
+          </div>
+
+          <div class="step-content">
+
+            <strong>
+              Service Completed
+            </strong>
+
+            <span>
+              Your service has been completed.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= REJECTED ================= -->
+
+    <div
+      class="special-status rejected"
+      *ngIf="booking.status === 'REJECTED'"
+    >
+
+      <div class="special-icon">
+        ×
+      </div>
+
+      <div>
+
+        <h3>
+          Booking Rejected
+        </h3>
+
+        <p>
+          The provider was unable to accept this booking.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= CANCELLED ================= -->
+
+    <div
+      class="special-status cancelled"
+      *ngIf="booking.status === 'CANCELLED'"
+    >
+
+      <div class="special-icon">
+        ×
+      </div>
+
+      <div>
+
+        <h3>
+          Booking Cancelled
+        </h3>
+
+        <p>
+          This booking has been cancelled.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= BOOKING INFORMATION ================= -->
+
+    <div class="info-card">
+
+      <div class="section-heading">
+        <span class="eyebrow">
+          BOOKING INFORMATION
+        </span>
+
+        <h2>
+          Service Details
+        </h2>
+      </div>
+
+
+      <div class="info-grid">
+
+        <div class="info-item">
+
+          <span>
+            SERVICE
+          </span>
+
+          <strong>
+            {{ booking.serviceTitle }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            CATEGORY
+          </span>
+
+          <strong>
+            {{ booking.subCategoryName }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            DATE
+          </span>
+
+          <strong>
+            {{ formatDate(booking.bookingDate) }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            TIME
+          </span>
+
+          <strong>
+            {{ formatTime(booking.bookingTime) }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            AGREED PRICE
+          </span>
+
+          <strong>
+            ₹{{ booking.agreedPrice }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            PROVIDER
+          </span>
+
+          <strong>
+            {{ booking.providerBusinessName }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= ADDRESS ================= -->
+
+    <div class="info-card">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          SERVICE LOCATION
+        </span>
+
+        <h2>
+          Address
+        </h2>
+
+      </div>
+
+
+      <div class="address-box">
+
+        <strong>
+          {{ booking.address }}
+        </strong>
+
+        <span>
+          {{ booking.city }},
+          {{ booking.state }}
+          - {{ booking.pincode }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= CUSTOMER NOTE ================= -->
+
+    <div
+      class="info-card"
+      *ngIf="booking.customerNote"
+    >
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          CUSTOMER NOTE
+        </span>
+
+        <h2>
+          Additional Information
+        </h2>
+
+      </div>
+
+
+      <p class="customer-note">
+        {{ booking.customerNote }}
+      </p>
+
+    </div>
+
+
+    <!-- FOOTER ACTION -->
+    <div class="bottom-actions">
+
+      <a
+        routerLink="/bookings"
+        class="secondary-btn"
+      >
+        ← My Bookings
+      </a>
+
+      <a
+        routerLink="/services"
+        class="primary-btn"
+      >
+        Explore More Services
+      </a>
+
+    </div>
+
+  </div>
+
+</div>

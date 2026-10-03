@@ -1,0 +1,1061 @@
+<div class="page">
+
+  <!-- HEADER -->
+
+  <header class="page-header">
+
+    <div>
+      <span class="eyebrow">ADMINISTRATION</span>
+
+      <h1>Service Catalog</h1>
+
+      <p>
+        Manage the categories and subcategories offered through Servease.
+      </p>
+    </div>
+
+    <button
+      *ngIf="activeTab === 'categories'"
+      class="primary-btn"
+      type="button"
+      (click)="openCreateCategory()">
+
+      <span>＋</span>
+      Add Category
+
+    </button>
+
+    <button
+      *ngIf="activeTab === 'subcategories'"
+      class="primary-btn"
+      type="button"
+      (click)="openCreateSubcategory()">
+
+      <span>＋</span>
+      Add Subcategory
+
+    </button>
+
+  </header>
+
+
+  <!-- ALERTS -->
+
+  <div
+    *ngIf="successMessage"
+    class="alert success-alert">
+
+    <span>✓</span>
+    {{ successMessage }}
+
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="alert error-alert">
+
+    <span>!</span>
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- SLIDING TAB -->
+
+  <div class="catalog-switch-wrapper">
+
+    <div class="catalog-switch">
+
+      <div
+        class="switch-slider"
+        [class.subcategory]="activeTab === 'subcategories'">
+      </div>
+
+      <button
+        type="button"
+        class="switch-option"
+        [class.selected]="activeTab === 'categories'"
+        (click)="switchTab('categories')">
+
+        <span class="switch-icon">◈</span>
+        Categories
+
+        <span class="count">
+          {{ categories.length }}
+        </span>
+
+      </button>
+
+      <button
+        type="button"
+        class="switch-option"
+        [class.selected]="activeTab === 'subcategories'"
+        (click)="switchTab('subcategories')">
+
+        <span class="switch-icon">◇</span>
+        Subcategories
+
+        <span class="count">
+          {{ subcategories.length }}
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================
+       CATEGORIES
+       ======================================================== -->
+
+  <ng-container *ngIf="activeTab === 'categories'">
+
+    <section class="toolbar">
+
+      <div class="search-box">
+
+        <span class="search-icon">⌕</span>
+
+        <input
+          type="text"
+          [(ngModel)]="categorySearchTerm"
+          placeholder="Search categories..." />
+
+        <button
+          *ngIf="categorySearchTerm"
+          type="button"
+          class="clear-search"
+          (click)="categorySearchTerm = ''">
+
+          ×
+
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        [disabled]="loadingCategories"
+        (click)="loadCategories()">
+
+        <span
+          [class.spin]="loadingCategories">
+          ↻
+        </span>
+
+        Refresh
+
+      </button>
+
+    </section>
+
+
+    <!-- CATEGORY LOADING -->
+
+    <section
+      *ngIf="loadingCategories"
+      class="state-card">
+
+      <div class="loader"></div>
+
+      <h3>Loading categories</h3>
+
+      <p>
+        Please wait while the categories are fetched.
+      </p>
+
+    </section>
+
+
+    <!-- CATEGORY EMPTY -->
+
+    <section
+      *ngIf="
+        !loadingCategories &&
+        filteredCategories.length === 0
+      "
+      class="state-card">
+
+      <div class="empty-icon">◈</div>
+
+      <h3>
+        {{
+        categorySearchTerm
+        ? 'No categories found'
+        : 'No categories yet'
+        }}
+      </h3>
+
+      <p>
+        {{
+        categorySearchTerm
+        ? 'Try a different search term.'
+        : 'Create your first service category.'
+        }}
+      </p>
+
+      <button
+        *ngIf="!categorySearchTerm"
+        type="button"
+        class="primary-btn"
+        (click)="openCreateCategory()">
+
+        Add Category
+
+      </button>
+
+    </section>
+
+
+    <!-- CATEGORY CARDS -->
+
+    <section
+      *ngIf="
+        !loadingCategories &&
+        filteredCategories.length > 0
+      "
+      class="catalog-grid">
+
+      <article
+        class="catalog-card"
+        *ngFor="
+          let category of filteredCategories;
+          trackBy: trackByCategoryId
+        ">
+
+        <!-- IMAGE -->
+
+        <div class="card-image">
+
+          <img
+            *ngIf="category.image"
+            [src]="getImageUrl(category.image)"
+            [alt]="category.name" />
+
+          <div
+            *ngIf="!category.image"
+            class="image-placeholder">
+
+            <span>◈</span>
+            <small>No image</small>
+
+          </div>
+
+          <span
+            class="status"
+            [class.active]="category.active"
+            [class.inactive]="!category.active">
+
+            {{ category.active ? 'Active' : 'Inactive' }}
+
+          </span>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <div class="card-content">
+
+          <div class="card-title-row">
+
+            <div class="catalog-icon">
+              {{ getIconText(category.icon) }}
+            </div>
+
+            <div>
+
+              <h2>
+                {{ category.name }}
+              </h2>
+
+              <span class="item-id">
+                Category #{{ category.id }}
+              </span>
+
+            </div>
+
+          </div>
+
+          <p>
+            {{
+            category.description ||
+            'No description provided.'
+            }}
+          </p>
+
+        </div>
+
+
+        <!-- META -->
+
+        <div class="card-meta">
+
+          <span>
+            Order {{ category.displayOrder }}
+          </span>
+
+          <span>
+            {{ category.image ? 'Image added' : 'No image' }}
+          </span>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="card-actions">
+
+          <button
+            type="button"
+            class="edit-btn"
+            (click)="openEditCategory(category)">
+
+            Edit
+
+          </button>
+
+          <button
+            type="button"
+            class="delete-btn"
+            [disabled]="
+              deletingCategoryId === category.id
+            "
+            (click)="deleteCategory(category)">
+
+            {{
+            deletingCategoryId === category.id
+            ? 'Deleting...'
+            : 'Delete'
+            }}
+
+          </button>
+
+        </div>
+
+      </article>
+
+    </section>
+
+  </ng-container>
+
+
+  <!-- ========================================================
+       SUBCATEGORIES
+       ======================================================== -->
+
+  <ng-container *ngIf="activeTab === 'subcategories'">
+
+    <section class="toolbar">
+
+      <div class="search-box">
+
+        <span class="search-icon">⌕</span>
+
+        <input
+          type="text"
+          [(ngModel)]="subcategorySearchTerm"
+          placeholder="Search subcategories..." />
+
+        <button
+          *ngIf="subcategorySearchTerm"
+          type="button"
+          class="clear-search"
+          (click)="subcategorySearchTerm = ''">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <select
+        class="category-filter"
+        [(ngModel)]="selectedCategoryFilter">
+
+        <option [ngValue]="null">
+          All Categories
+        </option>
+
+        <option
+          *ngFor="let category of categories"
+          [ngValue]="category.id">
+
+          {{ category.name }}
+
+        </option>
+
+      </select>
+
+
+      <button
+        type="button"
+        class="secondary-btn"
+        [disabled]="loadingSubcategories"
+        (click)="loadSubcategories()">
+
+        <span
+          [class.spin]="loadingSubcategories">
+          ↻
+        </span>
+
+        Refresh
+
+      </button>
+
+    </section>
+
+
+    <!-- SUBCATEGORY LOADING -->
+
+    <section
+      *ngIf="loadingSubcategories"
+      class="state-card">
+
+      <div class="loader"></div>
+
+      <h3>Loading subcategories</h3>
+
+      <p>
+        Please wait while the subcategories are fetched.
+      </p>
+
+    </section>
+
+
+    <!-- SUBCATEGORY EMPTY -->
+
+    <section
+      *ngIf="
+        !loadingSubcategories &&
+        filteredSubcategories.length === 0
+      "
+      class="state-card">
+
+      <div class="empty-icon">◇</div>
+
+      <h3>
+        {{
+        subcategorySearchTerm ||
+        selectedCategoryFilter !== null
+        ? 'No subcategories found'
+        : 'No subcategories yet'
+        }}
+      </h3>
+
+      <p>
+        {{
+        subcategorySearchTerm ||
+        selectedCategoryFilter !== null
+        ? 'Try changing your search or category filter.'
+        : 'Create your first service subcategory.'
+        }}
+      </p>
+
+      <button
+        *ngIf="
+          !subcategorySearchTerm &&
+          selectedCategoryFilter === null
+        "
+        type="button"
+        class="primary-btn"
+        (click)="openCreateSubcategory()">
+
+        Add Subcategory
+
+      </button>
+
+    </section>
+
+
+    <!-- SUBCATEGORY CARDS -->
+
+    <section
+      *ngIf="
+        !loadingSubcategories &&
+        filteredSubcategories.length > 0
+      "
+      class="catalog-grid">
+
+      <article
+        class="catalog-card"
+        *ngFor="
+          let subcategory of filteredSubcategories;
+          trackBy: trackBySubcategoryId
+        ">
+
+        <div class="subcategory-banner">
+
+          <span
+            class="status"
+            [class.active]="subcategory.active"
+            [class.inactive]="!subcategory.active">
+
+            {{
+              subcategory.active
+                ? 'Active'
+                : 'Inactive'
+            }}
+
+          </span>
+
+          <span class="order-label">
+            Order {{ subcategory.displayOrder }}
+          </span>
+
+        </div>
+
+
+        <div class="card-content">
+
+          <div class="card-title-row">
+
+            <div class="catalog-icon">
+              {{ getIconText(subcategory.icon) }}
+            </div>
+
+            <div>
+
+              <h2>
+                {{ subcategory.name }}
+              </h2>
+
+              <span class="item-id">
+                #{{ subcategory.id }}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="parent-category">
+
+            <span>Category</span>
+
+            <strong>
+              {{ subcategory.categoryName }}
+            </strong>
+
+          </div>
+
+
+          <p>
+            {{
+            subcategory.description ||
+            'No description provided.'
+            }}
+          </p>
+
+        </div>
+
+
+        <div class="card-actions">
+
+          <button
+            type="button"
+            class="edit-btn"
+            (click)="openEditSubcategory(subcategory)">
+
+            Edit
+
+          </button>
+
+          <button
+            type="button"
+            class="delete-btn"
+            [disabled]="
+              deletingSubcategoryId ===
+              subcategory.id
+            "
+            (click)="deleteSubcategory(subcategory)">
+
+            {{
+            deletingSubcategoryId ===
+            subcategory.id
+            ? 'Deleting...'
+            : 'Delete'
+            }}
+
+          </button>
+
+        </div>
+
+      </article>
+
+    </section>
+
+  </ng-container>
+
+</div>
+
+
+<!-- ==========================================================
+     CATEGORY MODAL
+     ========================================================== -->
+
+<div
+  *ngIf="showCategoryModal"
+  class="modal-backdrop"
+  (click)="closeCategoryModal()">
+
+  <div
+    class="modal"
+    (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+
+      <div>
+
+        <span class="eyebrow">
+          {{
+            isEditingCategory
+              ? 'EDIT CATEGORY'
+              : 'NEW CATEGORY'
+          }}
+        </span>
+
+        <h2>
+          {{
+          isEditingCategory
+          ? 'Edit Category'
+          : 'Create Category'
+          }}
+        </h2>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="
+          savingCategory ||
+          uploadingImage
+        "
+        (click)="closeCategoryModal()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="image-section">
+
+        <div class="image-preview">
+
+          <img
+            *ngIf="imagePreview"
+            [src]="imagePreview"
+            alt="Category preview" />
+
+          <div
+            *ngIf="!imagePreview"
+            class="image-placeholder">
+
+            <span>▧</span>
+
+            <strong>No image</strong>
+
+            <small>
+              Optional category image
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="image-controls">
+
+          <label class="upload-btn">
+
+            <input
+              type="file"
+              accept="image/*"
+              [disabled]="
+                uploadingImage ||
+                savingCategory
+              "
+              (change)="onImageSelected($event)" />
+
+            {{
+            uploadingImage
+            ? 'Uploading...'
+            : 'Choose Image'
+            }}
+
+          </label>
+
+          <small>
+            Category image is optional.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <div class="form-group full">
+
+          <label>
+            Category Name
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="categoryForm.name"
+            placeholder="e.g. Home Services" />
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label>
+            Description
+          </label>
+
+          <textarea
+            rows="4"
+            [(ngModel)]="categoryForm.description"
+            placeholder="Describe this category...">
+          </textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Icon
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="categoryForm.icon"
+            placeholder="e.g. home, electrician" />
+
+          <small>
+            Shown beside the category name.
+          </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Display Order
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="categoryForm.displayOrder" />
+
+        </div>
+
+
+        <div
+          *ngIf="isEditingCategory"
+          class="form-group full">
+
+          <label class="switch-row">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="categoryForm.active" />
+
+            <span class="switch"></span>
+
+            <span>
+
+              <strong>
+                Active category
+              </strong>
+
+              <small>
+                Active categories are available to customers.
+              </small>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="secondary-btn"
+        [disabled]="
+          savingCategory ||
+          uploadingImage
+        "
+        (click)="closeCategoryModal()">
+
+        Cancel
+
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        [disabled]="
+          savingCategory ||
+          uploadingImage ||
+          !categoryForm.name.trim()
+        "
+        (click)="saveCategory()">
+
+        <span
+          *ngIf="savingCategory"
+          class="button-loader">
+        </span>
+
+        {{
+        savingCategory
+        ? 'Saving...'
+        : isEditingCategory
+        ? 'Update Category'
+        : 'Create Category'
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ==========================================================
+     SUBCATEGORY MODAL
+     ========================================================== -->
+
+<div
+  *ngIf="showSubcategoryModal"
+  class="modal-backdrop"
+  (click)="closeSubcategoryModal()">
+
+  <div
+    class="modal small-modal"
+    (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+
+      <div>
+
+        <span class="eyebrow">
+          {{
+            isEditingSubcategory
+              ? 'EDIT SUBCATEGORY'
+              : 'NEW SUBCATEGORY'
+          }}
+        </span>
+
+        <h2>
+          {{
+          isEditingSubcategory
+          ? 'Edit Subcategory'
+          : 'Create Subcategory'
+          }}
+        </h2>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="savingSubcategory"
+        (click)="closeSubcategoryModal()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="form-grid">
+
+        <div class="form-group full">
+
+          <label>
+            Parent Category
+            <span>*</span>
+          </label>
+
+          <select
+            [(ngModel)]="subcategoryForm.categoryId">
+
+            <option [ngValue]="null">
+              Select category
+            </option>
+
+            <option
+              *ngFor="let category of categories"
+              [ngValue]="category.id">
+
+              {{ category.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label>
+            Subcategory Name
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="subcategoryForm.name"
+            placeholder="e.g. Electrical Services" />
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label>
+            Description
+          </label>
+
+          <textarea
+            rows="4"
+            [(ngModel)]="subcategoryForm.description"
+            placeholder="Describe this subcategory...">
+          </textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Icon
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="subcategoryForm.icon"
+            placeholder="e.g. electrician" />
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Display Order
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="subcategoryForm.displayOrder" />
+
+        </div>
+
+
+        <div
+          *ngIf="isEditingSubcategory"
+          class="form-group full">
+
+          <label class="switch-row">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="subcategoryForm.active" />
+
+            <span class="switch"></span>
+
+            <span>
+
+              <strong>
+                Active subcategory
+              </strong>
+
+              <small>
+                Active subcategories are available to customers.
+              </small>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="secondary-btn"
+        [disabled]="savingSubcategory"
+        (click)="closeSubcategoryModal()">
+
+        Cancel
+
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        [disabled]="
+          savingSubcategory ||
+          !subcategoryForm.name.trim() ||
+          subcategoryForm.categoryId === null
+        "
+        (click)="saveSubcategory()">
+
+        <span
+          *ngIf="savingSubcategory"
+          class="button-loader">
+        </span>
+
+        {{
+        savingSubcategory
+        ? 'Saving...'
+        : isEditingSubcategory
+        ? 'Update Subcategory'
+        : 'Create Subcategory'
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

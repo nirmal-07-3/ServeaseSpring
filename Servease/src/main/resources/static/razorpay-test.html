@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Servease - Razorpay Test</title>
+
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f7fb;
+        }
+
+        .payment-card {
+            width: 400px;
+            max-width: 90%;
+
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            box-shadow:
+                    0 10px 30px
+                    rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        .test-badge {
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            background: #fff3cd;
+
+            color: #856404;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            margin-bottom: 25px;
+        }
+
+        .service {
+            margin-bottom: 25px;
+        }
+
+        .service h2 {
+            margin: 0 0 8px;
+
+            font-size: 21px;
+        }
+
+        .service p {
+            margin: 0;
+
+            color: #666;
+        }
+
+        .amount-section {
+            border-top: 1px solid #eee;
+
+            border-bottom: 1px solid #eee;
+
+            padding: 20px 0;
+
+            margin-bottom: 25px;
+        }
+
+        .amount-label {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+        .amount {
+            font-size: 32px;
+
+            font-weight: bold;
+
+            margin-top: 5px;
+        }
+
+        .pay-button {
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #111827;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .pay-button:hover {
+            opacity: 0.9;
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 20px;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: #f3f4f6;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            word-break: break-word;
+
+            display: none;
+        }
+
+        .info {
+            margin-top: 20px;
+
+            color: #777;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="payment-card">
+
+    <div class="logo">
+        Servease
+    </div>
+
+
+    <div class="test-badge">
+        RAZORPAY TEST MODE
+    </div>
+
+
+    <div class="service">
+
+        <h2>
+            Fan Installation
+        </h2>
+
+        <p>
+            Booking #8
+        </p>
+
+    </div>
+
+
+    <div class="amount-section">
+
+        <div class="amount-label">
+            Amount to Pay
+        </div>
+
+        <div class="amount">
+            ₹349
+        </div>
+
+    </div>
+
+
+    <button
+            id="payButton"
+            class="pay-button">
+
+        Pay ₹349
+
+    </button>
+
+
+    <div
+            id="message"
+            class="message">
+    </div>
+
+
+    <div class="info">
+
+        This is a Razorpay Test Mode payment.
+        No real money will be charged.
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+    /*
+     * =====================================================
+     * SERVEASE RAZORPAY TEST PAGE
+     * =====================================================
+     *
+     * Temporary testing page.
+     *
+     * Later this functionality will move to Angular.
+     */
+
+
+    /*
+     * =====================================================
+     * CUSTOMER JWT
+     * =====================================================
+     *
+     * Paste your CURRENT customer JWT here locally.
+     *
+     * Do NOT commit this file with the JWT to GitHub.
+     */
+
+    const CUSTOMER_TOKEN =
+        "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lckBnbWFpbC5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODY4Njg3OTAsImV4cCI6MTc4Njk1NTE5MH0.zyJbcrQkMVtiHDpAqsF920CxMVu03_cE-alWKN-Fs0x_E8tgFgMZb-BHLxoA2Kbm";
+
+
+    /*
+     * =====================================================
+     * BOOKING ID
+     * =====================================================
+     */
+
+    const bookingId = 8;
+
+
+    /*
+     * =====================================================
+     * RAZORPAY TEST KEY ID
+     * =====================================================
+     *
+     * Public key.
+     *
+     * It is okay for this to be in frontend code.
+     */
+
+    const RAZORPAY_KEY_ID =
+        "rzp_test_TP7XFgUWUzHJpg";
+
+
+    /*
+     * =====================================================
+     * EXISTING RAZORPAY ORDER
+     * =====================================================
+     *
+     * This order was already created by our backend.
+     *
+     * We DO NOT create another order here.
+     */
+
+    const RAZORPAY_ORDER_ID =
+        "order_TQOZ6ozKpjPVde";
+
+
+    /*
+     * =====================================================
+     * PAYMENT AMOUNT
+     * =====================================================
+     *
+     * Database amount:
+     *
+     * ₹349
+     *
+     * Razorpay uses paise:
+     *
+     * 349 × 100 = 34900
+     */
+
+    const amountInPaise = 34900;
+
+
+    /*
+     * =====================================================
+     * HTML ELEMENTS
+     * =====================================================
+     */
+
+    const payButton =
+        document.getElementById("payButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    /*
+     * =====================================================
+     * SHOW MESSAGE
+     * =====================================================
+     */
+
+    function showMessage(text) {
+
+        message.style.display = "block";
+
+        message.textContent = text;
+    }
+
+
+    /*
+     * =====================================================
+     * PAY BUTTON
+     * =====================================================
+     */
+
+    payButton.addEventListener(
+        "click",
+        async function () {
+
+            payButton.disabled = true;
+
+            showMessage(
+                "Opening Razorpay Checkout..."
+            );
+
+
+            /*
+             * =================================================
+             * RAZORPAY CHECKOUT OPTIONS
+             * =================================================
+             */
+
+            const options = {
+
+                /*
+                 * Razorpay Test Key ID
+                 */
+
+                key:
+                RAZORPAY_KEY_ID,
+
+
+                /*
+                 * Amount in paise
+                 */
+
+                amount:
+                amountInPaise,
+
+
+                /*
+                 * Currency
+                 */
+
+                currency:
+                    "INR",
+
+
+                /*
+                 * Application name
+                 */
+
+                name:
+                    "Servease",
+
+
+                /*
+                 * Description
+                 */
+
+                description:
+                    "Fan Installation - Booking #4",
+
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Existing server-created Razorpay order.
+                 */
+
+                order_id:
+                RAZORPAY_ORDER_ID,
+
+
+                /*
+                 * Customer prefill
+                 */
+
+                prefill: {
+
+                    name:
+                        "Servease Customer"
+
+                },
+
+
+                /*
+                 * Checkout theme
+                 */
+
+                theme: {
+
+                    color:
+                        "#111827"
+
+                },
+
+
+                /*
+                 * =================================================
+                 * SUCCESS HANDLER
+                 * =================================================
+                 *
+                 * Razorpay gives us:
+                 *
+                 * payment_id
+                 * order_id
+                 * signature
+                 *
+                 * We send these to Spring Boot.
+                 */
+
+                handler:
+                    async function (response) {
+
+                        console.log(
+                            "Razorpay payment successful."
+                        );
+
+
+                        console.log(
+                            "Payment ID:",
+                            response.razorpay_payment_id
+                        );
+
+
+                        console.log(
+                            "Order ID:",
+                            response.razorpay_order_id
+                        );
+
+
+                        console.log(
+                            "Signature:",
+                            response.razorpay_signature
+                        );
+
+
+                        showMessage(
+                            "Payment successful. " +
+                            "Verifying payment..."
+                        );
+
+
+                        try {
+
+
+                            /*
+                             * =================================================
+                             * SEND PAYMENT DETAILS TO BACKEND
+                             * =================================================
+                             */
+
+                            const verifyResponse =
+                                await fetch(
+                                    "/api/payments/razorpay/verify",
+                                    {
+                                        method: "POST",
+
+                                        headers: {
+
+                                            "Content-Type":
+                                                "application/json",
+
+                                            "Authorization":
+                                                "Bearer " +
+                                                CUSTOMER_TOKEN
+
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+
+                                                razorpayPaymentId:
+                                                response
+                                                    .razorpay_payment_id,
+
+                                                razorpayOrderId:
+                                                response
+                                                    .razorpay_order_id,
+
+                                                razorpaySignature:
+                                                response
+                                                    .razorpay_signature
+
+                                            })
+
+                                    }
+                                );
+
+
+                            /*
+                             * Get backend response.
+                             */
+
+                            const result =
+                                await verifyResponse.json();
+
+
+                            console.log(
+                                "Backend verification response:",
+                                result
+                            );
+
+
+                            /*
+                             * =================================================
+                             * BACKEND VERIFICATION FAILED
+                             * =================================================
+                             */
+
+                            if (
+                                !verifyResponse.ok ||
+                                !result.success
+                            ) {
+
+                                throw new Error(
+                                    result.message ||
+                                    "Payment verification failed."
+                                );
+
+                            }
+
+
+                            /*
+                             * =================================================
+                             * PAYMENT VERIFIED
+                             * =================================================
+                             */
+
+                            showMessage(
+                                "Payment verified successfully! " +
+                                "Payment ID: " +
+                                response.razorpay_payment_id
+                            );
+
+
+                            console.log(
+                                "Payment verification successful."
+                            );
+
+
+                            /*
+                             * Payment is complete.
+                             */
+
+                            payButton.disabled = true;
+
+
+                        } catch (error) {
+
+
+                            console.error(
+                                "Verification error:",
+                                error
+                            );
+
+
+                            showMessage(
+                                "Payment completed, " +
+                                "but backend verification failed: " +
+                                error.message
+                            );
+
+
+                            /*
+                             * Allow retry if verification
+                             * failed.
+                             */
+
+                            payButton.disabled = false;
+
+                        }
+
+                    },
+
+
+                /*
+                 * =================================================
+                 * CHECKOUT CLOSED
+                 * =================================================
+                 */
+
+                modal: {
+
+                    ondismiss:
+                        function () {
+
+                            payButton.disabled =
+                                false;
+
+                            showMessage(
+                                "Payment window closed."
+                            );
+
+                        }
+
+                }
+
+            };
+
+
+            /*
+             * =====================================================
+             * CREATE RAZORPAY INSTANCE
+             * =====================================================
+             */
+
+            const razorpay =
+                new Razorpay(options);
+
+
+            /*
+             * =====================================================
+             * PAYMENT FAILED
+             * =====================================================
+             */
+
+            razorpay.on(
+                "payment.failed",
+                function (response) {
+
+                    console.error(
+                        "Razorpay payment failed:",
+                        response
+                    );
+
+
+                    if (response.error) {
+
+                        console.error(
+                            "Code:",
+                            response.error.code
+                        );
+
+                        console.error(
+                            "Description:",
+                            response.error.description
+                        );
+
+                        console.error(
+                            "Reason:",
+                            response.error.reason
+                        );
+
+                    }
+
+
+                    payButton.disabled =
+                        false;
+
+
+                    showMessage(
+                        "Payment failed. " +
+                        (
+                            response.error &&
+                            response.error.description
+                                ? response.error.description
+                                : "Please try again."
+                        )
+                    );
+
+                }
+            );
+
+
+            /*
+             * =====================================================
+             * OPEN CHECKOUT
+             * ===================================================== */
+
+            razorpay.open();
+
+        }
+
+    );
+
+</script>
+
+
+</body>
+
+</html>

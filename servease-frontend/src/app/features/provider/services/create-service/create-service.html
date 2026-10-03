@@ -1,0 +1,353 @@
+<div class="create-service-page">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/provider/services"
+        class="back-link"
+      >
+        ← My Services
+      </a>
+
+      <h1>Add Service</h1>
+
+      <p>
+        Add a service that you provide to customers.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Error -->
+
+  <div
+    *ngIf="errorMessage"
+    class="alert alert-error"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- Success -->
+
+  <div
+    *ngIf="successMessage"
+    class="alert alert-success"
+  >
+    {{ successMessage }}
+  </div>
+
+
+  <!-- Loading -->
+
+  <div
+    *ngIf="loadingCategories"
+    class="state-card"
+  >
+
+    <div class="loader"></div>
+
+    <p>
+      Loading categories...
+    </p>
+
+  </div>
+
+
+  <!-- Form -->
+
+  <ng-container *ngIf="!loadingCategories">
+
+    <section class="create-card">
+
+      <div class="card-header">
+
+        <span class="section-label">
+          SERVICE INFORMATION
+        </span>
+
+        <h2>
+          Create your service
+        </h2>
+
+        <p>
+          Select the category and enter details about the service you provide.
+        </p>
+
+      </div>
+
+
+      <form
+        (ngSubmit)="createService()"
+        #serviceForm="ngForm"
+        novalidate
+      >
+
+        <!-- Category -->
+
+        <div class="form-group">
+
+          <label for="category">
+            Category
+          </label>
+
+          <select
+            id="category"
+            name="category"
+            [(ngModel)]="selectedCategoryId"
+            (ngModelChange)="onCategoryChange()"
+            required
+          >
+
+            <option
+              [ngValue]="null"
+            >
+              Select category
+            </option>
+
+            <option
+              *ngFor="let category of categories"
+              [ngValue]="category.id"
+            >
+              {{ category.name }}
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Subcategory -->
+
+        <div class="form-group">
+
+          <label for="subCategory">
+            Subcategory
+          </label>
+
+          <select
+            id="subCategory"
+            name="subCategory"
+            [(ngModel)]="selectedSubCategoryId"
+            [disabled]="
+              !selectedCategoryId ||
+              loadingSubCategories
+            "
+            required
+          >
+
+            <option
+              [ngValue]="null"
+            >
+              {{
+              loadingSubCategories
+              ? 'Loading subcategories...'
+              : 'Select subcategory'
+              }}
+            </option>
+
+            <option
+              *ngFor="let subCategory of subCategories"
+              [ngValue]="subCategory.id"
+            >
+              {{ subCategory.name }}
+            </option>
+
+          </select>
+
+          <span
+            *ngIf="
+              selectedCategoryId &&
+              loadingSubCategories
+            "
+            class="field-hint"
+          >
+            Loading available subcategories...
+          </span>
+
+        </div>
+
+
+        <!-- Title -->
+
+        <div class="form-group">
+
+          <label for="title">
+            Service title
+          </label>
+
+          <input
+            id="title"
+            type="text"
+            name="title"
+            [(ngModel)]="service.title"
+            placeholder="e.g. AC repair"
+            maxlength="150"
+            required
+          >
+
+        </div>
+
+
+        <!-- Description -->
+
+        <div class="form-group">
+
+          <label for="description">
+            Service description
+          </label>
+
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="service.description"
+            placeholder="Describe the service you provide..."
+            rows="5"
+            maxlength="1000"
+            required
+          ></textarea>
+
+          <span class="field-hint">
+            Maximum 1000 characters
+          </span>
+
+        </div>
+
+
+        <!-- Price / Duration -->
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="basePrice">
+              Base price (₹)
+            </label>
+
+            <input
+              id="basePrice"
+              type="number"
+              name="basePrice"
+              [(ngModel)]="service.basePrice"
+              min="0.01"
+              step="0.01"
+              placeholder="e.g. 499"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="duration">
+              Estimated duration (minutes)
+            </label>
+
+            <input
+              id="duration"
+              type="number"
+              name="duration"
+              [(ngModel)]="service.estimatedDurationMinutes"
+              min="1"
+              step="1"
+              placeholder="e.g. 60"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- Radius -->
+
+        <div class="form-group">
+
+          <label for="radius">
+            Service radius (km)
+          </label>
+
+          <input
+            id="radius"
+            type="number"
+            name="radius"
+            [(ngModel)]="service.serviceRadiusKm"
+            min="0.1"
+            step="0.1"
+            placeholder="e.g. 6"
+            required
+          >
+
+          <span class="field-hint">
+            Maximum distance you are willing to travel for this service.
+          </span>
+
+        </div>
+
+
+        <!-- Selected Subcategory -->
+
+        <div
+          *ngIf="getSelectedSubCategory() as selectedSubCategory"
+          class="subcategory-info"
+        >
+
+          <strong>
+            {{ selectedSubCategory.name }}
+          </strong>
+
+          <span
+            *ngIf="selectedSubCategory.description"
+          >
+            {{ selectedSubCategory.description }}
+          </span>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div class="form-actions">
+
+          <a
+            routerLink="/provider/services"
+            class="cancel-button"
+          >
+            Cancel
+          </a>
+
+          <button
+            type="submit"
+            class="save-button"
+            [disabled]="
+              saving ||
+              loadingSubCategories
+            "
+          >
+
+            <span *ngIf="!saving">
+              Create service
+            </span>
+
+            <span *ngIf="saving">
+              Creating...
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </ng-container>
+
+</div>

@@ -1,0 +1,263 @@
+<div class="provider-services-page">
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <a
+        class="back-link"
+        [routerLink]="[
+          '/services',
+          categoryId
+        ]"
+      >
+        ← Back to {{ subCategoryName }}
+      </a>
+
+
+      <span class="eyebrow">
+        SERVEASE
+      </span>
+
+
+      <h1>
+        {{ subCategoryName }}
+      </h1>
+
+
+      <p>
+        Compare available professionals and choose
+        the service that works for you.
+      </p>
+
+    </div>
+
+
+    <div class="hero-decoration">
+      <span>✦</span>
+    </div>
+
+  </section>
+
+
+  <!-- CONTENT -->
+
+  <main class="content">
+
+    <div class="section-heading">
+
+      <div>
+
+        <span class="section-eyebrow">
+          AVAILABLE SERVICES
+        </span>
+
+        <h2>
+          Choose a professional service
+        </h2>
+
+      </div>
+
+
+      <span
+        class="service-count"
+        *ngIf="!loading && !error"
+      >
+        {{ services.length }}
+        {{ services.length === 1 ? 'service' : 'services' }}
+      </span>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+      class="loading-state"
+      *ngIf="loading"
+    >
+
+      <div class="spinner"></div>
+
+      <p>
+        Finding available professionals...
+      </p>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div
+      class="error-state"
+      *ngIf="!loading && error"
+    >
+
+      <div class="error-icon">
+        !
+      </div>
+
+
+      <h3>
+        Something went wrong
+      </h3>
+
+
+      <p>
+        {{ error }}
+      </p>
+
+
+      <button
+        type="button"
+        (click)="retry()"
+      >
+        Try again
+      </button>
+
+    </div>
+
+
+    <!-- SERVICE LIST -->
+
+    <div
+      class="service-list"
+      *ngIf="
+        !loading &&
+        !error &&
+        services.length > 0
+      "
+    >
+
+      <article
+        class="service-card"
+        *ngFor="
+          let service of services;
+          let i = index
+        "
+      >
+
+        <div class="service-top">
+
+          <div class="service-icon">
+            ϟ
+          </div>
+
+
+          <span class="service-number">
+            {{ (i + 1).toString().padStart(2, '0') }}
+          </span>
+
+        </div>
+
+
+        <div class="service-main">
+
+          <span class="provider-name">
+            {{ service.providerBusinessName }}
+          </span>
+
+
+          <h3>
+            {{ service.title }}
+          </h3>
+
+
+          <p class="description">
+            {{ service.description }}
+          </p>
+
+
+          <div class="service-meta">
+
+            <span>
+              <strong>
+                ₹{{ formatPrice(service.basePrice) }}
+              </strong>
+              starting
+            </span>
+
+
+            <span>
+              {{ formatDuration(
+                service.estimatedDurationMinutes
+              ) }}
+            </span>
+
+
+            <span>
+              {{ formatRadius(
+                service.serviceRadiusKm
+              ) }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="service-action">
+
+          <a
+            [routerLink]="[
+              '/services',
+              categoryId,
+              subCategoryId,
+              service.id
+            ]"
+          >
+            View service
+            <span>→</span>
+          </a>
+
+        </div>
+
+      </article>
+
+    </div>
+
+
+    <!-- EMPTY -->
+
+    <div
+      class="empty-state"
+      *ngIf="
+        !loading &&
+        !error &&
+        services.length === 0
+      "
+    >
+
+      <div class="empty-icon">
+        ✦
+      </div>
+
+
+      <h3>
+        No professionals available
+      </h3>
+
+
+      <p>
+        There are currently no active services
+        available in this category.
+      </p>
+
+
+      <a
+        class="back-button"
+        [routerLink]="[
+          '/services',
+          categoryId
+        ]"
+      >
+        Browse other services
+      </a>
+
+    </div>
+
+  </main>
+
+</div>

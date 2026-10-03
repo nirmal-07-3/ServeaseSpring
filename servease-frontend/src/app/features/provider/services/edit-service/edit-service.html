@@ -1,0 +1,441 @@
+<div class="edit-service-page">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+
+      <a
+        routerLink="/provider/services"
+        class="back-link"
+      >
+        ← My Services
+      </a>
+
+      <h1>Edit Service</h1>
+
+      <p>
+        Update the details of your service.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Loading -->
+
+  <div
+    *ngIf="loading"
+    class="loading-card"
+  >
+
+    <div class="loading-spinner"></div>
+
+    <p>
+      Loading service...
+    </p>
+
+  </div>
+
+
+  <!-- Error -->
+
+  <div
+    *ngIf="errorMessage && !loading"
+    class="alert alert-error"
+  >
+
+    <span class="alert-icon">
+      !
+    </span>
+
+    <span>
+      {{ errorMessage }}
+    </span>
+
+  </div>
+
+
+  <!-- Edit Form -->
+
+  <form
+    *ngIf="!loading && service"
+    [formGroup]="serviceForm"
+    (ngSubmit)="saveChanges()"
+    class="service-form"
+  >
+
+    <!-- Service Information -->
+
+    <section class="form-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="section-label">
+            SERVICE INFORMATION
+          </span>
+
+          <h2>
+            Basic details
+          </h2>
+
+          <p>
+            Update the information customers will see about this service.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Subcategory -->
+
+      <div class="form-group">
+
+        <label>
+          Subcategory
+        </label>
+
+        <div class="readonly-field">
+
+          <span>
+            {{ service.subCategoryName }}
+          </span>
+
+          <span class="readonly-label">
+            Cannot be changed
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Title -->
+
+      <div class="form-group">
+
+        <label for="title">
+          Service title
+          <span class="required">*</span>
+        </label>
+
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="e.g. AC Repair"
+          [class.invalid]="isInvalid('title')"
+        />
+
+        <div
+          class="field-error"
+          *ngIf="isInvalid('title')"
+        >
+
+          <span *ngIf="title?.errors?.['required']">
+            Service title is required.
+          </span>
+
+          <span *ngIf="title?.errors?.['minlength']">
+            Service title must be at least 2 characters.
+          </span>
+
+          <span *ngIf="title?.errors?.['maxlength']">
+            Service title cannot exceed 100 characters.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Description -->
+
+      <div class="form-group">
+
+        <label for="description">
+          Description
+          <span class="required">*</span>
+        </label>
+
+        <textarea
+          id="description"
+          rows="5"
+          formControlName="description"
+          placeholder="Describe what your service includes..."
+          [class.invalid]="isInvalid('description')"
+        ></textarea>
+
+        <div
+          class="field-error"
+          *ngIf="isInvalid('description')"
+        >
+
+          <span *ngIf="description?.errors?.['required']">
+            Description is required.
+          </span>
+
+          <span *ngIf="description?.errors?.['minlength']">
+            Description must be at least 10 characters.
+          </span>
+
+          <span *ngIf="description?.errors?.['maxlength']">
+            Description cannot exceed 1000 characters.
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Pricing & Service Details -->
+
+    <section class="form-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="section-label">
+            PRICING & DETAILS
+          </span>
+
+          <h2>
+            Service settings
+          </h2>
+
+          <p>
+            Update your pricing, estimated duration and service coverage.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- Base Price -->
+
+        <div class="form-group">
+
+          <label for="basePrice">
+            Starting price
+            <span class="required">*</span>
+          </label>
+
+          <div class="input-with-prefix">
+
+            <span>
+              ₹
+            </span>
+
+            <input
+              id="basePrice"
+              type="number"
+              min="1"
+              step="0.01"
+              formControlName="basePrice"
+              placeholder="500"
+              [class.invalid]="isInvalid('basePrice')"
+            />
+
+          </div>
+
+          <div
+            class="field-error"
+            *ngIf="isInvalid('basePrice')"
+          >
+
+            <span *ngIf="basePrice?.errors?.['required']">
+              Starting price is required.
+            </span>
+
+            <span *ngIf="basePrice?.errors?.['min']">
+              Starting price must be greater than 0.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- Duration -->
+
+        <div class="form-group">
+
+          <label for="estimatedDurationMinutes">
+            Estimated duration
+            <span class="required">*</span>
+          </label>
+
+          <div class="input-with-suffix">
+
+            <input
+              id="estimatedDurationMinutes"
+              type="number"
+              min="1"
+              step="1"
+              formControlName="estimatedDurationMinutes"
+              placeholder="60"
+              [class.invalid]="isInvalid('estimatedDurationMinutes')"
+            />
+
+            <span>
+              minutes
+            </span>
+
+          </div>
+
+          <div
+            class="field-error"
+            *ngIf="isInvalid('estimatedDurationMinutes')"
+          >
+
+            <span
+              *ngIf="estimatedDurationMinutes?.errors?.['required']"
+            >
+              Duration is required.
+            </span>
+
+            <span
+              *ngIf="estimatedDurationMinutes?.errors?.['min']"
+            >
+              Duration must be greater than 0.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- Radius -->
+
+        <div class="form-group">
+
+          <label for="serviceRadiusKm">
+            Service radius
+            <span class="required">*</span>
+          </label>
+
+          <div class="input-with-suffix">
+
+            <input
+              id="serviceRadiusKm"
+              type="number"
+              min="1"
+              step="0.1"
+              formControlName="serviceRadiusKm"
+              placeholder="10"
+              [class.invalid]="isInvalid('serviceRadiusKm')"
+            />
+
+            <span>
+              km
+            </span>
+
+          </div>
+
+          <div
+            class="field-error"
+            *ngIf="isInvalid('serviceRadiusKm')"
+          >
+
+            <span
+              *ngIf="serviceRadiusKm?.errors?.['required']"
+            >
+              Service radius is required.
+            </span>
+
+            <span
+              *ngIf="serviceRadiusKm?.errors?.['min']"
+            >
+              Service radius must be greater than 0.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Current Status -->
+
+    <section class="form-card status-card">
+
+      <div class="status-information">
+
+        <div>
+
+          <span class="section-label">
+            CURRENT STATUS
+          </span>
+
+          <h2>
+            Service visibility
+          </h2>
+
+          <p>
+            You can change the active status from the My Services page.
+          </p>
+
+        </div>
+
+
+        <span
+          class="status-badge"
+          [class.active]="service.active"
+          [class.inactive]="!service.active"
+        >
+          {{ service.active ? 'Active' : 'Inactive' }}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- Form Actions -->
+
+    <div class="form-actions">
+
+      <a
+        routerLink="/provider/services"
+        class="cancel-button"
+        [class.disabled]="saving"
+      >
+        Cancel
+      </a>
+
+
+      <button
+        type="submit"
+        class="save-button"
+        [disabled]="saving"
+      >
+
+        <span *ngIf="!saving">
+          Save changes
+        </span>
+
+        <span *ngIf="saving">
+          Saving...
+        </span>
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
