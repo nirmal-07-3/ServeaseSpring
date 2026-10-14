@@ -1,28 +1,22 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnInit
-} from '@angular/core';
-
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { finalize } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+
 import { Auth } from '../../../core/services/auth';
 
-
-
-import {
-  BookingStatus,
-  BookingResponse
-} from '../bookings/bookings';
-
-
-
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
+interface ProviderBooking {
+  id?: number;
+  customerName?: string;
+  serviceName?: string;
+  serviceTitle?: string;
+  bookingDate?: string;
+  bookingTime?: string;
+  agreedPrice?: number;
+  status?: string;
+  address?: string;
+  city?: string;
 }
 
 @Component({
@@ -30,7 +24,8 @@ interface ApiResponse<T> {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -39,89 +34,60 @@ export class Dashboard implements OnInit {
 
   providerName = 'Provider';
 
-  bookings: BookingResponse[] = [];
+  bookings: ProviderBooking[] = [];
 
   loading = false;
   errorMessage = '';
 
+  sidebarOpen = false;
+
   constructor(
     private auth: Auth,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
-  ) {
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
     const user = this.auth.getUser();
 
     if (user?.name) {
       this.providerName = user.name;
     }
-  }
-
-  ngOnInit(): void {
 
     this.loadProviderData();
   }
 
-
-  // ============================================================
-  // LOAD PROVIDER DATA
-  // ============================================================
-
   loadProviderData(): void {
-
     this.loading = true;
     this.errorMessage = '';
 
-    this.http
-      .get<ApiResponse<BookingResponse[]>>(
-        '/api/provider/bookings'
-      )
+    this.http.get<any>('/api/provider/bookings')
       .pipe(
         finalize(() => {
-
           this.loading = false;
-
           this.cdr.detectChanges();
-
-          console.log(
-            'PROVIDER DASHBOARD LOADING:',
-            this.loading
-          );
-
         })
       )
       .subscribe({
-
         next: (response) => {
-
-          console.log(
-            'PROVIDER DASHBOARD RESPONSE:',
-            response
-          );
-
           if (
-            response &&
-            response.success === true &&
+            response?.success === true &&
             Array.isArray(response.data)
           ) {
-
             this.bookings = response.data;
-
           } else {
-
             this.bookings = [];
 
             this.errorMessage =
               response?.message ||
-              'Unable to load provider data.';
+              'Unable to load provider bookings.';
           }
-
-          this.cdr.detectChanges();
         },
 
         error: (error) => {
-
           console.error(
-            'PROVIDER DASHBOARD ERROR:',
+            'Error loading provider dashboard:',
             error
           );
 
@@ -129,21 +95,12 @@ export class Dashboard implements OnInit {
 
           this.errorMessage =
             error?.error?.message ||
-            'Failed to load dashboard data. Please try again.';
-
-          this.cdr.detectChanges();
+            'Unable to load dashboard data. Please try again.';
         }
-
       });
   }
 
-
-  // ============================================================
-  // REFRESH
-  // ============================================================
-
   refreshDashboard(): void {
-
     if (this.loading) {
       return;
     }
@@ -151,234 +108,232 @@ export class Dashboard implements OnInit {
     this.loadProviderData();
   }
 
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 
-  // ============================================================
-  // STATISTICS
-  // ============================================================
+  closeSidebar(): void {
+    this.sidebarOpen = false;
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.closeSidebar();
+    this.router.navigate(['/login']);
+  }
+
+  getProviderInitials(): string {
+    if (!this.providerName) {
+      return 'P';
+    }
+
+    const parts = this.providerName
+      .trim()
+      .split(/\s+/);
+
+    if (parts.length === 1) {
+      return parts[0]
+        .charAt(0)
+        .toUpperCase();
+    }
+
+    return (
+      parts[0].charAt(0) +
+      parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
+  }
 
   get totalBookings(): number {
-
     return this.bookings.length;
   }
 
-
   get pendingBookings(): number {
-
     return this.bookings.filter(
-      booking =>
-        booking.status === BookingStatus.PENDING
+      booking => booking.status === 'PENDING'
     ).length;
   }
-
 
   get acceptedBookings(): number {
-
     return this.bookings.filter(
-      booking =>
-        booking.status === BookingStatus.ACCEPTED
+      booking => booking.status === 'ACCEPTED'
     ).length;
   }
-
 
   get inProgressBookings(): number {
-
     return this.bookings.filter(
-      booking =>
-        booking.status === BookingStatus.IN_PROGRESS
+      booking => booking.status === 'IN_PROGRESS'
     ).length;
   }
-
 
   get completedBookings(): number {
-
     return this.bookings.filter(
-      booking =>
-        booking.status === BookingStatus.COMPLETED
+      booking => booking.status === 'COMPLETED'
     ).length;
   }
 
-
-  // ============================================================
-  // TOTAL EARNINGS
-  // ============================================================
-
   get totalEarnings(): number {
-
     return this.bookings
       .filter(
-        booking =>
-          booking.status === BookingStatus.COMPLETED
+        booking => booking.status === 'COMPLETED'
       )
-      .reduce(
-        (total, booking) =>
-          total + Number(booking.agreedPrice || 0),
-        0
-      );
+      .reduce((total, booking) => {
+        return total +
+          Number(booking.agreedPrice || 0);
+      }, 0);
   }
 
-
-  // ============================================================
-  // RECENT BOOKINGS
-  // ============================================================
-
-  get recentBookings(): BookingResponse[] {
-
+  get recentBookings(): ProviderBooking[] {
     return [...this.bookings]
       .sort((a, b) => {
+        const dateA = new Date(
+          `${a.bookingDate || ''}T${a.bookingTime || '00:00'}`
+        ).getTime();
 
-        const dateA =
-          new Date(
-            `${a.bookingDate}T${a.bookingTime}`
-          ).getTime();
-
-        const dateB =
-          new Date(
-            `${b.bookingDate}T${b.bookingTime}`
-          ).getTime();
+        const dateB = new Date(
+          `${b.bookingDate || ''}T${b.bookingTime || '00:00'}`
+        ).getTime();
 
         return dateB - dateA;
-
       })
       .slice(0, 5);
   }
 
+  get todaysBookings(): ProviderBooking[] {
+    const today = new Date();
 
-  // ============================================================
-  // TODAY'S BOOKINGS
-  // ============================================================
+    const todayString = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0')
+    ].join('-');
 
-  get todaysBookings(): BookingResponse[] {
+    return this.bookings
+      .filter(booking => {
+        return (
+          this.formatDateForComparison(
+            booking.bookingDate
+          ) === todayString
+        );
+      })
+      .sort((a, b) => {
+        const timeA =
+          a.bookingTime || '00:00';
 
-    const today =
-      new Date();
+        const timeB =
+          b.bookingTime || '00:00';
 
-    const todayString =
-      this.formatDateForComparison(today);
-
-    return [...this.bookings]
-      .filter(
-        booking =>
-          booking.bookingDate === todayString
-      )
-      .sort((a, b) =>
-        a.bookingTime.localeCompare(
-          b.bookingTime
-        )
-      );
+        return timeA.localeCompare(timeB);
+      });
   }
-
-
-  // ============================================================
-  // DATE COMPARISON
-  // ============================================================
 
   private formatDateForComparison(
-    date: Date
-  ): string {
-
-    const year =
-      date.getFullYear();
-
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, '0');
-
-    const day =
-      String(
-        date.getDate()
-      ).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
-
-
-  // ============================================================
-  // STATUS LABEL
-  // ============================================================
-
-  getStatusLabel(
-    status: BookingStatus
-  ): string {
-
-    switch (status) {
-
-      case BookingStatus.PENDING:
-        return 'Pending';
-
-      case BookingStatus.ACCEPTED:
-        return 'Accepted';
-
-      case BookingStatus.REJECTED:
-        return 'Rejected';
-
-      case BookingStatus.IN_PROGRESS:
-        return 'In progress';
-
-      case BookingStatus.COMPLETED:
-        return 'Completed';
-
-      case BookingStatus.CANCELLED:
-        return 'Cancelled';
-
-      default:
-        return status;
-    }
-  }
-
-
-  // ============================================================
-  // STATUS CLASS
-  // ============================================================
-
-  getStatusClass(
-    status: BookingStatus
-  ): string {
-
-    switch (status) {
-
-      case BookingStatus.PENDING:
-        return 'pending';
-
-      case BookingStatus.ACCEPTED:
-        return 'accepted';
-
-      case BookingStatus.REJECTED:
-        return 'rejected';
-
-      case BookingStatus.IN_PROGRESS:
-        return 'in-progress';
-
-      case BookingStatus.COMPLETED:
-        return 'completed';
-
-      case BookingStatus.CANCELLED:
-        return 'cancelled';
-
-      default:
-        return '';
-    }
-  }
-
-
-  // ============================================================
-  // DATE
-  // ============================================================
-
-  formatDate(
-    date: string
+    date: any
   ): string {
 
     if (!date) {
-      return '-';
+      return '';
     }
 
-    const parsed =
-      new Date(
-        `${date}T00:00:00`
-      );
+    if (typeof date === 'string') {
+      return date.substring(0, 10);
+    }
 
-    return parsed.toLocaleDateString(
+    const parsedDate = new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return '';
+    }
+
+    return [
+      parsedDate.getFullYear(),
+      String(
+        parsedDate.getMonth() + 1
+      ).padStart(2, '0'),
+      String(
+        parsedDate.getDate()
+      ).padStart(2, '0')
+    ].join('-');
+  }
+
+  getStatusLabel(
+    status: string | undefined
+  ): string {
+
+    switch (status) {
+
+      case 'PENDING':
+        return 'Pending';
+
+      case 'ACCEPTED':
+        return 'Accepted';
+
+      case 'IN_PROGRESS':
+        return 'In Progress';
+
+      case 'COMPLETED':
+        return 'Completed';
+
+      case 'REJECTED':
+        return 'Rejected';
+
+      case 'CANCELLED':
+        return 'Cancelled';
+
+      default:
+        return status || 'Unknown';
+    }
+  }
+
+  getStatusClass(
+    status: string | undefined
+  ): string {
+
+    switch (status) {
+
+      case 'PENDING':
+        return 'status-pending';
+
+      case 'ACCEPTED':
+        return 'status-accepted';
+
+      case 'IN_PROGRESS':
+        return 'status-progress';
+
+      case 'COMPLETED':
+        return 'status-completed';
+
+      case 'REJECTED':
+        return 'status-rejected';
+
+      case 'CANCELLED':
+        return 'status-cancelled';
+
+      default:
+        return 'status-default';
+    }
+  }
+
+  formatDate(date: any): string {
+
+    if (!date) {
+      return '—';
+    }
+
+    const parsedDate = new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return date;
+    }
+
+    return parsedDate.toLocaleDateString(
       'en-IN',
       {
         day: '2-digit',
@@ -388,34 +343,31 @@ export class Dashboard implements OnInit {
     );
   }
 
-
-  // ============================================================
-  // TIME
-  // ============================================================
-
   formatTime(
-    time: string
+    time: string | undefined | null
   ): string {
 
     if (!time) {
-      return '-';
+      return '—';
     }
 
-    const parts =
-      time.split(':');
+    const parts = time.split(':');
 
     if (parts.length < 2) {
       return time;
     }
 
-    const hours =
-      Number(parts[0]);
+    const hours = Number(parts[0]);
+    const minutes = Number(parts[1]);
 
-    const minutes =
-      Number(parts[1]);
+    if (
+      Number.isNaN(hours) ||
+      Number.isNaN(minutes)
+    ) {
+      return time;
+    }
 
-    const date =
-      new Date();
+    const date = new Date();
 
     date.setHours(
       hours,
@@ -427,30 +379,23 @@ export class Dashboard implements OnInit {
     return date.toLocaleTimeString(
       'en-IN',
       {
-        hour: '2-digit',
-        minute: '2-digit'
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
       }
     );
   }
 
+  formatPrice(price: any): string {
 
-  // ============================================================
-  // PRICE
-  // ============================================================
+    const amount = Number(price || 0);
 
-  formatPrice(
-    price: number
-  ): string {
-
-    return new Intl.NumberFormat(
+    return amount.toLocaleString(
       'en-IN',
       {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2
       }
-    ).format(
-      Number(price || 0)
     );
   }
-
 }

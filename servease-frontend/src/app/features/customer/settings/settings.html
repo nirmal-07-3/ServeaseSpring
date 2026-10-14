@@ -1,0 +1,269 @@
+<div class="settings-page">
+
+  <div class="settings-header">
+    <div>
+      <span class="page-label">ACCOUNT</span>
+      <h1>Settings</h1>
+      <p>Manage your profile and account security.</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading your profile...</span>
+  </div>
+
+  <div *ngIf="!loading" class="settings-content">
+
+    <div class="profile-card">
+
+      <div class="card-heading">
+        <div>
+          <span class="section-label">PERSONAL INFORMATION</span>
+          <h2>Your Profile</h2>
+          <p>Keep your personal information up to date.</p>
+        </div>
+      </div>
+
+      <div class="profile-overview">
+
+        <div class="avatar">
+          <img
+            *ngIf="profile?.profileImage"
+            [src]="profile?.profileImage"
+            alt="Profile"
+          />
+
+          <span *ngIf="!profile?.profileImage">
+            {{ getInitials() }}
+          </span>
+        </div>
+
+        <div class="profile-summary">
+          <h3>{{ profile?.name }}</h3>
+          <p>{{ profile?.email }}</p>
+
+          <div class="status-row">
+            <span class="role-badge">
+              {{ profile?.role }}
+            </span>
+
+            <span class="verified-badge" *ngIf="profile?.emailVerified">
+              ✓ Email Verified
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div
+        *ngIf="profileSuccess"
+        class="alert success-alert"
+      >
+        <span>✓</span>
+        <span>{{ profileSuccess }}</span>
+      </div>
+
+      <div
+        *ngIf="profileError"
+        class="alert error-alert"
+      >
+        <span>!</span>
+        <span>{{ profileError }}</span>
+      </div>
+
+      <form
+        class="settings-form"
+        (ngSubmit)="saveProfile()"
+      >
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="name">Full Name</label>
+
+            <input
+              id="name"
+              type="text"
+              name="name"
+              [(ngModel)]="profileForm.name"
+              (input)="clearProfileMessages()"
+              placeholder="Enter your full name"
+              maxlength="100"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+
+            <input
+              id="email"
+              type="email"
+              [value]="profile?.email || ''"
+              disabled
+            />
+
+            <span class="field-note">
+              Email address cannot be changed here.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+
+            <input
+              id="phone"
+              type="tel"
+              name="phone"
+              [(ngModel)]="profileForm.phone"
+              (input)="clearProfileMessages()"
+              placeholder="10-digit phone number"
+              maxlength="10"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="profileImage">Profile Image URL</label>
+
+            <input
+              id="profileImage"
+              type="text"
+              name="profileImage"
+              [(ngModel)]="profileForm.profileImage"
+              (input)="clearProfileMessages()"
+              placeholder="https://example.com/profile.jpg"
+            />
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="primary-btn"
+            [disabled]="savingProfile"
+          >
+            <span
+              *ngIf="savingProfile"
+              class="button-spinner"
+            ></span>
+
+            <span>
+              {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+            </span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="password-card">
+
+      <div class="card-heading">
+        <div>
+          <span class="section-label">SECURITY</span>
+          <h2>Change Password</h2>
+          <p>Update your password to keep your account secure.</p>
+        </div>
+
+        <div class="security-icon">
+          🔒
+        </div>
+      </div>
+
+      <div
+        *ngIf="passwordSuccess"
+        class="alert success-alert"
+      >
+        <span>✓</span>
+        <span>{{ passwordSuccess }}</span>
+      </div>
+
+      <div
+        *ngIf="passwordError"
+        class="alert error-alert"
+      >
+        <span>!</span>
+        <span>{{ passwordError }}</span>
+      </div>
+
+      <form
+        class="settings-form"
+        (ngSubmit)="changePassword()"
+      >
+
+        <div class="password-grid">
+
+          <div class="form-group">
+            <label for="oldPassword">Current Password</label>
+
+            <input
+              id="oldPassword"
+              type="password"
+              name="oldPassword"
+              [(ngModel)]="passwordForm.oldPassword"
+              (input)="clearPasswordMessages()"
+              placeholder="Enter current password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+
+            <input
+              id="newPassword"
+              type="password"
+              name="newPassword"
+              [(ngModel)]="passwordForm.newPassword"
+              (input)="clearPasswordMessages()"
+              placeholder="Minimum 8 characters"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmNewPassword">Confirm New Password</label>
+
+            <input
+              id="confirmNewPassword"
+              type="password"
+              name="confirmNewPassword"
+              [(ngModel)]="passwordForm.confirmNewPassword"
+              (input)="clearPasswordMessages()"
+              placeholder="Confirm new password"
+            />
+          </div>
+
+        </div>
+
+        <div class="security-note">
+          <span class="security-note-icon">i</span>
+          <span>
+            Use a strong password with at least 8 characters.
+          </span>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="secondary-btn"
+            [disabled]="changingPassword"
+          >
+            <span
+              *ngIf="changingPassword"
+              class="button-spinner"
+            ></span>
+
+            <span>
+              {{ changingPassword ? 'Updating...' : 'Change Password' }}
+            </span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

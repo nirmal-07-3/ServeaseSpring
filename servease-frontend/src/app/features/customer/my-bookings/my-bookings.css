@@ -48,6 +48,12 @@
 /* ================================
    BUTTONS
 ================================ */
+.secondary-btn,
+.cancel-btn,
+.booking-actions .primary-btn {
+  width: 100%;
+  text-align: center;
+}
 
 .refresh-btn,
 .primary-btn,

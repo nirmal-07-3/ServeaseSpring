@@ -1,7 +1,5 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
-
 
 export const routes: Routes = [
 
@@ -47,11 +45,92 @@ export const routes: Routes = [
   },
 
   {
-    path: 'home',
+    path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/customer/dashboard/dashboard')
-        .then(m => m.Dashboard)
+      import('./shared/layouts/app-layout/app-layout')
+        .then(m => m.AppLayout),
+
+    children: [
+
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('./features/customer/dashboard/dashboard')
+            .then(m => m.Dashboard)
+      },
+
+      {
+        path: 'services',
+        loadComponent: () =>
+          import('./features/customer/services/services')
+            .then(m => m.Services)
+      },
+
+      {
+        path: 'services/:categoryId',
+        loadComponent: () =>
+          import('./features/customer/category-services/category-services')
+            .then(m => m.CategoryServices)
+      },
+
+      {
+        path: 'services/:categoryId/:subCategoryId',
+        loadComponent: () =>
+          import('./features/customer/provider-services/provider-services')
+            .then(m => m.ProviderServices)
+      },
+
+      {
+        path: 'services/:categoryId/:subCategoryId/:serviceId',
+        loadComponent: () =>
+          import('./features/customer/service-details/service-details')
+            .then(m => m.ServiceDetails)
+      },
+
+      {
+        path: 'services/:categoryId/:subCategoryId/:serviceId/book',
+        loadComponent: () =>
+          import('./features/customer/booking/booking')
+            .then(m => m.Booking)
+      },
+
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./features/customer/my-bookings/my-bookings')
+            .then(m => m.MyBookings)
+      },
+
+      {
+        path: 'bookings/:id',
+        loadComponent: () =>
+          import('./features/customer/booking-details/booking-details')
+            .then(m => m.BookingDetails)
+      },
+
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/customer/settings/settings')
+            .then(m => m.Settings)
+      },
+
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/customer/profile/profile')
+            .then(m => m.Profile)
+      },
+
+      {
+        path: 'messages',
+        loadComponent: () =>
+          import('./features/customer/messages/messages')
+            .then(m => m.Messages)
+      },
+
+    ]
   },
 
   {
@@ -63,12 +142,29 @@ export const routes: Routes = [
   },
 
   {
+    path: 'admin/providers',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin/providers/providers')
+        .then(m => m.Providers)
+  },
+
+  {
+    path: 'admin/categories',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin/categories/categories')
+        .then(m => m.Categories)
+  },
+
+  {
     path: 'provider/dashboard',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/provider/dashboard/dashboard')
         .then(m => m.Dashboard)
   },
+
   {
     path: 'provider/profile',
     canActivate: [authGuard],
@@ -76,13 +172,15 @@ export const routes: Routes = [
       import('./features/provider/profile/profile')
         .then(m => m.Profile)
   },
+
   {
     path: 'provider/availability',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/provider/availability/availability')
-        .then(m => m.Availability),
-    canActivate: [authGuard]
+        .then(m => m.Availability)
   },
+
   {
     path: 'provider/services',
     canActivate: [authGuard],
@@ -101,6 +199,7 @@ export const routes: Routes = [
 
   {
     path: 'provider/services/edit/:id',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/provider/services/edit-service/edit-service')
         .then(m => m.EditService)
@@ -122,82 +221,13 @@ export const routes: Routes = [
         .then(m => m.Verification)
   },
 
-
-  {
-    path: 'services',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/services/services')
-        .then(m => m.Services)
-  },
-
-  {
-    path: 'services/:categoryId',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/category-services/category-services')
-        .then(m => m.CategoryServices)
-  },
-
-  {
-    path: 'services/:categoryId/:subCategoryId',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/provider-services/provider-services')
-        .then(m => m.ProviderServices)
-  },
-
-  {
-    path: 'services/:categoryId/:subCategoryId/:serviceId',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/service-details/service-details')
-        .then(m => m.ServiceDetails)
-  },
-
-  {
-    path: 'services/:categoryId/:subCategoryId/:serviceId/book',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/booking/booking')
-        .then(m => m.Booking)
-  },
-
-  {
-    path: 'bookings',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/my-bookings/my-bookings')
-        .then(m => m.MyBookings)
-  },
-
-  {
-    path: 'bookings/:id',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/customer/booking-details/booking-details')
-        .then(m => m.BookingDetails)
-  },
-
-  {
-    path: 'admin/providers',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/admin/providers/providers')
-        .then(m => m.Providers)
-  },
-
-  {
-    path: 'admin/categories',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/admin/categories/categories')
-        .then(m => m.Categories)
-  },
-
-
-
-
+  // {
+  //   path: 'provider/messages',
+  //   canActivate: [authGuard],
+  //   loadComponent: () =>
+  //     import('./features/provider/messages/messages')
+  //       .then(m => m.Messages)
+  // },
 
   {
     path: '**',

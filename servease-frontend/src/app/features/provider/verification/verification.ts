@@ -18,6 +18,11 @@ interface ApiResponse<T> {
 }
 
 
+interface ProviderVerificationProfile {
+  verificationStatus: string;
+}
+
+
 export type DocumentType =
   | 'AADHAR'
   | 'PAN'
@@ -39,6 +44,7 @@ export interface ProviderDocument {
   verified: boolean;
 
   uploadedAt: string;
+
 }
 
 
@@ -62,6 +68,15 @@ export interface ProviderDocument {
 
 
 export class Verification implements OnInit {
+
+
+  // ============================================================
+  // PROVIDER VERIFICATION STATUS
+  // ============================================================
+
+  verificationStatus = 'PENDING';
+
+  verificationLoading = true;
 
 
   // ============================================================
@@ -159,7 +174,302 @@ export class Verification implements OnInit {
 
   ngOnInit(): void {
 
+    this.loadVerificationStatus();
+
     this.loadDocuments();
+
+  }
+
+
+  // ============================================================
+  // LOAD PROVIDER VERIFICATION STATUS
+  // ============================================================
+
+  loadVerificationStatus(): void {
+
+    this.verificationLoading = true;
+
+    this.http
+
+      .get<ApiResponse<ProviderVerificationProfile>>(
+        '/api/providers/me'
+      )
+
+      .pipe(
+
+        finalize(() => {
+
+          this.verificationLoading = false;
+
+          this.cdr.detectChanges();
+
+        })
+
+      )
+
+      .subscribe({
+
+        next: (response) => {
+
+          if (
+
+            response &&
+
+            response.success &&
+
+            response.data
+
+          ) {
+
+            this.verificationStatus =
+              response.data.verificationStatus ||
+              'PENDING';
+
+          }
+
+          else {
+
+            this.verificationStatus = 'PENDING';
+
+          }
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'VERIFICATION: PROFILE STATUS LOAD ERROR =',
+            error
+          );
+
+          this.verificationStatus = 'PENDING';
+
+        }
+
+      });
+
+  }
+
+
+  // ============================================================
+  // VERIFICATION STATUS LABEL
+  // ============================================================
+
+  getVerificationLabel(): string {
+
+    switch (
+      this.verificationStatus
+      ) {
+
+      case 'APPROVED':
+
+        return 'Verified';
+
+
+      case 'REJECTED':
+
+        return 'Rejected';
+
+
+      case 'PENDING':
+
+      default:
+
+        return 'Pending verification';
+
+    }
+
+  }
+
+
+  // ============================================================
+  // VERIFICATION STATUS DESCRIPTION
+  // ============================================================
+
+  getVerificationDescription(): string {
+
+    switch (
+      this.verificationStatus
+      ) {
+
+      case 'APPROVED':
+
+        return 'Your provider account has been verified.';
+
+
+      case 'REJECTED':
+
+        return 'Your provider verification was not approved.';
+
+
+      case 'PENDING':
+
+      default:
+
+        return 'Your provider verification is currently under review.';
+
+    }
+
+  }
+
+
+  // ============================================================
+  // VERIFICATION STATUS CLASS
+  // ============================================================
+
+  getVerificationStatusClass(): string {
+
+    switch (
+      this.verificationStatus
+      ) {
+
+      case 'APPROVED':
+
+        return 'approved';
+
+
+      case 'REJECTED':
+
+        return 'rejected';
+
+
+      case 'PENDING':
+
+      default:
+
+        return 'pending';
+
+    }
+
+  }
+
+
+  // ============================================================
+  // FILE SELECT
+  // ============================================================
+
+  onFileSelected(
+    event: Event
+  ): void {
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+    this.selectedFile = null;
+
+    this.selectedFileName = '';
+
+
+    const input =
+      event.target as HTMLInputElement;
+
+
+    if (
+
+      !input.files ||
+
+      input.files.length === 0
+
+    ) {
+
+      return;
+
+    }
+
+
+    const file =
+      input.files[0];
+
+
+    const allowedTypes = [
+
+      'application/pdf',
+
+      'image/jpeg',
+
+      'image/jpg',
+
+      'image/png'
+
+    ];
+
+
+    if (!allowedTypes.includes(file.type)) {
+
+      this.errorMessage =
+        'Only PDF, JPG, JPEG and PNG files are allowed.';
+
+      input.value = '';
+
+      return;
+
+    }
+
+
+    const maxSize =
+      5 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
+
+      this.errorMessage =
+        'File size must not exceed 5 MB.';
+
+      input.value = '';
+
+      return;
+
+    }
+
+
+    this.selectedFile = file;
+
+    this.selectedFileName = file.name;
+
+  }
+
+
+  // ============================================================
+  // DOCUMENT TYPE CHANGE
+  // ============================================================
+
+  onDocumentTypeChange(): void {
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+  }
+
+
+  // ============================================================
+  // CHECK WHETHER DOCUMENT ALREADY EXISTS
+  // ============================================================
+
+  hasDocumentType(
+    documentType: DocumentType
+  ): boolean {
+
+    return this.documents.some(
+
+      document =>
+        document.documentType === documentType
+
+    );
+
+  }
+
+
+  // ============================================================
+  // SELECTED DOCUMENT ALREADY EXISTS
+  // ============================================================
+
+  selectedTypeAlreadyUploaded(): boolean {
+
+    return this.hasDocumentType(
+      this.selectedDocumentType
+    );
 
   }
 
@@ -252,144 +562,6 @@ export class Verification implements OnInit {
 
 
   // ============================================================
-  // FILE SELECT
-  // ============================================================
-
-  onFileSelected(
-    event: Event
-  ): void {
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
-    this.selectedFile = null;
-
-    this.selectedFileName = '';
-
-
-    const input =
-      event.target as HTMLInputElement;
-
-
-    if (
-
-      !input.files ||
-
-      input.files.length === 0
-
-    ) {
-
-      return;
-
-    }
-
-
-    const file =
-      input.files[0];
-
-
-    // ----------------------------------------------------------
-    // FILE TYPE
-    // ----------------------------------------------------------
-
-    const allowedTypes = [
-
-      'application/pdf',
-
-      'image/jpeg',
-
-      'image/jpg',
-
-      'image/png'
-
-    ];
-
-
-    if (!allowedTypes.includes(file.type)) {
-
-      this.errorMessage =
-        'Only PDF, JPG, JPEG and PNG files are allowed.';
-
-      input.value = '';
-
-      return;
-
-    }
-
-
-    // ----------------------------------------------------------
-    // FILE SIZE
-    // ----------------------------------------------------------
-
-    const maxSize =
-      5 * 1024 * 1024;
-
-
-    if (file.size > maxSize) {
-
-      this.errorMessage =
-        'File size must not exceed 5 MB.';
-
-      input.value = '';
-
-      return;
-
-    }
-
-
-    this.selectedFile = file;
-
-    this.selectedFileName = file.name;
-
-  }
-
-
-  // ============================================================
-  // DOCUMENT TYPE CHANGE
-  // ============================================================
-
-  onDocumentTypeChange(): void {
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
-  }
-
-
-  // ============================================================
-  // CHECK WHETHER DOCUMENT ALREADY EXISTS
-  // ============================================================
-
-  hasDocumentType(
-    documentType: DocumentType
-  ): boolean {
-
-    return this.documents.some(
-
-      document =>
-        document.documentType === documentType
-
-    );
-
-  }
-
-
-  // ============================================================
-  // SELECTED DOCUMENT ALREADY EXISTS
-  // ============================================================
-
-  selectedTypeAlreadyUploaded(): boolean {
-
-    return this.hasDocumentType(
-      this.selectedDocumentType
-    );
-
-  }
-
-
-  // ============================================================
   // UPLOAD DOCUMENT
   // ============================================================
 
@@ -400,20 +572,12 @@ export class Verification implements OnInit {
     this.successMessage = '';
 
 
-    // ----------------------------------------------------------
-    // PREVENT MULTIPLE REQUESTS
-    // ----------------------------------------------------------
-
     if (this.uploading) {
 
       return;
 
     }
 
-
-    // ----------------------------------------------------------
-    // DOCUMENT TYPE
-    // ----------------------------------------------------------
 
     if (!this.selectedDocumentType) {
 
@@ -424,10 +588,6 @@ export class Verification implements OnInit {
 
     }
 
-
-    // ----------------------------------------------------------
-    // DUPLICATE CHECK
-    // ----------------------------------------------------------
 
     if (this.selectedTypeAlreadyUploaded()) {
 
@@ -441,10 +601,6 @@ export class Verification implements OnInit {
     }
 
 
-    // ----------------------------------------------------------
-    // DOCUMENT NUMBER
-    // ----------------------------------------------------------
-
     if (!this.documentNumber.trim()) {
 
       this.errorMessage =
@@ -455,10 +611,6 @@ export class Verification implements OnInit {
     }
 
 
-    // ----------------------------------------------------------
-    // FILE
-    // ----------------------------------------------------------
-
     if (!this.selectedFile) {
 
       this.errorMessage =
@@ -468,10 +620,6 @@ export class Verification implements OnInit {
 
     }
 
-
-    // ----------------------------------------------------------
-    // CREATE FORM DATA
-    // ----------------------------------------------------------
 
     const formData =
       new FormData();
@@ -494,10 +642,6 @@ export class Verification implements OnInit {
       this.documentNumber.trim()
     );
 
-
-    // ----------------------------------------------------------
-    // START UPLOAD
-    // ----------------------------------------------------------
 
     this.uploading = true;
 
@@ -561,10 +705,6 @@ export class Verification implements OnInit {
               'Document uploaded successfully.';
 
 
-            // --------------------------------------------------
-            // RESET FORM
-            // --------------------------------------------------
-
             this.documentNumber = '';
 
             this.selectedFile = null;
@@ -585,11 +725,9 @@ export class Verification implements OnInit {
             }
 
 
-            // --------------------------------------------------
-            // RELOAD DOCUMENTS
-            // --------------------------------------------------
-
             this.loadDocuments();
+
+            this.loadVerificationStatus();
 
           }
 
@@ -824,13 +962,6 @@ export class Verification implements OnInit {
       document.documentUrl;
 
 
-    // Backend currently returns paths such as:
-    //
-    // providers/documents/...
-    //
-    // Convert relative storage path into
-    // the backend URL.
-
     if (
       !url.startsWith('http://') &&
       !url.startsWith('https://')
@@ -865,6 +996,8 @@ export class Verification implements OnInit {
 
 
     this.successMessage = '';
+
+    this.loadVerificationStatus();
 
     this.loadDocuments();
 

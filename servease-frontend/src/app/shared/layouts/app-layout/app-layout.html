@@ -46,23 +46,24 @@
 
 
       <!-- User -->
-      <button
+      <a
         class="user-button"
-        type="button"
+        routerLink="/profile"
+        aria-label="Open profile"
       >
 
         <div class="avatar">
-          U
+          {{ getUserInitials() }}
         </div>
 
         <div class="user-info">
 
           <span class="user-name">
-            User
+            {{ userName }}
           </span>
 
           <span class="user-role">
-            Account
+            Customer
           </span>
 
         </div>
@@ -71,7 +72,7 @@
           ˅
         </span>
 
-      </button>
+      </a>
 
     </header>
 

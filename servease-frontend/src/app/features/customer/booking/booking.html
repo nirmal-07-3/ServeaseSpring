@@ -1,11 +1,6 @@
 <div class="booking-page">
-
-  <!-- HEADER -->
-
   <header class="booking-header">
-
     <div class="header-inner">
-
       <a
         class="back-link"
         [routerLink]="[
@@ -18,146 +13,60 @@
         ← Back to service
       </a>
 
-
-      <span class="brand">
-        SERVEASE
-      </span>
-
+      <span class="brand">SERVEASE</span>
     </div>
-
   </header>
 
-
-  <!-- LOADING SERVICE -->
-
-  <div
-    class="loading-state"
-    *ngIf="loading"
-  >
-
+  <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
-
-    <p>
-      Preparing your booking...
-    </p>
-
+    <p>Preparing your booking...</p>
   </div>
-
-
-  <!-- ERROR -->
 
   <div
     class="error-state"
-    *ngIf="
-      !loading &&
-      error &&
-      !service
-    "
+    *ngIf="!loading && error && !service"
   >
-
-    <div class="error-icon">
-      !
-    </div>
-
-    <h2>
-      Unable to continue
-    </h2>
-
-    <p>
-      {{ error }}
-    </p>
-
-    <button
-      type="button"
-      (click)="loadService()"
-    >
+    <div class="error-icon">!</div>
+    <h2>Unable to continue</h2>
+    <p>{{ error }}</p>
+    <button type="button" (click)="loadService()">
       Try again
     </button>
-
   </div>
-
-
-  <!-- BOOKING -->
 
   <main
     class="booking-content"
-    *ngIf="
-      !loading &&
-      service
-    "
+    *ngIf="!loading && service"
   >
-
     <div class="page-heading">
+      <span class="eyebrow">BOOK SERVICE</span>
 
-      <span class="eyebrow">
-        BOOK SERVICE
-      </span>
-
-      <h1>
-        Schedule your service
-      </h1>
+      <h1>Schedule your service</h1>
 
       <p>
-        Choose a convenient time and provide the
-        location where the professional should visit.
+        Choose a convenient time and provide the location
+        where the professional should visit.
       </p>
-
     </div>
 
-
-    <!-- ERROR -->
-
-    <div
-      class="form-error"
-      *ngIf="error"
-    >
-
+    <div class="form-error" *ngIf="error">
       <span>!</span>
-
       {{ error }}
-
     </div>
-
 
     <div class="booking-layout">
-
-
-      <!-- FORM -->
-
       <section class="form-card">
-
         <div class="card-heading">
-
-          <span>
-            01
-          </span>
-
+          <span>01</span>
           <div>
-
-            <h2>
-              Service appointment
-            </h2>
-
-            <p>
-              When should the professional visit?
-            </p>
-
+            <h2>Service appointment</h2>
+            <p>When should the professional visit?</p>
           </div>
-
         </div>
 
-
         <div class="form-grid">
-
-
-          <!-- DATE -->
-
           <div class="field">
-
-            <label for="bookingDate">
-              Date
-            </label>
-
+            <label for="bookingDate">Date</label>
             <input
               id="bookingDate"
               type="date"
@@ -165,60 +74,29 @@
               [(ngModel)]="bookingDate"
               [min]="minDate"
             >
-
           </div>
 
-
-          <!-- TIME -->
-
           <div class="field">
-
-            <label for="bookingTime">
-              Preferred time
-            </label>
-
+            <label for="bookingTime">Preferred time</label>
             <input
               id="bookingTime"
               type="time"
               name="bookingTime"
               [(ngModel)]="bookingTime"
             >
-
           </div>
-
-
         </div>
-
 
         <div class="card-heading address-heading">
-
-          <span>
-            02
-          </span>
-
+          <span>02</span>
           <div>
-
-            <h2>
-              Service location
-            </h2>
-
-            <p>
-              Where should we provide the service?
-            </p>
-
+            <h2>Service location</h2>
+            <p>Where should we provide the service?</p>
           </div>
-
         </div>
 
-
-        <!-- ADDRESS -->
-
         <div class="field">
-
-          <label for="address">
-            Full address
-          </label>
-
+          <label for="address">Full address</label>
           <textarea
             id="address"
             name="address"
@@ -226,21 +104,11 @@
             [(ngModel)]="address"
             placeholder="House / flat, street, landmark..."
           ></textarea>
-
         </div>
 
-
         <div class="form-grid">
-
-
-          <!-- CITY -->
-
           <div class="field">
-
-            <label for="city">
-              City
-            </label>
-
+            <label for="city">City</label>
             <input
               id="city"
               type="text"
@@ -248,18 +116,10 @@
               [(ngModel)]="city"
               placeholder="Enter city"
             >
-
           </div>
 
-
-          <!-- STATE -->
-
           <div class="field">
-
-            <label for="state">
-              State
-            </label>
-
+            <label for="state">State</label>
             <input
               id="state"
               type="text"
@@ -267,21 +127,11 @@
               [(ngModel)]="state"
               placeholder="Enter state"
             >
-
           </div>
-
-
         </div>
 
-
-        <!-- PINCODE -->
-
         <div class="field">
-
-          <label for="pincode">
-            Pincode
-          </label>
-
+          <label for="pincode">Pincode</label>
           <input
             id="pincode"
             type="text"
@@ -291,33 +141,17 @@
             [(ngModel)]="pincode"
             placeholder="6-digit pincode"
           >
-
         </div>
-
 
         <div class="card-heading address-heading">
-
-          <span>
-            03
-          </span>
-
+          <span>03</span>
           <div>
-
-            <h2>
-              Additional note
-            </h2>
-
-            <p>
-              Anything the professional should know?
-            </p>
-
+            <h2>Additional note</h2>
+            <p>Anything the professional should know?</p>
           </div>
-
         </div>
 
-
         <div class="field">
-
           <label for="customerNote">
             Note
             <span>Optional</span>
@@ -330,11 +164,91 @@
             [(ngModel)]="customerNote"
             placeholder="Tell the professional anything useful about the service..."
           ></textarea>
-
         </div>
 
+        <div class="card-heading address-heading payment-heading">
+          <span>04</span>
+          <div>
+            <h2>Payment method</h2>
+            <p>Choose how you intend to pay for this booking.</p>
+          </div>
+        </div>
 
-        <!-- SUBMIT -->
+        <div class="payment-options">
+          <label
+            class="payment-option"
+            [class.selected]="paymentPreference === 'PAY_ONLINE'"
+          >
+            <input
+              type="radio"
+              name="paymentPreference"
+              value="PAY_ONLINE"
+              [(ngModel)]="paymentPreference"
+            >
+
+            <span class="payment-option-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M7 15h3"></path>
+              </svg>
+            </span>
+
+            <span class="payment-option-content">
+              <strong>Pay online</strong>
+              <span>Choose online payment for this booking.</span>
+            </span>
+
+            <span class="payment-radio" aria-hidden="true"></span>
+          </label>
+
+          <label
+            class="payment-option"
+            [class.selected]="paymentPreference === 'PAY_AT_SERVICE'"
+          >
+            <input
+              type="radio"
+              name="paymentPreference"
+              value="PAY_AT_SERVICE"
+              [(ngModel)]="paymentPreference"
+            >
+
+            <span class="payment-option-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+                <circle cx="12" cy="12" r="2.5"></circle>
+                <path d="M6 9h.01M18 15h.01"></path>
+              </svg>
+            </span>
+
+            <span class="payment-option-content">
+              <strong>Pay at service</strong>
+              <span>Arrange payment when the service is provided.</span>
+            </span>
+
+            <span class="payment-radio" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <p class="payment-disclaimer">
+          Your selection records your payment preference.
+          Online payment processing and payment confirmation
+          are handled separately.
+        </p>
 
         <button
           type="button"
@@ -342,117 +256,54 @@
           [disabled]="submitting"
           (click)="submitBooking()"
         >
-
-          <span
-            *ngIf="!submitting"
-          >
-            Confirm booking
-            →
+          <span *ngIf="!submitting">
+            Confirm booking →
           </span>
 
-          <span
-            *ngIf="submitting"
-          >
+          <span *ngIf="submitting">
             Creating booking...
           </span>
-
         </button>
-
-
       </section>
 
-
-      <!-- SUMMARY -->
-
       <aside class="summary-card">
+        <span class="summary-label">YOUR SERVICE</span>
 
-        <span class="summary-label">
-          YOUR SERVICE
-        </span>
-
-
-        <div class="summary-icon">
-          ϟ
-        </div>
-
+        <div class="summary-icon">ϟ</div>
 
         <span class="provider">
           {{ service.providerBusinessName }}
         </span>
 
+        <h2>{{ service.title }}</h2>
 
-        <h2>
-          {{ service.title }}
-        </h2>
-
-
-        <p>
-          {{ service.description }}
-        </p>
-
+        <p>{{ service.description }}</p>
 
         <div class="summary-divider"></div>
 
-
         <div class="summary-row">
-
-          <span>
-            Starting price
-          </span>
-
-          <strong>
-            ₹{{ formatPrice(
-            service.basePrice
-            ) }}
-          </strong>
-
+          <span>Starting price</span>
+          <strong>₹{{ formatPrice(service.basePrice) }}</strong>
         </div>
 
-
         <div class="summary-row">
-
-          <span>
-            Estimated duration
-          </span>
-
+          <span>Estimated duration</span>
           <strong>
-            {{ formatDuration(
-            service.estimatedDurationMinutes
-            ) }}
+            {{ formatDuration(service.estimatedDurationMinutes) }}
           </strong>
-
         </div>
-
 
         <div class="summary-divider"></div>
-
 
         <div class="trust">
-
-          <span class="trust-icon">
-            ✓
-          </span>
+          <span class="trust-icon">✓</span>
 
           <div>
-
-            <strong>
-              Secure booking
-            </strong>
-
-            <p>
-              Your booking information is
-              protected.
-            </p>
-
+            <strong>Secure booking</strong>
+            <p>Your booking information is protected.</p>
           </div>
-
         </div>
-
       </aside>
-
-
     </div>
-
   </main>
-
 </div>

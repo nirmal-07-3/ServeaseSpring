@@ -1,9 +1,5 @@
 <div class="verification-page">
 
-  <!-- ============================================================
-       HEADER
-  ============================================================ -->
-
   <div class="page-header">
 
     <div class="header-left">
@@ -39,30 +35,52 @@
     </div>
 
 
-    <button
-      type="button"
-      class="refresh-button"
-      (click)="refreshDocuments()"
-      [disabled]="loading || uploading"
-    >
+    <div class="header-right">
 
-      <span
-        class="refresh-icon"
-        [class.spinning]="loading"
+      <div
+        class="verification-status-card"
+        [ngClass]="getVerificationStatusClass()"
       >
-        ↻
-      </span>
 
-      Refresh
+        <span class="verification-status-dot"></span>
 
-    </button>
+        <div class="verification-status-content">
+
+          <strong>
+            {{ getVerificationLabel() }}
+          </strong>
+
+          <span>
+            {{ getVerificationDescription() }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="refresh-button"
+        (click)="refreshDocuments()"
+        [disabled]="loading || uploading"
+      >
+
+        <span
+          class="refresh-icon"
+          [class.spinning]="loading"
+        >
+          ↻
+        </span>
+
+        Refresh
+
+      </button>
+
+    </div>
 
   </div>
 
-
-  <!-- ============================================================
-       MESSAGES
-  ============================================================ -->
 
   <div
     *ngIf="successMessage"
@@ -87,10 +105,6 @@
 
   </div>
 
-
-  <!-- ============================================================
-       SUMMARY
-  ============================================================ -->
 
   <div class="summary-grid">
 
@@ -159,16 +173,8 @@
   </div>
 
 
-  <!-- ============================================================
-       MAIN CONTENT
-  ============================================================ -->
-
   <div class="content-grid">
 
-
-    <!-- ==========================================================
-         EXISTING DOCUMENTS
-    =========================================================== -->
 
     <section class="documents-section">
 
@@ -187,8 +193,6 @@
       </div>
 
 
-      <!-- Loading -->
-
       <div
         *ngIf="loading"
         class="loading-state"
@@ -202,8 +206,6 @@
 
       </div>
 
-
-      <!-- Documents -->
 
       <div
         *ngIf="!loading && documents.length > 0"
@@ -312,8 +314,6 @@
       </div>
 
 
-      <!-- Empty -->
-
       <div
         *ngIf="!loading && documents.length === 0"
         class="empty-state"
@@ -336,10 +336,6 @@
     </section>
 
 
-    <!-- ==========================================================
-         UPLOAD SECTION
-    =========================================================== -->
-
     <section class="upload-section">
 
       <div class="section-header">
@@ -359,10 +355,6 @@
 
       <div class="upload-form">
 
-
-        <!-- ======================================================
-             DOCUMENT TYPE
-        ======================================================= -->
 
         <div class="form-group">
 
@@ -385,11 +377,11 @@
 
               {{ type.label }}
 
-              <span
+              <ng-container
                 *ngIf="hasDocumentType(type.value)"
               >
                 — Already uploaded
-              </span>
+              </ng-container>
 
             </option>
 
@@ -409,10 +401,6 @@
 
         </div>
 
-
-        <!-- ======================================================
-             DOCUMENT NUMBER
-        ======================================================= -->
 
         <div class="form-group">
 
@@ -440,10 +428,6 @@
 
         </div>
 
-
-        <!-- ======================================================
-             FILE
-        ======================================================= -->
 
         <div class="form-group">
 
@@ -511,10 +495,6 @@
         </div>
 
 
-        <!-- ======================================================
-             UPLOAD BUTTON
-        ======================================================= -->
-
         <button
           type="button"
           class="upload-button"
@@ -546,10 +526,6 @@
         </button>
 
 
-        <!-- ======================================================
-             SECURITY NOTE
-        ======================================================= -->
-
         <div class="security-note">
 
           <span class="security-icon">
@@ -577,10 +553,6 @@
   </div>
 
 
-  <!-- ============================================================
-       INFORMATION
-  ============================================================ -->
-
   <div class="verification-info">
 
     <div class="info-icon">
@@ -592,6 +564,10 @@
       <h3>About document verification</h3>
 
       <p>
+        Your provider account is currently
+        <strong>
+          {{ getVerificationLabel() }}
+        </strong>.
         Submitted documents are reviewed as part of the provider
         verification process. A document marked as
         <strong>Pending review</strong> has been uploaded successfully

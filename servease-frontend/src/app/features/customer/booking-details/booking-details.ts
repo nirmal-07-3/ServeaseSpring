@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import {
   ActivatedRoute,
   Router,
@@ -32,7 +36,6 @@ interface Booking {
   state: string;
   pincode: string;
   customerNote?: string;
-
   status:
     | 'PENDING'
     | 'ACCEPTED'
@@ -40,6 +43,48 @@ interface Booking {
     | 'IN_PROGRESS'
     | 'COMPLETED'
     | 'CANCELLED';
+}
+
+interface Payment {
+  id: number;
+  bookingId: number;
+  amount: number;
+  status:
+    | 'PENDING'
+    | 'SUCCESS'
+    | 'FAILED'
+    | 'REFUNDED';
+  paymentMethod:
+    | 'UPI'
+    | 'CARD'
+    | 'NET_BANKING'
+    | 'CASH';
+  transactionId?: string;
+  gatewayOrderId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface RazorpayOrder {
+  paymentId: number;
+  bookingId: number;
+  razorpayOrderId: string;
+  razorpayKeyId: string;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+interface RazorpayPaymentResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
 }
 
 @Component({
@@ -58,6 +103,12 @@ export class BookingDetails implements OnInit {
 
   loading = false;
   error = '';
+
+  payment: Payment | null = null;
+  paymentLoading = false;
+  paymentProcessing = false;
+  paymentError = '';
+  paymentSuccess = '';
 
   constructor(
     private api: Api,
@@ -97,8 +148,13 @@ export class BookingDetails implements OnInit {
       .subscribe({
 
         next: (response) => {
+
           this.booking =
             response?.data ?? null;
+
+          if (this.booking) {
+            this.loadPayment(this.booking.id);
+          }
 
           this.cdr.detectChanges();
         },
@@ -115,6 +171,355 @@ export class BookingDetails implements OnInit {
           this.error =
             err?.error?.message ||
             'Unable to load booking details.';
+
+          this.cdr.detectChanges();
+        }
+
+      });
+  }
+
+  loadPayment(bookingId: number): void {
+
+    this.paymentLoading = true;
+    this.paymentError = '';
+
+    this.api
+      .get<ApiResponse<Payment>>(
+        `/payments/booking/${bookingId}`
+      )
+      .pipe(
+        finalize(() => {
+          this.paymentLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          this.payment =
+            response?.data ?? null;
+        },
+
+        error: (err) => {
+
+          if (err?.status === 404) {
+            this.payment = null;
+            return;
+          }
+
+          console.error(
+            'Failed to load payment:',
+            err
+          );
+
+          this.payment = null;
+
+          this.paymentError =
+            err?.error?.message ||
+            'Unable to load payment information.';
+        }
+
+      });
+  }
+
+  canPay(): boolean {
+
+    return (
+      !!this.booking &&
+      this.booking.status === 'ACCEPTED' &&
+      this.payment?.status !== 'SUCCESS' &&
+      !this.paymentProcessing
+    );
+  }
+
+  isPaymentSuccessful(): boolean {
+
+    return this.payment?.status === 'SUCCESS';
+  }
+
+  payNow(): void {
+
+    if (!this.booking || !this.canPay()) {
+      return;
+    }
+
+    this.paymentProcessing = true;
+    this.paymentError = '';
+    this.paymentSuccess = '';
+
+    const bookingId = this.booking.id;
+
+    const createPayment$ = this.payment
+      ? this.api.get<ApiResponse<Payment>>(
+        `/payments/booking/${bookingId}`
+      )
+      : this.api.post<ApiResponse<Payment>>(
+        '/payments',
+        {
+          bookingId,
+          paymentMethod: 'UPI'
+        }
+      );
+
+    createPayment$
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          this.payment =
+            response?.data ?? this.payment;
+
+          this.createRazorpayOrder(bookingId);
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Failed to create payment:',
+            err
+          );
+
+          this.paymentProcessing = false;
+
+          this.paymentError =
+            err?.error?.message ||
+            'Unable to start the payment.';
+
+          this.cdr.detectChanges();
+        }
+
+      });
+  }
+
+  private createRazorpayOrder(
+    bookingId: number
+  ): void {
+
+    this.api
+      .post<ApiResponse<RazorpayOrder>>(
+        `/payments/razorpay/order/${bookingId}`,
+        {}
+      )
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          const order = response?.data;
+
+          if (
+            !order?.razorpayOrderId ||
+            !order?.razorpayKeyId
+          ) {
+
+            this.paymentProcessing = false;
+
+            this.paymentError =
+              'Razorpay order information is incomplete.';
+
+            this.cdr.detectChanges();
+
+            return;
+          }
+
+          this.openRazorpayCheckout(order);
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Failed to create Razorpay order:',
+            err
+          );
+
+          this.paymentProcessing = false;
+
+          this.paymentError =
+            err?.error?.message ||
+            'Unable to create the Razorpay order.';
+
+          this.cdr.detectChanges();
+        }
+
+      });
+  }
+
+  private openRazorpayCheckout(
+    order: RazorpayOrder
+  ): void {
+
+    if (!window.Razorpay) {
+
+      this.paymentProcessing = false;
+
+      this.paymentError =
+        'Razorpay Checkout could not be loaded. Please refresh and try again.';
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    const options = {
+
+      key: order.razorpayKeyId,
+
+      amount:
+        Math.round(order.amount * 100),
+
+      currency:
+        order.currency || 'INR',
+
+      name: 'Servease',
+
+      description:
+        this.booking?.serviceTitle ||
+        'Service Booking',
+
+      order_id:
+      order.razorpayOrderId,
+
+      prefill: {},
+
+      theme: {
+        color: '#111827'
+      },
+
+      modal: {
+
+        ondismiss: () => {
+
+          this.paymentProcessing = false;
+
+          this.paymentError =
+            'Payment window was closed. You can try again.';
+
+          this.cdr.detectChanges();
+        }
+
+      },
+
+      handler: (
+        response: RazorpayPaymentResponse
+      ) => {
+
+        this.verifyRazorpayPayment(
+          response
+        );
+      }
+
+    };
+
+    try {
+
+      const razorpay =
+        new window.Razorpay(options);
+
+      razorpay.on(
+        'payment.failed',
+        (response: any) => {
+
+          console.error(
+            'Razorpay payment failed:',
+            response
+          );
+
+          this.paymentProcessing = false;
+
+          this.paymentError =
+            response?.error?.description ||
+            'Razorpay payment failed. Please try again.';
+
+          this.cdr.detectChanges();
+        }
+      );
+
+      razorpay.open();
+
+    } catch (err) {
+
+      console.error(
+        'Unable to open Razorpay Checkout:',
+        err
+      );
+
+      this.paymentProcessing = false;
+
+      this.paymentError =
+        'Unable to open Razorpay Checkout.';
+
+      this.cdr.detectChanges();
+    }
+  }
+
+  private verifyRazorpayPayment(
+    response: RazorpayPaymentResponse
+  ): void {
+
+    this.api
+      .post<ApiResponse<Payment>>(
+        '/payments/razorpay/verify',
+        {
+          razorpayPaymentId:
+          response.razorpay_payment_id,
+
+          razorpayOrderId:
+          response.razorpay_order_id,
+
+          razorpaySignature:
+          response.razorpay_signature
+        }
+      )
+      .pipe(
+        finalize(() => {
+
+          this.paymentProcessing = false;
+
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+
+        next: (verifyResponse) => {
+
+          this.payment =
+            verifyResponse?.data ??
+            this.payment;
+
+          this.paymentSuccess =
+            'Payment completed successfully.';
+
+          this.paymentError = '';
+
+          if (this.booking) {
+            this.loadPayment(
+              this.booking.id
+            );
+          }
+
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Payment verification failed:',
+            err
+          );
+
+          this.paymentError =
+            err?.error?.message ||
+            'Payment was completed, but verification failed. Please contact support before paying again.';
 
           this.cdr.detectChanges();
         }

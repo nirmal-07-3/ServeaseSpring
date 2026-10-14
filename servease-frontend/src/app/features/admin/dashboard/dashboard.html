@@ -1,32 +1,34 @@
 <div class="admin-dashboard">
 
-  <!-- Header -->
-
   <section class="dashboard-header">
 
-    <div>
+    <div class="header-content">
+
       <span class="eyebrow">
         ADMINISTRATION
       </span>
 
       <h1>
-        Welcome back, {{ adminName }}.
+        Welcome back, <span>{{ adminName }}.</span>
       </h1>
 
       <p>
         Here's what's happening across Servease today.
       </p>
+
     </div>
 
-    <div class="header-action">
+    <div class="header-status">
       <span class="status-dot"></span>
-      System operational
+
+      <div>
+        <strong>System operational</strong>
+        <span>All core services are running</span>
+      </div>
     </div>
 
   </section>
 
-
-  <!-- Statistics -->
 
   <section class="stats-grid">
 
@@ -34,7 +36,7 @@
 
     <article class="stat-card">
 
-      <div class="stat-top">
+      <div class="stat-card-top">
 
         <div class="stat-icon">
           {{ stat.icon }}
@@ -64,14 +66,10 @@
   </section>
 
 
-  <!-- Main content -->
-
   <div class="content-grid">
 
 
-    <!-- Activity -->
-
-    <section class="panel">
+    <section class="panel activity-panel">
 
       <div class="panel-header">
 
@@ -85,9 +83,9 @@
           </h2>
         </div>
 
-        <button type="button">
-          View all
-        </button>
+        <span class="panel-count">
+          {{ activities.length }} updates
+        </span>
 
       </div>
 
@@ -130,8 +128,6 @@
     </section>
 
 
-    <!-- Pending actions -->
-
     <aside class="panel pending-panel">
 
       <div class="panel-header">
@@ -160,7 +156,8 @@
             ♙
           </div>
 
-          <div>
+          <div class="pending-content">
+
             <strong>
               Provider verification
             </strong>
@@ -168,6 +165,7 @@
             <span>
               12 providers waiting
             </span>
+
           </div>
 
           <span class="arrow">
@@ -186,7 +184,8 @@
             ◈
           </div>
 
-          <div>
+          <div class="pending-content">
+
             <strong>
               Service requests
             </strong>
@@ -194,6 +193,7 @@
             <span>
               5 requests to review
             </span>
+
           </div>
 
           <span class="arrow">
@@ -212,7 +212,8 @@
             ◉
           </div>
 
-          <div>
+          <div class="pending-content">
+
             <strong>
               User reports
             </strong>
@@ -220,6 +221,7 @@
             <span>
               3 reports need attention
             </span>
+
           </div>
 
           <span class="arrow">
@@ -235,37 +237,55 @@
   </div>
 
 
-  <!-- Quick management -->
-
   <section class="management-section">
 
     <div class="section-heading">
 
-      <span class="section-eyebrow">
-        MANAGEMENT
-      </span>
+      <div>
+        <span class="section-eyebrow">
+          MANAGEMENT
+        </span>
 
-      <h2>
-        Quick access
-      </h2>
+        <h2>
+          Quick access
+        </h2>
+      </div>
+
+      <p>
+        Manage the main areas of your platform.
+      </p>
 
     </div>
 
 
     <div class="management-grid">
 
+
       <a
         routerLink="/admin/users"
         class="management-card"
       >
-        <span class="management-icon">◉</span>
 
-        <div>
-          <h3>Users</h3>
-          <p>Manage customers and accounts</p>
+        <span class="management-icon">
+          ◉
+        </span>
+
+        <div class="management-content">
+
+          <h3>
+            Users
+          </h3>
+
+          <p>
+            Manage customers and accounts
+          </p>
+
         </div>
 
-        <span class="arrow">→</span>
+        <span class="management-arrow">
+          →
+        </span>
+
       </a>
 
 
@@ -273,14 +293,27 @@
         routerLink="/admin/providers"
         class="management-card"
       >
-        <span class="management-icon">♙</span>
 
-        <div>
-          <h3>Providers</h3>
-          <p>Verify and manage providers</p>
+        <span class="management-icon">
+          ♙
+        </span>
+
+        <div class="management-content">
+
+          <h3>
+            Providers
+          </h3>
+
+          <p>
+            Verify and manage providers
+          </p>
+
         </div>
 
-        <span class="arrow">→</span>
+        <span class="management-arrow">
+          →
+        </span>
+
       </a>
 
 
@@ -288,14 +321,27 @@
         routerLink="/admin/services"
         class="management-card"
       >
-        <span class="management-icon">◈</span>
 
-        <div>
-          <h3>Services</h3>
-          <p>Manage categories and services</p>
+        <span class="management-icon">
+          ◈
+        </span>
+
+        <div class="management-content">
+
+          <h3>
+            Services
+          </h3>
+
+          <p>
+            Manage categories and services
+          </p>
+
         </div>
 
-        <span class="arrow">→</span>
+        <span class="management-arrow">
+          →
+        </span>
+
       </a>
 
 
@@ -303,15 +349,29 @@
         routerLink="/admin/bookings"
         class="management-card"
       >
-        <span class="management-icon">▣</span>
 
-        <div>
-          <h3>Bookings</h3>
-          <p>Monitor platform bookings</p>
+        <span class="management-icon">
+          ▣
+        </span>
+
+        <div class="management-content">
+
+          <h3>
+            Bookings
+          </h3>
+
+          <p>
+            Monitor platform bookings
+          </p>
+
         </div>
 
-        <span class="arrow">→</span>
+        <span class="management-arrow">
+          →
+        </span>
+
       </a>
+
 
     </div>
 

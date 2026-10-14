@@ -1,7 +1,3 @@
-/* =========================================================
-   SERVEASE CUSTOMER DASHBOARD
-   ========================================================= */
-
 :host {
   display: block;
   width: 100%;
@@ -17,10 +13,6 @@
   color: #172033;
   padding-bottom: 70px;
 }
-
-/* =========================================================
-   HERO / WELCOME SECTION
-   ========================================================= */
 
 .welcome-section {
   position: relative;
@@ -73,7 +65,6 @@
 }
 
 .welcome-content h1 span {
-  display: inline;
   color: #dbeafe;
 }
 
@@ -83,10 +74,6 @@
   font-size: 16px;
   line-height: 1.6;
 }
-
-/* =========================================================
-   HERO DECORATION
-   ========================================================= */
 
 .hero-decoration {
   position: absolute;
@@ -133,10 +120,6 @@
   backdrop-filter: blur(5px);
 }
 
-/* =========================================================
-   SEARCH SECTION
-   ========================================================= */
-
 .search-section {
   position: relative;
   z-index: 5;
@@ -161,7 +144,6 @@
   flex: 0 0 auto;
   color: #64748b;
   font-size: 25px;
-  line-height: 1;
 }
 
 .search-box input {
@@ -193,16 +175,12 @@
   font-weight: 750;
   cursor: pointer;
   box-shadow: 0 7px 16px rgba(37, 99, 235, 0.2);
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .search-button:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 
 .location-text {
@@ -218,10 +196,6 @@
   color: #2563eb;
   font-size: 15px;
 }
-
-/* =========================================================
-   GENERAL CONTENT
-   ========================================================= */
 
 .dashboard-section {
   margin-bottom: 55px;
@@ -239,10 +213,6 @@
   padding-left: 6%;
   padding-right: 6%;
 }
-
-/* =========================================================
-   SECTION HEADER
-   ========================================================= */
 
 .section-header {
   display: flex;
@@ -284,16 +254,11 @@
 
 .view-all span {
   font-size: 17px;
-  line-height: 1;
 }
 
 .view-all:hover {
   gap: 11px;
 }
-
-/* =========================================================
-   CATEGORY GRID
-   ========================================================= */
 
 .category-grid {
   display: grid;
@@ -302,12 +267,10 @@
 }
 
 .category-card {
-  min-width: 0;
   min-height: 190px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   padding: 25px 14px 18px;
   background: #ffffff;
   border: 1px solid #e3e8f0;
@@ -316,10 +279,8 @@
   text-decoration: none;
   text-align: center;
   box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
-  transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease;
+  transition: transform 0.22s ease, border-color 0.22s ease,
+  box-shadow 0.22s ease;
 }
 
 .category-card:hover {
@@ -331,7 +292,6 @@
 .category-icon {
   width: 62px;
   height: 62px;
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,15 +303,10 @@
   font-weight: 700;
 }
 
-.category-info {
-  min-width: 0;
-}
-
 .category-info h3 {
   margin: 0;
   color: #172033;
   font-size: 14px;
-  line-height: 1.35;
   font-weight: 750;
 }
 
@@ -367,7 +322,6 @@
   padding-top: 13px;
   color: #2563eb;
   font-size: 16px;
-  line-height: 1;
   transition: transform 0.2s ease;
 }
 
@@ -375,9 +329,71 @@
   transform: translateX(4px);
 }
 
-/* =========================================================
-   RECENT BOOKINGS
-   ========================================================= */
+.booking-overview-section {
+  margin-bottom: 45px;
+}
+
+.booking-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.overview-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 19px;
+  background: #ffffff;
+  border: 1px solid #e3e8f0;
+  border-radius: 17px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.overview-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.overview-icon.total {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.overview-icon.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.overview-icon.active {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.overview-icon.completed {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.overview-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.overview-card strong {
+  color: #172033;
+  font-size: 23px;
+  font-weight: 800;
+}
 
 .recent-bookings-section {
   margin-top: 3px;
@@ -389,10 +405,6 @@
   gap: 13px;
 }
 
-/* =========================================================
-   BOOKING CARD
-   ========================================================= */
-
 .recent-booking-card {
   display: flex;
   align-items: center;
@@ -403,10 +415,8 @@
   border: 1px solid #e3e8f0;
   border-radius: 17px;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease,
+  box-shadow 0.2s ease;
 }
 
 .recent-booking-card:hover {
@@ -416,9 +426,9 @@
 }
 
 .recent-booking-icon {
-  flex: 0 0 auto;
   width: 55px;
   height: 55px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -438,7 +448,6 @@
   margin-bottom: 4px;
   color: #94a3b8;
   font-size: 10px;
-  line-height: 1.2;
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -448,7 +457,6 @@
   margin: 0;
   color: #172033;
   font-size: 15px;
-  line-height: 1.35;
   font-weight: 750;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -459,7 +467,6 @@
   margin: 4px 0 0;
   color: #64748b;
   font-size: 12px;
-  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -479,12 +486,7 @@
   color: #cbd5e1;
 }
 
-/* =========================================================
-   BOOKING STATUS + PRICE
-   ========================================================= */
-
 .recent-booking-side {
-  flex: 0 0 auto;
   min-width: 120px;
   display: flex;
   flex-direction: column;
@@ -506,7 +508,6 @@
   padding: 5px 10px;
   border-radius: 999px;
   font-size: 10px;
-  line-height: 1;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -541,14 +542,10 @@
   color: #475569;
 }
 
-/* =========================================================
-   BOOKING VIEW ARROW
-   ========================================================= */
-
 .recent-booking-arrow {
-  flex: 0 0 auto;
   width: 35px;
   height: 35px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -557,10 +554,8 @@
   color: #64748b;
   text-decoration: none;
   font-size: 18px;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease,
+  transform 0.2s ease;
 }
 
 .recent-booking-arrow:hover {
@@ -568,10 +563,6 @@
   color: #2563eb;
   transform: translateX(3px);
 }
-
-/* =========================================================
-   BOOKING LOADING / ERROR / EMPTY
-   ========================================================= */
 
 .recent-bookings-state {
   min-height: 145px;
@@ -607,14 +598,6 @@
   cursor: pointer;
 }
 
-.recent-bookings-state.error button:hover {
-  background: #fef2f2;
-}
-
-/* =========================================================
-   SPINNER
-   ========================================================= */
-
 .small-spinner {
   width: 25px;
   height: 25px;
@@ -631,15 +614,6 @@
   }
 }
 
-/* =========================================================
-   EMPTY BOOKINGS
-   ========================================================= */
-
-.recent-bookings-state:has(.empty-booking-icon) {
-  justify-content: flex-start;
-  text-align: left;
-}
-
 .empty-booking-icon {
   width: 50px;
   height: 50px;
@@ -651,6 +625,11 @@
   background: #eff6ff;
   color: #2563eb;
   font-size: 22px;
+}
+
+.recent-bookings-state:has(.empty-booking-icon) {
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .recent-bookings-state:has(.empty-booking-icon) > div:nth-child(2) {
@@ -683,19 +662,7 @@
   text-decoration: none;
   font-size: 12px;
   font-weight: 700;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
 }
-
-.booking-explore-button:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-}
-
-/* =========================================================
-   LOWER CONTENT GRID
-   ========================================================= */
 
 .dashboard-grid {
   display: grid;
@@ -705,18 +672,9 @@
   margin-top: 5px;
 }
 
-/*
-   Override the generic section spacing inside
-   the lower two-column layout.
-*/
-
 .dashboard-grid .dashboard-section {
   margin-bottom: 0;
 }
-
-/* =========================================================
-   RECOMMENDED SERVICES
-   ========================================================= */
 
 .service-list {
   display: flex;
@@ -734,16 +692,12 @@
   border: 1px solid #e3e8f0;
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .service-card:hover {
   transform: translateY(-2px);
   border-color: #bfdbfe;
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.07);
 }
 
 .service-icon {
@@ -768,7 +722,6 @@
   margin: 0;
   color: #172033;
   font-size: 14px;
-  line-height: 1.4;
   font-weight: 750;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -819,11 +772,7 @@
   font-weight: 800;
 }
 
-/* =========================================================
-   QUICK CARD
-   ========================================================= */
-
-.quick-card {
+.upcoming-card {
   position: relative;
   overflow: hidden;
   min-height: 310px;
@@ -839,114 +788,134 @@
   box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15);
 }
 
-.quick-card::before {
+.upcoming-card::before {
   content: "";
   position: absolute;
-  width: 210px;
-  height: 210px;
-  right: -95px;
-  top: -95px;
+  width: 220px;
+  height: 220px;
+  right: -110px;
+  top: -110px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
 }
 
-.quick-card::after {
-  content: "";
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  left: -75px;
-  bottom: -90px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.quick-icon {
+.upcoming-card-header {
   position: relative;
   z-index: 2;
-  width: 48px;
-  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.upcoming-icon {
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
   border: 1px solid rgba(255, 255, 255, 0.17);
-  border-radius: 14px;
+  border-radius: 13px;
   background: rgba(255, 255, 255, 0.1);
-  font-size: 21px;
+  font-size: 20px;
 }
 
-.quick-card .section-eyebrow {
-  position: relative;
-  z-index: 2;
+.upcoming-card .section-eyebrow {
+  margin: 0;
   color: rgba(255, 255, 255, 0.72);
 }
 
-.quick-card h2 {
+.upcoming-card h2 {
   position: relative;
   z-index: 2;
-  margin: 8px 0 0;
-  max-width: 250px;
+  margin: 0;
   color: #ffffff;
-  font-size: 24px;
-  line-height: 1.2;
+  font-size: 23px;
   font-weight: 800;
-  letter-spacing: -0.4px;
 }
 
-.quick-card p {
+.upcoming-service {
   position: relative;
   z-index: 2;
   margin: 13px 0 0;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 13px;
-  line-height: 1.65;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 750;
 }
 
-.quick-button {
+.upcoming-provider {
+  position: relative;
+  z-index: 2;
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+}
+
+.upcoming-details {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.upcoming-details div {
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.upcoming-details span {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.upcoming-details strong {
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.upcoming-card .dashboard-status {
+  position: relative;
+  z-index: 2;
+}
+
+.upcoming-button {
   position: relative;
   z-index: 3;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  margin-top: 23px;
-  padding: 12px 16px;
-  border-radius: 11px;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 11px 15px;
+  border-radius: 10px;
   background: #ffffff;
   color: #1d4ed8;
   text-decoration: none;
   font-size: 12px;
   font-weight: 750;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
-.quick-button span {
-  font-size: 16px;
+.upcoming-button:hover {
+  transform: translateY(-1px);
 }
 
-.quick-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 9px 20px rgba(15, 23, 42, 0.15);
+.upcoming-empty-text {
+  position: relative;
+  z-index: 2;
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.6;
 }
-
-/* =========================================================
-   FOCUS STATES
-   ========================================================= */
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.25);
-  outline-offset: 3px;
-}
-
-/* =========================================================
-   TABLET
-   ========================================================= */
 
 @media (max-width: 1100px) {
   .welcome-section {
@@ -969,6 +938,10 @@ input:focus-visible {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .booking-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .dashboard-grid {
     grid-template-columns: minmax(0, 1fr) 280px;
   }
@@ -977,10 +950,6 @@ input:focus-visible {
     right: 8%;
   }
 }
-
-/* =========================================================
-   TABLET / MOBILE
-   ========================================================= */
 
 @media (max-width: 800px) {
   .welcome-section {
@@ -996,20 +965,6 @@ input:focus-visible {
     display: none;
   }
 
-  .circle-one {
-    width: 320px;
-    height: 320px;
-    right: -130px;
-    top: -170px;
-  }
-
-  .circle-two {
-    width: 220px;
-    height: 220px;
-    right: -30px;
-    bottom: -150px;
-  }
-
   .search-section {
     margin-top: -32px;
     padding-left: 20px;
@@ -1022,10 +977,6 @@ input:focus-visible {
     padding-right: 20px;
   }
 
-  .search-section + .dashboard-section {
-    margin-top: 42px;
-  }
-
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1033,10 +984,6 @@ input:focus-visible {
   .dashboard-grid {
     grid-template-columns: 1fr;
     gap: 40px;
-  }
-
-  .quick-card {
-    min-height: 280px;
   }
 
   .recent-booking-card {
@@ -1047,10 +994,6 @@ input:focus-visible {
     display: none;
   }
 }
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 550px) {
   .welcome-section {
@@ -1080,10 +1023,6 @@ input:focus-visible {
     border-radius: 15px;
   }
 
-  .search-icon {
-    font-size: 21px;
-  }
-
   .search-box input {
     height: 46px;
     font-size: 13px;
@@ -1092,7 +1031,6 @@ input:focus-visible {
   .search-button {
     min-width: 76px;
     height: 46px;
-    padding: 0 12px;
     font-size: 12px;
   }
 
@@ -1109,14 +1047,6 @@ input:focus-visible {
 
   .section-header h2 {
     font-size: 21px;
-  }
-
-  .section-eyebrow {
-    font-size: 10px;
-  }
-
-  .view-all {
-    font-size: 11px;
   }
 
   .category-grid {
@@ -1145,12 +1075,26 @@ input:focus-visible {
     display: none;
   }
 
-  .category-arrow {
-    padding-top: 10px;
-    font-size: 14px;
+  .booking-overview-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
-  /* Recent bookings */
+  .overview-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .overview-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    font-size: 17px;
+  }
+
+  .overview-card strong {
+    font-size: 19px;
+  }
 
   .recent-booking-card {
     align-items: flex-start;
@@ -1166,22 +1110,12 @@ input:focus-visible {
     font-size: 19px;
   }
 
-  .recent-booking-id {
-    font-size: 9px;
-  }
-
   .recent-booking-content h3 {
     font-size: 12px;
   }
 
   .recent-booking-content p {
     font-size: 11px;
-  }
-
-  .recent-booking-meta {
-    margin-top: 6px;
-    gap: 6px;
-    font-size: 10px;
   }
 
   .recent-booking-side {
@@ -1204,17 +1138,6 @@ input:focus-visible {
     padding: 20px 14px;
     font-size: 12px;
   }
-
-  .recent-bookings-state:has(.empty-booking-icon) {
-    align-items: flex-start;
-  }
-
-  .booking-explore-button {
-    padding: 0 11px;
-    font-size: 10px;
-  }
-
-  /* Recommended */
 
   .service-card {
     gap: 12px;
@@ -1240,39 +1163,16 @@ input:focus-visible {
     font-size: 9px;
   }
 
-  .service-price span {
-    font-size: 9px;
-  }
-
   .service-price strong {
     font-size: 13px;
   }
 
-  /* Quick card */
-
-  .quick-card {
+  .upcoming-card {
     min-height: 265px;
     padding: 23px;
     border-radius: 17px;
   }
-
-  .quick-card h2 {
-    font-size: 22px;
-  }
-
-  .quick-card p {
-    font-size: 12px;
-  }
-
-  .quick-button {
-    width: 100%;
-    margin-top: 20px;
-  }
 }
-
-/* =========================================================
-   VERY SMALL MOBILE
-   ========================================================= */
 
 @media (max-width: 380px) {
   .welcome-content h1 {
@@ -1287,18 +1187,10 @@ input:focus-visible {
     display: none;
   }
 
-  .recent-booking-card {
-    padding-right: 12px;
-  }
-
   .recent-booking-content h3 {
     white-space: normal;
   }
 }
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   *,

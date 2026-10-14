@@ -1,0 +1,213 @@
+<div class="profile-page">
+
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">ACCOUNT</span>
+      <h1>My Profile</h1>
+      <p>Manage your personal information and account details.</p>
+    </div>
+  </div>
+
+  <div
+    class="loading-state"
+    *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading profile...</span>
+  </div>
+
+  <div
+    class="message error-message"
+    *ngIf="!loading && errorMessage">
+    <span class="message-icon">!</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <ng-container *ngIf="!loading && profile">
+
+    <div
+      class="message success-message"
+      *ngIf="successMessage">
+      <span class="message-icon">✓</span>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="profile-grid">
+
+      <section class="profile-card profile-summary">
+
+        <div class="profile-avatar">
+
+          <img
+            *ngIf="hasProfileImage()"
+            [src]="profileForm.profileImage"
+            alt="Profile photo">
+
+          <span *ngIf="!hasProfileImage()">
+            {{ getInitials() }}
+          </span>
+
+        </div>
+
+        <h2>{{ profile.name }}</h2>
+
+        <p class="profile-email">
+          {{ profile.email }}
+        </p>
+
+        <span class="status-badge">
+          {{ profile.status }}
+        </span>
+
+        <div class="summary-details">
+
+          <div class="summary-item">
+            <span class="summary-label">Account Type</span>
+            <span class="summary-value">
+              {{ profile.role }}
+            </span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-label">Email</span>
+            <span
+              class="verification"
+              [class.verified]="profile.emailVerified">
+              {{ profile.emailVerified ? 'Verified' : 'Not verified' }}
+            </span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-label">Phone</span>
+            <span
+              class="verification"
+              [class.verified]="profile.phoneVerified">
+              {{ profile.phoneVerified ? 'Verified' : 'Not verified' }}
+            </span>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="profile-card profile-form-card">
+
+        <div class="card-header">
+          <div>
+            <h2>Personal Information</h2>
+            <p>Update the information associated with your account.</p>
+          </div>
+        </div>
+
+        <form
+          (ngSubmit)="saveProfile()"
+          autocomplete="off">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="name">Full Name</label>
+
+              <input
+                id="name"
+                type="text"
+                name="name"
+                [(ngModel)]="profileForm.name"
+                (input)="clearMessages()"
+                placeholder="Enter your full name"
+                maxlength="100"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+
+              <input
+                id="email"
+                type="email"
+                name="email"
+                [value]="profile.email"
+                readonly>
+
+              <span class="field-note">
+                Email address cannot be changed here.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+
+              <input
+                id="phone"
+                type="tel"
+                name="phone"
+                [(ngModel)]="profileForm.phone"
+                (input)="clearMessages()"
+                placeholder="10-digit mobile number"
+                maxlength="10"
+                required>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="profileImage">Profile Image URL</label>
+
+              <input
+                id="profileImage"
+                type="url"
+                name="profileImage"
+                [(ngModel)]="profileForm.profileImage"
+                (input)="clearMessages()"
+                placeholder="https://example.com/profile.jpg">
+
+              <span class="field-note">
+                Optional. Enter a publicly accessible image URL.
+              </span>
+            </div>
+
+          </div>
+
+          <div
+            class="image-preview"
+            *ngIf="hasProfileImage()">
+
+            <img
+              [src]="profileForm.profileImage"
+              alt="Profile preview">
+
+            <div>
+              <span class="preview-title">Profile Preview</span>
+              <span class="preview-text">
+                This image will be used as your profile photo.
+              </span>
+            </div>
+
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              class="save-button"
+              [disabled]="saving">
+
+              <span
+                class="button-spinner"
+                *ngIf="saving">
+              </span>
+
+              <span>
+                {{ saving ? 'Saving Changes...' : 'Save Changes' }}
+              </span>
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+    </div>
+
+  </ng-container>
+
+</div>

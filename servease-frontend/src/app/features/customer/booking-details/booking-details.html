@@ -1,3 +1,4 @@
+
 <div class="booking-details-page">
 
   <!-- HEADER -->
@@ -508,7 +509,168 @@
     </div>
 
 
+    <!-- ================= PAYMENT ================= -->
+
+    <div
+      class="info-card payment-card"
+      *ngIf="
+        booking.status === 'ACCEPTED' ||
+        payment
+      "
+    >
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          PAYMENT
+        </span>
+
+        <h2>
+          Payment Details
+        </h2>
+
+      </div>
+
+
+      <!-- PAYMENT LOADING -->
+
+      <div
+        class="payment-state"
+        *ngIf="paymentLoading"
+      >
+
+        <div class="spinner"></div>
+
+        <span>
+          Checking payment status...
+        </span>
+
+      </div>
+
+
+      <!-- PAYMENT SUCCESS -->
+
+      <div
+        class="payment-success"
+        *ngIf="
+          !paymentLoading &&
+          isPaymentSuccessful()
+        "
+      >
+
+        <div class="payment-success-icon">
+          ✓
+        </div>
+
+        <div class="payment-success-content">
+
+          <strong>
+            Payment Successful
+          </strong>
+
+          <span>
+            Your payment of ₹{{ payment?.amount || booking.agreedPrice }}
+            has been completed.
+          </span>
+
+          <small
+            *ngIf="payment?.transactionId"
+          >
+            Transaction ID:
+            {{ payment?.transactionId }}
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- PAYMENT ACTION -->
+
+      <div
+        class="payment-action"
+        *ngIf="
+          !paymentLoading &&
+          !isPaymentSuccessful() &&
+          booking.status === 'ACCEPTED'
+        "
+      >
+
+        <div class="payment-summary">
+
+          <span>
+            Amount to Pay
+          </span>
+
+          <strong>
+            ₹{{ booking.agreedPrice }}
+          </strong>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="primary-btn payment-btn"
+          [disabled]="paymentProcessing"
+          (click)="payNow()"
+        >
+
+          <span
+            class="button-spinner"
+            *ngIf="paymentProcessing"
+          ></span>
+
+          <span>
+            {{
+              paymentProcessing
+              ? 'Processing Payment...'
+              : 'Pay ₹' + booking.agreedPrice
+            }}
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- PAYMENT ERROR -->
+
+      <div
+        class="payment-error"
+        *ngIf="paymentError"
+      >
+
+        <span class="payment-error-icon">
+          !
+        </span>
+
+        <span>
+          {{ paymentError }}
+        </span>
+
+      </div>
+
+
+      <!-- PAYMENT SUCCESS MESSAGE -->
+
+      <div
+        class="payment-message"
+        *ngIf="
+          paymentSuccess &&
+          !isPaymentSuccessful()
+        "
+      >
+
+        {{ paymentSuccess }}
+
+      </div>
+
+    </div>
+
+
     <!-- FOOTER ACTION -->
+
     <div class="bottom-actions">
 
       <a
@@ -530,3 +692,4 @@
   </div>
 
 </div>
+

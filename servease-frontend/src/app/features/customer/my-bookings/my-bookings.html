@@ -427,6 +427,22 @@
 
 
           <button
+            *ngIf="canSwitchToPayAtService(booking)"
+            type="button"
+            class="primary-btn"
+            [disabled]="switchingPaymentPreferenceId !== null"
+            (click)="switchToPayAtService(booking)"
+          >
+            {{
+            switchingPaymentPreferenceId === booking.id
+            ? 'Switching...'
+            : 'Switch to Pay at Service'
+            }}
+          </button>
+
+
+
+          <button
             *ngIf="canCancel(booking)"
             type="button"
             class="cancel-btn"

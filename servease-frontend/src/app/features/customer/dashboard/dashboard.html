@@ -1,13 +1,7 @@
 <div class="dashboard">
 
-  <!-- =========================
-       HERO
-  ========================== -->
-
   <section class="welcome-section">
-
     <div class="welcome-content">
-
       <span class="eyebrow">
         SERVEASE
       </span>
@@ -20,28 +14,18 @@
       <p>
         What can we help you with today?
       </p>
-
     </div>
 
-
     <div class="hero-decoration">
-
       <div class="decoration-circle circle-one"></div>
-
       <div class="decoration-circle circle-two"></div>
 
       <span class="decoration-icon">
         ✦
       </span>
-
     </div>
-
   </section>
 
-
-  <!-- =========================
-       SEARCH
-  ========================== -->
 
   <section class="search-section">
 
@@ -60,36 +44,26 @@
       <button
         type="button"
         class="search-button"
+        routerLink="/services"
       >
         Search
       </button>
 
     </div>
 
-
     <div class="location-text">
-
-      <span>
-        ⌖
-      </span>
-
+      <span>⌖</span>
       Services available in your area
-
     </div>
 
   </section>
 
-
-  <!-- =========================
-       CATEGORIES
-  ========================== -->
 
   <section class="dashboard-section">
 
     <div class="section-header">
 
       <div>
-
         <span class="section-eyebrow">
           EXPLORE
         </span>
@@ -97,31 +71,21 @@
         <h2>
           Browse services
         </h2>
-
       </div>
-
 
       <a
         routerLink="/services"
         class="view-all"
       >
         View all
-
-        <span>
-          →
-        </span>
-
+        <span>→</span>
       </a>
 
     </div>
 
-
     <div class="category-grid">
 
-      @for (
-      category of categories;
-      track category.name
-      ) {
+      @for (category of categories; track category.name) {
 
       <a
         class="category-card"
@@ -129,11 +93,8 @@
       >
 
         <div class="category-icon">
-
           {{ category.icon }}
-
         </div>
-
 
         <div class="category-info">
 
@@ -146,7 +107,6 @@
           </p>
 
         </div>
-
 
         <span class="category-arrow">
             →
@@ -161,45 +121,116 @@
   </section>
 
 
-  <!-- =========================
-       RECENT BOOKINGS
-  ========================== -->
-
-  <section class="dashboard-section recent-bookings-section">
+  <section class="dashboard-section booking-overview-section">
 
     <div class="section-header">
 
       <div>
-
         <span class="section-eyebrow">
           YOUR ACTIVITY
         </span>
 
         <h2>
-          Recent bookings
+          Booking overview
         </h2>
-
       </div>
-
 
       <a
         routerLink="/bookings"
         class="view-all"
       >
         View all
-
-        <span>
-          →
-        </span>
-
+        <span>→</span>
       </a>
 
     </div>
 
+    <div class="booking-overview-grid">
 
-    <!-- =========================
-         BOOKINGS LOADING
-    ========================== -->
+      <div class="overview-card">
+
+        <div class="overview-icon total">
+          ◷
+        </div>
+
+        <div>
+          <span>Total bookings</span>
+          <strong>{{ totalBookings }}</strong>
+        </div>
+
+      </div>
+
+
+      <div class="overview-card">
+
+        <div class="overview-icon pending">
+          ◌
+        </div>
+
+        <div>
+          <span>Pending</span>
+          <strong>{{ pendingBookings }}</strong>
+        </div>
+
+      </div>
+
+
+      <div class="overview-card">
+
+        <div class="overview-icon active">
+          ◉
+        </div>
+
+        <div>
+          <span>Active</span>
+          <strong>{{ activeBookings }}</strong>
+        </div>
+
+      </div>
+
+
+      <div class="overview-card">
+
+        <div class="overview-icon completed">
+          ✓
+        </div>
+
+        <div>
+          <span>Completed</span>
+          <strong>{{ completedBookings }}</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="dashboard-section recent-bookings-section">
+
+    <div class="section-header">
+
+      <div>
+        <span class="section-eyebrow">
+          RECENT ACTIVITY
+        </span>
+
+        <h2>
+          Recent bookings
+        </h2>
+      </div>
+
+      <a
+        routerLink="/bookings"
+        class="view-all"
+      >
+        View all
+        <span>→</span>
+      </a>
+
+    </div>
+
 
     <div
       class="recent-bookings-state"
@@ -215,22 +246,14 @@
     </div>
 
 
-    <!-- =========================
-         BOOKINGS ERROR
-    ========================== -->
-
     <div
       class="recent-bookings-state error"
-      *ngIf="
-        !bookingsLoading &&
-        bookingsError
-      "
+      *ngIf="!bookingsLoading && bookingsError"
     >
 
       <span>
         {{ bookingsError }}
       </span>
-
 
       <button
         type="button"
@@ -241,10 +264,6 @@
 
     </div>
 
-
-    <!-- =========================
-         NO BOOKINGS
-    ========================== -->
 
     <div
       class="recent-bookings-state"
@@ -259,19 +278,13 @@
         ◷
       </div>
 
-
       <div>
-
-        <strong>
-          No bookings yet
-        </strong>
+        <strong>No bookings yet</strong>
 
         <span>
           Your recent service bookings will appear here.
         </span>
-
       </div>
-
 
       <a
         routerLink="/services"
@@ -283,10 +296,6 @@
     </div>
 
 
-    <!-- =========================
-         RECENT BOOKINGS LIST
-    ========================== -->
-
     <div
       class="recent-bookings-list"
       *ngIf="
@@ -296,22 +305,14 @@
       "
     >
 
-      @for (
-      booking of recentBookings;
-      track booking.id
-      ) {
+      @for (booking of recentBookings; track booking.id) {
 
       <article class="recent-booking-card">
-
-
-        <!-- BOOKING ICON -->
 
         <div class="recent-booking-icon">
           ✦
         </div>
 
-
-        <!-- BOOKING INFORMATION -->
 
         <div class="recent-booking-content">
 
@@ -319,16 +320,13 @@
               Booking #{{ booking.id }}
             </span>
 
-
           <h3>
             {{ booking.serviceTitle }}
           </h3>
 
-
           <p>
             {{ booking.providerBusinessName }}
           </p>
-
 
           <div class="recent-booking-meta">
 
@@ -349,19 +347,14 @@
         </div>
 
 
-        <!-- STATUS + PRICE -->
-
         <div class="recent-booking-side">
 
             <span
               class="dashboard-status"
-              [ngClass]="
-                getStatusClass(booking.status)
-              "
+              [ngClass]="getStatusClass(booking.status)"
             >
               {{ getStatusLabel(booking.status) }}
             </span>
-
 
           <strong>
             ₹{{ formatPrice(booking.agreedPrice) }}
@@ -370,13 +363,8 @@
         </div>
 
 
-        <!-- VIEW BOOKING -->
-
         <a
-          [routerLink]="[
-              '/bookings',
-              booking.id
-            ]"
+          [routerLink]="['/bookings', booking.id]"
           class="recent-booking-arrow"
           aria-label="View booking details"
         >
@@ -392,23 +380,14 @@
   </section>
 
 
-  <!-- =========================
-       LOWER CONTENT
-  ========================== -->
-
   <div class="dashboard-grid">
 
-
-    <!-- =========================
-         RECOMMENDED SERVICES
-    ========================== -->
 
     <section class="dashboard-section recommended-section">
 
       <div class="section-header">
 
         <div>
-
           <span class="section-eyebrow">
             FOR YOU
           </span>
@@ -416,20 +395,14 @@
           <h2>
             Recommended services
           </h2>
-
         </div>
-
 
         <a
           routerLink="/services"
           class="view-all"
         >
           Explore
-
-          <span>
-            →
-          </span>
-
+          <span>→</span>
         </a>
 
       </div>
@@ -437,24 +410,13 @@
 
       <div class="service-list">
 
-        @for (
-        service of recommendedServices;
-        track service.title
-        ) {
+        @for (service of recommendedServices; track service.title) {
 
         <article class="service-card">
 
-
-          <!-- SERVICE ICON -->
-
           <div class="service-icon">
-
             {{ service.icon }}
-
           </div>
-
-
-          <!-- SERVICE INFORMATION -->
 
           <div class="service-content">
 
@@ -462,11 +424,9 @@
               {{ service.title }}
             </h3>
 
-
             <p class="provider-name">
               {{ service.provider }}
             </p>
-
 
             <div class="service-meta">
 
@@ -474,16 +434,13 @@
                   ★ {{ service.rating }}
                 </span>
 
-
               <span>
                   ({{ service.reviews }})
                 </span>
 
-
               <span class="separator">
                   •
                 </span>
-
 
               <span>
                   {{ service.location }}
@@ -492,9 +449,6 @@
             </div>
 
           </div>
-
-
-          <!-- PRICE -->
 
           <div class="service-price">
 
@@ -517,47 +471,90 @@
     </section>
 
 
-    <!-- =========================
-         QUICK ACTION
-    ========================== -->
+    <aside class="upcoming-card">
 
-    <aside class="quick-card">
+      <div class="upcoming-card-header">
 
-      <div class="quick-icon">
-        ◷
+        <div class="upcoming-icon">
+          ◷
+        </div>
+
+        <span class="section-eyebrow">
+          NEXT UP
+        </span>
+
       </div>
 
 
-      <span class="section-eyebrow">
-        QUICK ACCESS
-      </span>
+      <ng-container *ngIf="upcomingBooking as booking">
 
+        <h2>
+          Upcoming booking
+        </h2>
 
-      <h2>
-        Need a service
-        right now?
-      </h2>
+        <p class="upcoming-service">
+          {{ booking.serviceTitle }}
+        </p>
 
+        <p class="upcoming-provider">
+          {{ booking.providerBusinessName }}
+        </p>
 
-      <p>
-        Find available professionals
-        and book a service in just
-        a few steps.
-      </p>
+        <div class="upcoming-details">
 
+          <div>
+            <span>Date</span>
+            <strong>
+              {{ formatDate(booking.bookingDate) }}
+            </strong>
+          </div>
 
-      <a
-        routerLink="/services"
-        class="quick-button"
-      >
+          <div>
+            <span>Time</span>
+            <strong>
+              {{ formatTime(booking.bookingTime) }}
+            </strong>
+          </div>
 
-        Find a professional
+        </div>
 
-        <span>
-          →
+        <span
+          class="dashboard-status"
+          [ngClass]="getStatusClass(booking.status)"
+        >
+          {{ getStatusLabel(booking.status) }}
         </span>
 
-      </a>
+        <a
+          [routerLink]="['/bookings', booking.id]"
+          class="upcoming-button"
+        >
+          View booking
+          <span>→</span>
+        </a>
+
+      </ng-container>
+
+
+      <ng-container *ngIf="!upcomingBooking">
+
+        <h2>
+          No upcoming booking
+        </h2>
+
+        <p class="upcoming-empty-text">
+          You don't have any upcoming service bookings right now.
+        </p>
+
+        <a
+          routerLink="/services"
+          class="upcoming-button"
+        >
+          Find a service
+          <span>→</span>
+        </a>
+
+      </ng-container>
 
     </aside>
 
