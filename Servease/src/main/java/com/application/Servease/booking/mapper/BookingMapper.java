@@ -8,46 +8,15 @@ import org.springframework.stereotype.Component;
 public class BookingMapper {
 
     public BookingResponse toResponse(Booking booking) {
-
         return BookingResponse.builder()
                 .id(booking.getId())
-
-                .customerId(
-                        booking.getCustomer().getId()
-                )
-
-                .providerId(
-                        booking.getProviderService()
-                                .getProvider()
-                                .getId()
-                )
-
-                .providerBusinessName(
-                        booking.getProviderService()
-                                .getProvider()
-                                .getBusinessName()
-                )
-
-                .providerServiceId(
-                        booking.getProviderService().getId()
-                )
-
-                .serviceTitle(
-                        booking.getProviderService().getTitle()
-                )
-
-                .subCategoryId(
-                        booking.getProviderService()
-                                .getSubCategory()
-                                .getId()
-                )
-
-                .subCategoryName(
-                        booking.getProviderService()
-                                .getSubCategory()
-                                .getName()
-                )
-
+                .customerId(booking.getCustomer().getId())
+                .providerId(booking.getProviderService().getProvider().getId())
+                .providerBusinessName(booking.getProviderService().getProvider().getBusinessName())
+                .providerServiceId(booking.getProviderService().getId())
+                .serviceTitle(booking.getProviderService().getTitle())
+                .subCategoryId(booking.getProviderService().getSubCategory().getId())
+                .subCategoryName(booking.getProviderService().getSubCategory().getName())
                 .bookingDate(booking.getBookingDate())
                 .bookingTime(booking.getBookingTime())
                 .agreedPrice(booking.getAgreedPrice())
@@ -57,7 +26,10 @@ public class BookingMapper {
                 .pincode(booking.getPincode())
                 .customerNote(booking.getCustomerNote())
                 .status(booking.getStatus())
-
+                .paymentPreference(booking.getPaymentPreference())
+                .estimatedDurationMinutesSnapshot(booking.getEstimatedDurationMinutesSnapshot())
+                .platformFeeRateSnapshot(booking.getPlatformFeeRateSnapshot())
+                .platformFeeAmountSnapshot(booking.getPlatformFeeAmountSnapshot())
                 .build();
     }
 }

@@ -90,36 +90,32 @@ public class ProviderBookingController {
     }
 
     @Operation(
-            summary = "Start booking"
+            summary = "Legacy start endpoint disabled"
     )
     @PatchMapping("/{id}/start")
     public ResponseEntity<ApiResponse<Void>> startBooking(
-            @PathVariable Long id) {
-
-        bookingService.startBooking(id);
-
-        return ResponseEntity.ok(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.status(409).body(
                 new ApiResponse<>(
-                        true,
-                        "Booking started successfully.",
+                        false,
+                        "Request and verify a START code to begin the service.",
                         null
                 )
         );
     }
 
     @Operation(
-            summary = "Complete booking"
+            summary = "Legacy completion endpoint disabled"
     )
     @PatchMapping("/{id}/complete")
     public ResponseEntity<ApiResponse<Void>> completeBooking(
-            @PathVariable Long id) {
-
-        bookingService.completeBooking(id);
-
-        return ResponseEntity.ok(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.status(409).body(
                 new ApiResponse<>(
-                        true,
-                        "Booking completed successfully.",
+                        false,
+                        "Confirm collection when applicable, then verify a COMPLETION code.",
                         null
                 )
         );

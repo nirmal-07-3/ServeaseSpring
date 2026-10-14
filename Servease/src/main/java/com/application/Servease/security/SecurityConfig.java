@@ -1,3 +1,4 @@
+
 package com.application.Servease.security;
 
 import org.springframework.context.annotation.Bean;
@@ -9,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,32 +28,17 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-
-    // ============================================================
-    // PASSWORD ENCODER
-    // ============================================================
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
-
-    // ============================================================
-    // CORS
-    // ============================================================
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of(
-                        "http://localhost:4200"
-                )
+                List.of("http://localhost:4200")
         );
 
         configuration.setAllowedMethods(
@@ -67,27 +52,16 @@ public class SecurityConfig {
                 )
         );
 
-        configuration.setAllowedHeaders(
-                List.of("*")
-        );
-
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
-
-
-    // ============================================================
-    // SECURITY FILTER CHAIN
-    // ============================================================
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -95,71 +69,29 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-
-                // =================================================
-                // CORS
-                // =================================================
-
-                .cors(cors -> cors
-                        .configurationSource(
-                                corsConfigurationSource()
-                        )
-                )
-
-
-                // =================================================
-                // CSRF
-                // =================================================
-
+                .cors(cors -> cors.configurationSource(
+                        corsConfigurationSource()
+                ))
                 .csrf(csrf -> csrf.disable())
-
-
-                // =================================================
-                // STATELESS JWT SESSION
-                // =================================================
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
-
-
-                // =================================================
-                // AUTHORIZATION
-                // =================================================
-
                 .authorizeHttpRequests(auth -> auth
-
-
-                        // =========================================
-                        // PUBLIC APIs
-                        // =========================================
 
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/categories/**",
                                 "/api/subcategories/**",
                                 "/api/payments/razorpay/webhook"
-                        )
-                        .permitAll()
-
-
-                        // =========================================
-                        // SWAGGER
-                        // =========================================
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
-                        )
-                        .permitAll()
-
-
-                        // =========================================
-                        // PUBLIC HTML PAGES
-                        // =========================================
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/",
@@ -170,13 +102,7 @@ public class SecurityConfig {
                                 "/verify-otp.html",
                                 "/reset-password.html",
                                 "/razorpay-test.html"
-                        )
-                        .permitAll()
-
-
-                        // =========================================
-                        // STATIC RESOURCES
-                        // =========================================
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/css/**",
@@ -185,65 +111,26 @@ public class SecurityConfig {
                                 "/assets/**",
                                 "/fonts/**",
                                 "/favicon.ico"
-                        )
-                        .permitAll()
+                        ).permitAll()
 
-
-                        // =========================================
-                        // ADMIN
-                        // =========================================
-
-                        .requestMatchers(
-                                "/api/admin/**"
-                        )
+                        .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
+                        .requestMatchers("/api/provider/bookings/**")
+                        .hasAnyRole("PROVIDER", "ADMIN")
 
-                        // =========================================
-                        // PROVIDER
-                        // =========================================
+                        .requestMatchers("/api/providers/**")
+                        .hasAnyRole("PROVIDER", "ADMIN")
 
-                        .requestMatchers(
-                                "/api/providers/**"
-                        )
-                        .hasAnyRole(
-                                "PROVIDER",
-                                "ADMIN"
-                        )
+                        .requestMatchers("/api/users/**")
+                        .hasAnyRole("CUSTOMER", "PROVIDER", "ADMIN")
 
-
-                        // =========================================
-                        // USERS
-                        // =========================================
-
-                        .requestMatchers(
-                                "/api/users/**"
-                        )
-                        .hasAnyRole(
-                                "CUSTOMER",
-                                "PROVIDER",
-                                "ADMIN"
-                        )
-
-
-                        // =========================================
-                        // EVERYTHING ELSE
-                        // =========================================
-
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 )
-
-
-                // =================================================
-                // JWT FILTER
-                // =================================================
-
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
-
 
         return http.build();
     }

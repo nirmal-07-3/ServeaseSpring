@@ -1,5 +1,6 @@
 package com.application.Servease.booking.dto;
 
+import com.application.Servease.booking.enums.PaymentPreference;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,4 +35,7 @@ public class CreateBookingRequest {
     private String pincode;
 
     private String customerNote;
+
+    @NotNull(message = "Payment preference is required")
+    private PaymentPreference paymentPreference;
 }

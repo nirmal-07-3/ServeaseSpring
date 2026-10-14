@@ -1,3 +1,4 @@
+
 package com.application.Servease.booking.controller;
 
 import com.application.Servease.booking.dto.BookingResponse;
@@ -41,12 +42,9 @@ public class BookingController {
         );
     }
 
-    @Operation(
-            summary = "Get my bookings"
-    )
+    @Operation(summary = "Get my bookings")
     @GetMapping
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getMyBookings() {
-
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
@@ -56,9 +54,7 @@ public class BookingController {
         );
     }
 
-    @Operation(
-            summary = "Get my booking"
-    )
+    @Operation(summary = "Get my booking")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BookingResponse>> getMyBooking(
             @PathVariable Long id) {
@@ -72,9 +68,7 @@ public class BookingController {
         );
     }
 
-    @Operation(
-            summary = "Cancel booking"
-    )
+    @Operation(summary = "Cancel booking")
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<Void>> cancelBooking(
             @PathVariable Long id) {
@@ -86,6 +80,25 @@ public class BookingController {
                         true,
                         "Booking cancelled successfully.",
                         null
+                )
+        );
+    }
+
+    @Operation(
+            summary = "Switch to payment at service",
+            description = "Explicitly switch an eligible booking from online payment to payment at service after the online payment deadline expires."
+    )
+    @PatchMapping("/{id}/payment-preference/pay-at-service")
+    public ResponseEntity<ApiResponse<BookingResponse>> switchToPayAtService(
+            @PathVariable Long id) {
+
+        BookingResponse booking = bookingService.switchToPayAtService(id);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Payment preference switched to payment at service.",
+                        booking
                 )
         );
     }
