@@ -17,10 +17,11 @@ import java.time.LocalDateTime;
 @Table(
         name = "booking_collections",
         indexes = {
-                @Index(
-                        name = "idx_booking_collection_status",
-                        columnList = "status"
-                )
+                @Index(name = "idx_booking_collection_status", columnList = "status")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_booking_collection_gateway_payment", columnNames = "gateway_payment_id"),
+                @UniqueConstraint(name = "uk_booking_collection_gateway_qr", columnNames = "gateway_qr_code_id")
         }
 )
 @Getter
@@ -57,6 +58,27 @@ public class BookingCollection {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_attempt_id", unique = true)
     private PaymentAttempt paymentAttempt;
+
+    @Column(name = "gateway_qr_code_id", length = 100)
+    private String gatewayQrCodeId;
+
+    @Column(name = "gateway_qr_image_url", length = 1000)
+    private String gatewayQrImageUrl;
+
+    @Column(name = "gateway_payment_id", length = 100)
+    private String gatewayPaymentId;
+
+    @Column(name = "qr_close_by_epoch")
+    private Long qrCloseByEpoch;
+
+    @Column(name = "platform_fee_rate_snapshot", precision = 5, scale = 2)
+    private BigDecimal platformFeeRateSnapshot;
+
+    @Column(name = "platform_fee_amount_snapshot", precision = 10, scale = 2)
+    private BigDecimal platformFeeAmountSnapshot;
+
+    @Column(name = "provider_net_amount_snapshot", precision = 10, scale = 2)
+    private BigDecimal providerNetAmountSnapshot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "confirmed_by_user_id")

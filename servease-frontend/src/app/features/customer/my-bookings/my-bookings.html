@@ -1,16 +1,10 @@
+
 <div class="bookings-page">
-
-  <!-- PAGE HEADER -->
   <div class="page-header">
-
     <div>
       <span class="eyebrow">MY BOOKINGS</span>
-
       <h1>Your Bookings</h1>
-
-      <p>
-        Track and manage all your service bookings.
-      </p>
+      <p>Track and manage all your service bookings.</p>
     </div>
 
     <button
@@ -20,58 +14,23 @@
       [disabled]="loading"
     >
       <span>↻</span>
-
       {{ loading ? 'Refreshing...' : 'Refresh' }}
     </button>
-
   </div>
 
-
-  <!-- ================= LOADING ================= -->
-
   <ng-container *ngIf="loading">
-
     <div class="state-card loading-state">
-
       <div class="spinner"></div>
-
-      <h3>
-        Loading your bookings...
-      </h3>
-
-      <p>
-        Please wait while we fetch your latest bookings.
-      </p>
-
+      <h3>Loading your bookings...</h3>
+      <p>Please wait while we fetch your latest bookings.</p>
     </div>
-
   </ng-container>
 
-
-  <!-- ================= NOT LOADING ================= -->
-
   <ng-container *ngIf="!loading">
-
-
-    <!-- ERROR -->
-
-    <div
-      class="state-card error-state"
-      *ngIf="error"
-    >
-
-      <div class="state-icon">
-        !
-      </div>
-
-      <h3>
-        Unable to load bookings
-      </h3>
-
-      <p>
-        {{ error }}
-      </p>
-
+    <div class="state-card error-state" *ngIf="error">
+      <div class="state-icon">!</div>
+      <h3>Unable to load bookings</h3>
+      <p>{{ error }}</p>
       <button
         type="button"
         class="primary-btn"
@@ -79,75 +38,41 @@
       >
         Try Again
       </button>
-
     </div>
-
-
-    <!-- EMPTY -->
 
     <div
       class="state-card empty-state"
       *ngIf="!error && bookings.length === 0"
     >
-
-      <div class="empty-icon">
-        ▣
-      </div>
-
-      <h3>
-        No bookings yet
-      </h3>
-
+      <div class="empty-icon">▣</div>
+      <h3>No bookings yet</h3>
       <p>
         You haven't booked any services yet.
         Find a service and make your first booking.
       </p>
-
-      <a
-        routerLink="/services"
-        class="primary-btn"
-      >
+      <a routerLink="/services" class="primary-btn">
         Explore Services
       </a>
-
     </div>
-
-
-    <!-- ================= BOOKING LIST ================= -->
 
     <div
       class="booking-list"
       *ngIf="!error && bookings.length > 0"
     >
-
       <div
         class="booking-card"
         *ngFor="let booking of bookings"
       >
-
-
-        <!-- BOOKING HEADER -->
-
         <div class="booking-top">
-
           <div class="booking-heading">
-
             <span class="booking-id">
               Booking #{{ booking.id }}
             </span>
-
-            <h2>
-              {{ booking.serviceTitle }}
-            </h2>
-
+            <h2>{{ booking.serviceTitle }}</h2>
             <p class="provider">
               {{ booking.providerBusinessName }}
             </p>
-
           </div>
-
-
-          <!-- STATUS -->
 
           <span
             class="status-badge"
@@ -155,69 +80,29 @@
           >
             {{ getStatusLabel(booking.status) }}
           </span>
-
         </div>
-
-
-        <!-- ================= BOOKING INFO ================= -->
 
         <div class="booking-info">
-
           <div class="info-item">
-
-            <span class="info-label">
-              DATE
-            </span>
-
-            <strong>
-              {{ formatDate(booking.bookingDate) }}
-            </strong>
-
+            <span class="info-label">DATE</span>
+            <strong>{{ formatDate(booking.bookingDate) }}</strong>
           </div>
 
-
           <div class="info-item">
-
-            <span class="info-label">
-              TIME
-            </span>
-
-            <strong>
-              {{ formatTime(booking.bookingTime) }}
-            </strong>
-
+            <span class="info-label">TIME</span>
+            <strong>{{ formatTime(booking.bookingTime) }}</strong>
           </div>
 
-
           <div class="info-item">
-
-            <span class="info-label">
-              PRICE
-            </span>
-
-            <strong>
-              ₹{{ booking.agreedPrice }}
-            </strong>
-
+            <span class="info-label">PRICE</span>
+            <strong>₹{{ booking.agreedPrice }}</strong>
           </div>
 
-
           <div class="info-item">
-
-            <span class="info-label">
-              LOCATION
-            </span>
-
-            <strong>
-              {{ booking.city }}, {{ booking.state }}
-            </strong>
-
+            <span class="info-label">LOCATION</span>
+            <strong>{{ booking.city }}, {{ booking.state }}</strong>
           </div>
-
         </div>
-
-
-        <!-- ================= TRACKING ================= -->
 
         <div
           class="tracking"
@@ -226,198 +111,89 @@
             booking.status !== 'CANCELLED'
           "
         >
-
           <div class="tracking-header">
-
-            <h3>
-              Booking Status
-            </h3>
-
+            <h3>Booking Status</h3>
             <a
               [routerLink]="['/bookings', booking.id]"
               class="details-link"
             >
               View Details →
             </a>
-
           </div>
-
 
           <div class="timeline">
-
-
-            <!-- BOOKING PLACED -->
-
             <div
               class="timeline-step"
-              [class.completed]="
-                getProgressStep(booking.status) >= 1
-              "
+              [class.completed]="getProgressStep(booking.status) >= 1"
             >
-
-              <div class="timeline-dot">
-                ✓
-              </div>
-
-              <span>
-                Booking Placed
-              </span>
-
+              <div class="timeline-dot">✓</div>
+              <span>Booking Placed</span>
             </div>
-
-
-            <!-- LINE -->
 
             <div
               class="timeline-line"
-              [class.active]="
-                getProgressStep(booking.status) >= 2
-              "
+              [class.active]="getProgressStep(booking.status) >= 2"
             ></div>
-
-
-            <!-- ACCEPTED -->
 
             <div
               class="timeline-step"
-              [class.completed]="
-                getProgressStep(booking.status) >= 2
-              "
+              [class.completed]="getProgressStep(booking.status) >= 2"
             >
-
               <div class="timeline-dot">
-
-                {{
-                getProgressStep(booking.status) >= 2
-                ? '✓'
-                : '2'
-                }}
-
+                {{ getProgressStep(booking.status) >= 2 ? '✓' : '2' }}
               </div>
-
-              <span>
-                Accepted
-              </span>
-
+              <span>Accepted</span>
             </div>
-
-
-            <!-- LINE -->
 
             <div
               class="timeline-line"
-              [class.active]="
-                getProgressStep(booking.status) >= 3
-              "
+              [class.active]="getProgressStep(booking.status) >= 3"
             ></div>
-
-
-            <!-- IN PROGRESS -->
 
             <div
               class="timeline-step"
-              [class.completed]="
-                getProgressStep(booking.status) >= 3
-              "
+              [class.completed]="getProgressStep(booking.status) >= 3"
             >
-
               <div class="timeline-dot">
-
-                {{
-                getProgressStep(booking.status) >= 3
-                ? '✓'
-                : '3'
-                }}
-
+                {{ getProgressStep(booking.status) >= 3 ? '✓' : '3' }}
               </div>
-
-              <span>
-                In Progress
-              </span>
-
+              <span>In Progress</span>
             </div>
-
-
-            <!-- LINE -->
 
             <div
               class="timeline-line"
-              [class.active]="
-                getProgressStep(booking.status) >= 4
-              "
+              [class.active]="getProgressStep(booking.status) >= 4"
             ></div>
-
-
-            <!-- COMPLETED -->
 
             <div
               class="timeline-step"
-              [class.completed]="
-                getProgressStep(booking.status) >= 4
-              "
+              [class.completed]="getProgressStep(booking.status) >= 4"
             >
-
               <div class="timeline-dot">
-
-                {{
-                getProgressStep(booking.status) >= 4
-                ? '✓'
-                : '4'
-                }}
-
+                {{ getProgressStep(booking.status) >= 4 ? '✓' : '4' }}
               </div>
-
-              <span>
-                Completed
-              </span>
-
+              <span>Completed</span>
             </div>
-
           </div>
-
         </div>
-
-
-        <!-- ================= REJECTED ================= -->
 
         <div
           class="special-status rejected-message"
           *ngIf="booking.status === 'REJECTED'"
         >
-
-          <strong>
-            Booking Rejected
-          </strong>
-
-          <span>
-            The provider was unable to accept this booking.
-          </span>
-
+          <strong>Booking Rejected</strong>
+          <span>The provider was unable to accept this booking.</span>
         </div>
-
-
-        <!-- ================= CANCELLED ================= -->
 
         <div
           class="special-status cancelled-message"
           *ngIf="booking.status === 'CANCELLED'"
         >
-
-          <strong>
-            Booking Cancelled
-          </strong>
-
-          <span>
-            This booking has been cancelled.
-          </span>
-
+          <strong>Booking Cancelled</strong>
+          <span>This booking has been cancelled.</span>
         </div>
 
-
-        <!-- ================= ACTIONS ================= -->
-
         <div class="booking-actions">
-
           <a
             [routerLink]="['/bookings', booking.id]"
             class="secondary-btn"
@@ -425,13 +201,12 @@
             View Details
           </a>
 
-
           <button
             *ngIf="canSwitchToPayAtService(booking)"
             type="button"
             class="primary-btn"
             [disabled]="switchingPaymentPreferenceId !== null"
-            (click)="switchToPayAtService(booking)"
+            (click)="openSwitchConfirmation(booking)"
           >
             {{
             switchingPaymentPreferenceId === booking.id
@@ -440,30 +215,126 @@
             }}
           </button>
 
-
-
           <button
             *ngIf="canCancel(booking)"
             type="button"
             class="cancel-btn"
             [disabled]="cancellingId === booking.id"
-            (click)="cancelBooking(booking)"
+            (click)="openCancelConfirmation(booking)"
           >
-
             {{
             cancellingId === booking.id
             ? 'Cancelling...'
             : 'Cancel Booking'
             }}
-
           </button>
-
         </div>
-
       </div>
+    </div>
+  </ng-container>
+</div>
 
+<div
+  class="modal-backdrop"
+  *ngIf="confirmationType"
+  (click)="closeConfirmation()"
+>
+  <section
+    class="confirmation-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirmation-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-icon">?</div>
+
+    <span class="modal-eyebrow">SERVEASE CONFIRMATION</span>
+
+    <h2 id="confirmation-title">
+      {{
+      confirmationType === 'switch'
+      ? 'Switch payment method?'
+      : 'Cancel this booking?'
+      }}
+    </h2>
+
+    <p *ngIf="confirmationBooking">
+      Booking #{{ confirmationBooking.id }} ·
+      {{ confirmationBooking.serviceTitle }}
+    </p>
+
+    <div class="modal-price" *ngIf="confirmationBooking">
+      ₹{{ confirmationBooking.agreedPrice }}
     </div>
 
-  </ng-container>
+    <p class="modal-description">
+      {{
+      confirmationType === 'switch'
+      ? 'If approved, you will pay directly when the service is provided. Servease will verify that this change is allowed.'
+      : 'Are you sure you want to cancel this booking? Servease will validate your request.'
+      }}
+    </p>
 
+    <div class="modal-actions">
+      <button
+        type="button"
+        class="modal-cancel-btn"
+        (click)="closeConfirmation()"
+      >
+        Go Back
+      </button>
+
+      <button
+        type="button"
+        class="modal-confirm-btn"
+        [class.danger]="confirmationType === 'cancel'"
+        (click)="confirmAction()"
+      >
+        {{
+        confirmationType === 'switch'
+        ? 'Confirm Switch'
+        : 'Confirm Cancellation'
+        }}
+      </button>
+    </div>
+  </section>
+</div>
+
+<div
+  class="feedback-backdrop"
+  *ngIf="feedbackType"
+  (click)="closeFeedback()"
+>
+  <section
+    class="feedback-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feedback-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div
+      class="feedback-icon"
+      [class.error]="feedbackType === 'error'"
+    >
+      {{ feedbackType === 'success' ? '✓' : '!' }}
+    </div>
+
+    <h2 id="feedback-title">
+      {{
+      feedbackType === 'success'
+      ? 'Success'
+      : 'Action unsuccessful'
+      }}
+    </h2>
+
+    <p>{{ feedbackMessage }}</p>
+
+    <button
+      type="button"
+      class="modal-confirm-btn"
+      (click)="closeFeedback()"
+    >
+      Okay
+    </button>
+  </section>
 </div>

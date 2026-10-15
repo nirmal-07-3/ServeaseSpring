@@ -1,0 +1,92 @@
+
+<section class="favorites-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">YOUR COLLECTION</span>
+      <h1>Favourite Providers</h1>
+      <p>Keep the service providers you love close at hand.</p>
+    </div>
+
+    <a class="back-link" routerLink="/services">
+      <span aria-hidden="true">←</span> Explore services
+    </a>
+  </header>
+
+  <div class="notice success" *ngIf="success" role="status">
+    {{ success }}
+  </div>
+
+  <div class="notice error" *ngIf="error" role="alert">
+    <span>{{ error }}</span>
+    <button type="button" (click)="retry()" [disabled]="loading">
+      Try again
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Loading your favourite providers...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && !error && favorites.length === 0">
+    <div class="empty-icon" aria-hidden="true">♡</div>
+    <h2>Your favourites start here</h2>
+    <p>You haven't saved any providers yet. Explore services and find the right professional for you.</p>
+    <a routerLink="/services" class="primary-button">Explore services</a>
+  </div>
+
+  <div
+    class="favorites-grid"
+    *ngIf="!loading && favorites.length > 0"
+  >
+    <article
+      class="favorite-card"
+      *ngFor="let favorite of favorites; trackBy: trackByProviderId"
+    >
+      <div class="card-top">
+        <div class="provider-avatar">
+          {{ (favorite.businessName || 'P').charAt(0).toUpperCase() }}
+        </div>
+        <span class="saved-label">
+          <span aria-hidden="true">♥</span> Saved
+        </span>
+      </div>
+
+      <div class="provider-info">
+        <h2>{{ favorite.businessName }}</h2>
+
+        <p class="location" *ngIf="favorite.city || favorite.address">
+          <span aria-hidden="true">⌖</span>
+          {{ favorite.city || favorite.address }}
+        </p>
+
+        <p class="description" *ngIf="favorite.description">
+          {{ favorite.description }}
+        </p>
+
+        <div class="rating" *ngIf="favorite.averageRating != null">
+          <span aria-hidden="true">★</span>
+          <strong>{{ favorite.averageRating | number:'1.1-1' }}</strong>
+          <span class="review-count">
+            ({{ favorite.totalReviews || 0 }} reviews)
+          </span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          type="button"
+          class="remove-button"
+          (click)="removeFavorite(favorite)"
+          [disabled]="removingProviderId !== null"
+        >
+          {{
+          removingProviderId === favorite.providerId
+          ? 'Removing...'
+          : 'Remove favourite'
+          }}
+        </button>
+      </div>
+    </article>
+  </div>
+</section>

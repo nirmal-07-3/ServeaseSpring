@@ -125,6 +125,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**")
                         .hasAnyRole("CUSTOMER", "PROVIDER", "ADMIN")
 
+                        .requestMatchers("/api/customer/favorites/**")
+                        .hasRole("CUSTOMER")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

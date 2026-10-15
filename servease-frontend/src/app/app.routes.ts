@@ -130,6 +130,14 @@ export const routes: Routes = [
             .then(m => m.Messages)
       },
 
+      {
+        path: 'favorites',
+        loadComponent: () =>
+          import('./features/customer/favorites/favorites')
+            .then(m => m.Favorites)
+      },
+
+
     ]
   },
 

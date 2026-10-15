@@ -1,566 +1,374 @@
 <div class="provider-bookings">
-
-  <!-- ============================================================
-       HEADER
-  ============================================================ -->
-
   <header class="page-header">
-
     <div>
-
-      <a
-        routerLink="/provider/dashboard"
-        class="back-link"
-      >
-        ← Dashboard
-      </a>
-
-      <span class="eyebrow">
-        PROVIDER PORTAL
-      </span>
-
+      <a routerLink="/provider/dashboard" class="back-link">← Dashboard</a>
+      <span class="eyebrow">PROVIDER PORTAL</span>
       <h1>Bookings</h1>
-
-      <p>
-        Manage your customer bookings and appointments.
-      </p>
-
+      <p>Manage your customer bookings and appointments.</p>
     </div>
-
     <button
       type="button"
       class="refresh-button"
       [disabled]="loading || actionLoading"
-      (click)="refreshBookings()"
-    >
+      (click)="refreshBookings()">
       ↻ Refresh
     </button>
-
   </header>
 
-
-  <!-- ============================================================
-       SUCCESS
-  ============================================================ -->
-
-  <div
-    *ngIf="successMessage"
-    class="alert success-alert"
-  >
-
+  <div *ngIf="successMessage" class="alert success-alert">
     <span class="alert-icon">✓</span>
-
     <span>{{ successMessage }}</span>
-
-    <button
-      type="button"
-      class="alert-close"
-      (click)="successMessage = ''"
-    >
-      ×
-    </button>
-
+    <button type="button" class="alert-close" (click)="successMessage = ''">×</button>
   </div>
 
-
-  <!-- ============================================================
-       ERROR
-  ============================================================ -->
-
-  <div
-    *ngIf="errorMessage"
-    class="alert error-alert"
-  >
-
+  <div *ngIf="errorMessage" class="alert error-alert">
     <span class="alert-icon">!</span>
-
     <span>{{ errorMessage }}</span>
-
-    <button
-      type="button"
-      class="alert-close"
-      (click)="errorMessage = ''"
-    >
-      ×
-    </button>
-
+    <button type="button" class="alert-close" (click)="errorMessage = ''">×</button>
   </div>
-
-
-  <!-- ============================================================
-       STATISTICS
-  ============================================================ -->
 
   <section class="stats-grid">
-
     <article class="stat-card">
-
-      <span class="stat-label">
-        Total bookings
-      </span>
-
-      <strong>
-        {{ totalBookings }}
-      </strong>
-
+      <span class="stat-label">Total bookings</span>
+      <strong>{{ totalBookings }}</strong>
     </article>
-
-
     <article class="stat-card">
-
-      <span class="stat-label">
-        Pending
-      </span>
-
-      <strong>
-        {{ pendingBookings }}
-      </strong>
-
+      <span class="stat-label">Pending</span>
+      <strong>{{ pendingBookings }}</strong>
     </article>
-
-
     <article class="stat-card">
-
-      <span class="stat-label">
-        Accepted
-      </span>
-
-      <strong>
-        {{ acceptedBookings }}
-      </strong>
-
+      <span class="stat-label">Accepted</span>
+      <strong>{{ acceptedBookings }}</strong>
     </article>
-
-
     <article class="stat-card">
-
-      <span class="stat-label">
-        Completed
-      </span>
-
-      <strong>
-        {{ completedBookings }}
-      </strong>
-
+      <span class="stat-label">Completed</span>
+      <strong>{{ completedBookings }}</strong>
     </article>
-
   </section>
 
-
-  <!-- ============================================================
-       MAIN CARD
-  ============================================================ -->
-
   <section class="bookings-card">
-
     <div class="card-header">
-
-      <div>
-
-        <span class="section-label">
-          CUSTOMER BOOKINGS
-        </span>
-
-        <h2>
-          Your bookings
-        </h2>
-
-      </div>
-
+      <span class="section-label">CUSTOMER BOOKINGS</span>
+      <h2>Your bookings</h2>
     </div>
 
-
-    <!-- ============================================================
-         LOADING
-    ============================================================ -->
-
-    <div
-      *ngIf="loading"
-      class="loading-state"
-    >
-
+    <div *ngIf="loading" class="loading-state">
       <div class="spinner"></div>
-
-      <p>
-        Loading bookings...
-      </p>
-
+      <p>Loading bookings...</p>
     </div>
 
-
-    <!-- ============================================================
-         EMPTY
-    ============================================================ -->
-
-    <div
-      *ngIf="!loading && bookings.length === 0"
-      class="empty-state"
-    >
-
-      <div class="empty-icon">
-        ▣
-      </div>
-
-      <h3>
-        No bookings yet
-      </h3>
-
-      <p>
-        Customer bookings will appear here when someone books one of your services.
-      </p>
-
+    <div *ngIf="!loading && bookings.length === 0" class="empty-state">
+      <div class="empty-icon">▣</div>
+      <h3>No bookings yet</h3>
+      <p>Customer bookings will appear here when someone books one of your services.</p>
     </div>
 
-
-    <!-- ============================================================
-         BOOKINGS
-    ============================================================ -->
-
-    <div
-      *ngIf="!loading && bookings.length > 0"
-      class="bookings-list"
-    >
-
-      <article
-        class="booking-card"
-        *ngFor="let booking of bookings"
-      >
-
-        <!-- TOP -->
-
+    <div *ngIf="!loading && bookings.length > 0" class="bookings-list">
+      <article class="booking-card" *ngFor="let booking of bookings">
         <div class="booking-top">
-
           <div>
-
-            <span class="booking-id">
-              Booking #{{ booking.id }}
-            </span>
-
-            <h3>
-              {{ booking.serviceTitle }}
-            </h3>
-
-            <p class="subcategory">
-              {{ booking.subCategoryName }}
-            </p>
-
+            <span class="booking-id">Booking #{{ booking.id }}</span>
+            <h3>{{ booking.serviceTitle }}</h3>
+            <p class="subcategory">{{ booking.subCategoryName }}</p>
           </div>
-
-
-          <span
-            class="status-badge"
-            [ngClass]="getStatusClass(booking.status)"
-          >
+          <span class="status-badge" [ngClass]="getStatusClass(booking.status)">
             {{ getStatusLabel(booking.status) }}
           </span>
-
         </div>
-
-
-        <!-- DETAILS -->
 
         <div class="booking-details">
-
           <div class="detail-item">
-
-            <span class="detail-label">
-              Date
-            </span>
-
-            <strong>
-              {{ formatDate(booking.bookingDate) }}
-            </strong>
-
+            <span class="detail-label">Date</span>
+            <strong>{{ formatDate(booking.bookingDate) }}</strong>
           </div>
-
-
           <div class="detail-item">
-
-            <span class="detail-label">
-              Time
-            </span>
-
-            <strong>
-              {{ formatTime(booking.bookingTime) }}
-            </strong>
-
+            <span class="detail-label">Time</span>
+            <strong>{{ formatTime(booking.bookingTime) }}</strong>
           </div>
-
-
           <div class="detail-item">
-
-            <span class="detail-label">
-              Amount
-            </span>
-
-            <strong>
-              ₹{{ formatPrice(booking.agreedPrice) }}
-            </strong>
-
+            <span class="detail-label">Amount</span>
+            <strong>₹{{ formatPrice(booking.agreedPrice) }}</strong>
           </div>
-
-
           <div class="detail-item">
-
-            <span class="detail-label">
-              Customer ID
-            </span>
-
-            <strong>
-              #{{ booking.customerId }}
-            </strong>
-
+            <span class="detail-label">Customer ID</span>
+            <strong>#{{ booking.customerId }}</strong>
           </div>
-
         </div>
-
-
-        <!-- ADDRESS -->
 
         <div class="booking-address">
-
-          <span class="detail-label">
-            Service location
-          </span>
-
-          <p>
-            {{ booking.address }},
-            {{ booking.city }},
-            {{ booking.state }}
-            - {{ booking.pincode }}
-          </p>
-
+          <span class="detail-label">Service location</span>
+          <p>{{ booking.address }}, {{ booking.city }}, {{ booking.state }} - {{ booking.pincode }}</p>
         </div>
 
-
-        <!-- NOTE -->
+        <div *ngIf="booking.customerNote" class="customer-note">
+          <span class="detail-label">Customer note</span>
+          <p>{{ booking.customerNote }}</p>
+        </div>
 
         <div
-          *ngIf="booking.customerNote"
-          class="customer-note"
-        >
-
-          <span class="detail-label">
-            Customer note
+          class="payment-summary"
+          *ngIf="booking.paymentPreference || booking.effectivePaymentPreference">
+          <div>
+            <span class="detail-label">Payment preference</span>
+            <strong>{{ booking.effectivePaymentPreference || booking.paymentPreference }}</strong>
+          </div>
+          <div *ngIf="booking.paymentStatus">
+            <span class="detail-label">Payment status</span>
+            <strong>{{ booking.paymentStatus }}</strong>
+          </div>
+          <span *ngIf="booking.paymentReconciliationRequired" class="reconciliation-warning">
+            Payment reconciliation required
           </span>
-
-          <p>
-            {{ booking.customerNote }}
-          </p>
-
         </div>
 
-
-        <!-- ACTIONS -->
-
         <div class="booking-actions">
-
           <button
             type="button"
             class="secondary-button"
-            (click)="viewBooking(booking)"
-          >
+            (click)="viewBooking(booking)">
             View details
           </button>
-
 
           <button
             *ngIf="canReject(booking)"
             type="button"
             class="danger-button"
             [disabled]="actionLoading"
-            (click)="rejectBooking(booking)"
-          >
+            (click)="rejectBooking(booking)">
             Reject
           </button>
-
 
           <button
             *ngIf="canAccept(booking)"
             type="button"
             class="primary-button"
             [disabled]="actionLoading"
-            (click)="acceptBooking(booking)"
-          >
+            (click)="acceptBooking(booking)">
             Accept
           </button>
-
 
           <button
             *ngIf="canStart(booking)"
             type="button"
             class="primary-button"
             [disabled]="actionLoading"
-            (click)="startBooking(booking)"
-          >
+            (click)="startBooking(booking)">
             Start service
           </button>
-
 
           <button
             *ngIf="canComplete(booking)"
             type="button"
             class="primary-button"
             [disabled]="actionLoading"
-            (click)="completeBooking(booking)"
-          >
+            (click)="completeBooking(booking)">
             Complete
           </button>
 
+          <button
+            *ngIf="canCollectAtService(booking)"
+            type="button"
+            class="collection-button"
+            (click)="openCollection(booking)">
+            Collect payment
+          </button>
         </div>
-
       </article>
-
     </div>
-
   </section>
 
-
-  <!-- ============================================================
-       DETAILS MODAL
-  ============================================================ -->
-
-  <div
-    *ngIf="selectedBooking"
-    class="modal-backdrop"
-    (click)="closeBooking()"
-  >
-
-    <div
-      class="details-modal"
-      (click)="$event.stopPropagation()"
-    >
-
+  <div *ngIf="selectedBooking" class="modal-backdrop" (click)="closeBooking()">
+    <div class="details-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
-
         <div>
-
-          <span class="section-label">
-            BOOKING DETAILS
-          </span>
-
-          <h2>
-            Booking #{{ selectedBooking.id }}
-          </h2>
-
+          <span class="section-label">BOOKING DETAILS</span>
+          <h2>Booking #{{ selectedBooking.id }}</h2>
         </div>
-
-        <button
-          type="button"
-          class="modal-close"
-          (click)="closeBooking()"
-        >
-          ×
-        </button>
-
+        <button type="button" class="modal-close" (click)="closeBooking()">×</button>
       </div>
-
 
       <div class="modal-status">
-
-        <span
-          class="status-badge"
-          [ngClass]="getStatusClass(selectedBooking.status)"
-        >
+        <span class="status-badge" [ngClass]="getStatusClass(selectedBooking.status)">
           {{ getStatusLabel(selectedBooking.status) }}
         </span>
-
       </div>
-
 
       <div class="modal-details">
-
+        <div><span>Service</span><strong>{{ selectedBooking.serviceTitle }}</strong></div>
+        <div><span>Category</span><strong>{{ selectedBooking.subCategoryName }}</strong></div>
+        <div><span>Date</span><strong>{{ formatDate(selectedBooking.bookingDate) }}</strong></div>
+        <div><span>Time</span><strong>{{ formatTime(selectedBooking.bookingTime) }}</strong></div>
+        <div><span>Agreed price</span><strong>₹{{ formatPrice(selectedBooking.agreedPrice) }}</strong></div>
+        <div><span>Customer ID</span><strong>#{{ selectedBooking.customerId }}</strong></div>
         <div>
-          <span>Service</span>
-          <strong>
-            {{ selectedBooking.serviceTitle }}
-          </strong>
+          <span>Payment preference</span>
+          <strong>{{ selectedBooking.effectivePaymentPreference || selectedBooking.paymentPreference || 'Not specified' }}</strong>
         </div>
-
         <div>
-          <span>Category</span>
-          <strong>
-            {{ selectedBooking.subCategoryName }}
-          </strong>
+          <span>Payment status</span>
+          <strong>{{ selectedBooking.paymentStatus || 'Not available' }}</strong>
         </div>
-
-        <div>
-          <span>Date</span>
-          <strong>
-            {{ formatDate(selectedBooking.bookingDate) }}
-          </strong>
-        </div>
-
-        <div>
-          <span>Time</span>
-          <strong>
-            {{ formatTime(selectedBooking.bookingTime) }}
-          </strong>
-        </div>
-
-        <div>
-          <span>Agreed price</span>
-          <strong>
-            ₹{{ formatPrice(selectedBooking.agreedPrice) }}
-          </strong>
-        </div>
-
-        <div>
-          <span>Customer ID</span>
-          <strong>
-            #{{ selectedBooking.customerId }}
-          </strong>
-        </div>
-
       </div>
-
 
       <div class="modal-section">
-
-        <span class="detail-label">
-          Service location
-        </span>
-
-        <p>
-          {{ selectedBooking.address }},
-          {{ selectedBooking.city }},
-          {{ selectedBooking.state }}
-          - {{ selectedBooking.pincode }}
-        </p>
-
+        <span class="detail-label">Service location</span>
+        <p>{{ selectedBooking.address }}, {{ selectedBooking.city }}, {{ selectedBooking.state }} - {{ selectedBooking.pincode }}</p>
       </div>
 
-
-      <div
-        *ngIf="selectedBooking.customerNote"
-        class="modal-section"
-      >
-
-        <span class="detail-label">
-          Customer note
-        </span>
-
-        <p>
-          {{ selectedBooking.customerNote }}
-        </p>
-
+      <div *ngIf="selectedBooking.customerNote" class="modal-section">
+        <span class="detail-label">Customer note</span>
+        <p>{{ selectedBooking.customerNote }}</p>
       </div>
 
+      <section *ngIf="verificationPurpose" class="verification-panel">
+        <span class="section-label">
+          {{ verificationPurpose === 'START' ? 'START CODE VERIFICATION' : 'COMPLETION CODE VERIFICATION' }}
+        </span>
 
-      <div class="modal-actions">
+        <h3>
+          {{ verificationPurpose === 'START' ? 'Verify before starting service' : 'Verify before completing service' }}
+        </h3>
+
+        <p>
+          Request the code sent to the customer's registered email.
+          Ask the customer for the code and enter it below.
+        </p>
+
+        <div *ngIf="verificationMessage" class="alert success-alert verification-alert">
+          {{ verificationMessage }}
+        </div>
+
+        <div *ngIf="verificationError" class="alert error-alert verification-alert">
+          {{ verificationError }}
+        </div>
 
         <button
           type="button"
           class="secondary-button"
-          (click)="closeBooking()"
-        >
-          Close
+          [disabled]="verificationRequestLoading || verificationLoading"
+          (click)="requestVerificationCode()">
+          {{ verificationRequestLoading ? 'Requesting code...' : 'Request verification code' }}
         </button>
 
+        <label class="detail-label" for="bookingVerificationCode">
+          Six-digit code
+        </label>
+
+        <input
+          id="bookingVerificationCode"
+          class="verification-input"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          [(ngModel)]="verificationCode"
+          placeholder="Enter 6-digit code"
+          [disabled]="verificationLoading || verificationRequestLoading">
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="verificationLoading || verificationRequestLoading || verificationCode.length !== 6"
+          (click)="verifyBookingCode()">
+          {{ verificationLoading ? 'Verifying...' : 'Verify code' }}
+        </button>
+      </section>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="verificationLoading || verificationRequestLoading"
+          (click)="closeBooking()">
+          Close
+        </button>
       </div>
-
     </div>
-
   </div>
 
+  <div *ngIf="collectionBooking" class="modal-backdrop collection-backdrop" (click)="closeCollection()">
+    <div class="details-modal collection-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="section-label">PAY AT SERVICE</span>
+          <h2>Collect payment · #{{ collectionBooking.id }}</h2>
+        </div>
+        <button type="button" class="modal-close" (click)="closeCollection()">×</button>
+      </div>
+
+      <div class="collection-amount">
+        <span>Booking amount</span>
+        <strong>₹{{ formatPrice(collectionBooking.agreedPrice) }}</strong>
+      </div>
+
+      <div *ngIf="collectionError" class="alert error-alert collection-alert">
+        {{ collectionError }}
+      </div>
+
+      <div *ngIf="collection" class="collection-status-panel">
+        <div>
+          <span class="detail-label">Collection status</span>
+          <strong>{{ getCollectionStatusLabel(collection) }}</strong>
+        </div>
+        <div>
+          <span class="detail-label">Collection ID</span>
+          <strong>{{ collection.collectionId }}</strong>
+        </div>
+        <div *ngIf="collection.gatewayPaymentId">
+          <span class="detail-label">Razorpay payment ID</span>
+          <strong>{{ collection.gatewayPaymentId }}</strong>
+        </div>
+        <div *ngIf="collection.expiresAt">
+          <span class="detail-label">QR expiry</span>
+          <strong>{{ collection.expiresAt | date:'medium' }}</strong>
+        </div>
+      </div>
+
+      <div *ngIf="collection?.imageUrl && !isCollectionConfirmed(collection)" class="qr-panel">
+        <img [src]="collection?.imageUrl" alt="Razorpay payment QR code" class="payment-qr">
+        <h3>Scan to pay</h3>
+        <p>
+          Ask the customer to scan this QR and pay the exact amount shown.
+          Keep this screen open while payment is verified.
+        </p>
+      </div>
+
+      <div *ngIf="isCollectionConfirmed(collection)" class="confirmed-panel">
+        <span class="confirmed-mark">✓</span>
+        <h3>Collection confirmed</h3>
+        <p>The backend reports this collection as confirmed.</p>
+      </div>
+
+      <div class="collection-actions">
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="statusLoading"
+          (click)="refreshCollectionStatus()">
+          {{ statusLoading ? 'Checking...' : 'Refresh status' }}
+        </button>
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="collectionLoading || cashLoading || isCollectionConfirmed(collection)"
+          (click)="createOnlineQr()">
+          {{ collectionLoading ? 'Creating QR...' : 'Generate online QR' }}
+        </button>
+
+        <button
+          type="button"
+          class="collection-button"
+          [disabled]="cashLoading || collectionLoading || isCollectionConfirmed(collection)"
+          (click)="confirmCashCollection()">
+          {{ cashLoading ? 'Confirming...' : 'Confirm cash received' }}
+        </button>
+      </div>
+
+      <p class="collection-note">
+        Online payments are confirmed by the Razorpay webhook. Do not mark an online payment as received based only on a screenshot or a generated QR. If an earlier QR has unresolved activity, reconcile its status before accepting cash.
+      </p>
+    </div>
+  </div>
 </div>

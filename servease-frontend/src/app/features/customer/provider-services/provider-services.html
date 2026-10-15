@@ -1,31 +1,28 @@
+
 <div class="provider-services-page">
 
-  <!-- HERO -->
-
   <section class="hero">
-
     <div class="hero-content">
 
       <a
         class="back-link"
-        [routerLink]="[
-          '/services',
-          categoryId
-        ]"
+        [routerLink]="['/services', categoryId]"
       >
         ← Back to {{ subCategoryName }}
       </a>
 
+      <a class="favorites-page-link" routerLink="/favorites">
+        <span aria-hidden="true">♡</span>
+        My favourite providers
+      </a>
 
       <span class="eyebrow">
         SERVEASE
       </span>
 
-
       <h1>
         {{ subCategoryName }}
       </h1>
-
 
       <p>
         Compare available professionals and choose
@@ -34,22 +31,15 @@
 
     </div>
 
-
     <div class="hero-decoration">
       <span>✦</span>
     </div>
-
   </section>
-
-
-  <!-- CONTENT -->
 
   <main class="content">
 
     <div class="section-heading">
-
       <div>
-
         <span class="section-eyebrow">
           AVAILABLE SERVICES
         </span>
@@ -57,9 +47,7 @@
         <h2>
           Choose a professional service
         </h2>
-
       </div>
-
 
       <span
         class="service-count"
@@ -68,47 +56,41 @@
         {{ services.length }}
         {{ services.length === 1 ? 'service' : 'services' }}
       </span>
-
     </div>
 
+    <div
+      class="favorite-error"
+      *ngIf="favoriteError"
+      role="alert"
+    >
+      <span>{{ favoriteError }}</span>
 
-    <!-- LOADING -->
+      <button
+        type="button"
+        (click)="loadFavorites()"
+        [disabled]="favoritesLoading"
+      >
+        Retry
+      </button>
+    </div>
 
     <div
       class="loading-state"
       *ngIf="loading"
     >
-
       <div class="spinner"></div>
-
-      <p>
-        Finding available professionals...
-      </p>
-
+      <p>Finding available professionals...</p>
     </div>
-
-
-    <!-- ERROR -->
 
     <div
       class="error-state"
       *ngIf="!loading && error"
     >
+      <div class="error-icon">!</div>
 
-      <div class="error-icon">
-        !
-      </div>
+      <h3>Something went wrong</h3>
 
-
-      <h3>
-        Something went wrong
-      </h3>
-
-
-      <p>
-        {{ error }}
-      </p>
-
+      <p>{{ error }}</p>
 
       <button
         type="button"
@@ -116,27 +98,16 @@
       >
         Try again
       </button>
-
     </div>
-
-
-    <!-- SERVICE LIST -->
 
     <div
       class="service-list"
-      *ngIf="
-        !loading &&
-        !error &&
-        services.length > 0
-      "
+      *ngIf="!loading && !error && services.length > 0"
     >
 
       <article
         class="service-card"
-        *ngFor="
-          let service of services;
-          let i = index
-        "
+        *ngFor="let service of services; let i = index"
       >
 
         <div class="service-top">
@@ -145,13 +116,37 @@
             ϟ
           </div>
 
-
           <span class="service-number">
             {{ (i + 1).toString().padStart(2, '0') }}
           </span>
 
-        </div>
+          <button
+            type="button"
+            class="favorite-toggle"
+            [class.is-favorite]="favoriteProviderIds.has(service.providerId)"
+            [disabled]="favoritesLoading || favoriteActionProviderId !== null"
+            [attr.aria-pressed]="favoriteProviderIds.has(service.providerId)"
+            [attr.aria-label]="
+              favoriteProviderIds.has(service.providerId)
+                ? 'Remove ' + service.providerBusinessName + ' from favourites'
+                : 'Add ' + service.providerBusinessName + ' to favourites'
+            "
+            (click)="toggleFavorite(service)"
+          >
+            <span aria-hidden="true">
+              {{ favoriteProviderIds.has(service.providerId) ? '♥' : '♡' }}
+            </span>
 
+            {{
+            favoriteActionProviderId === service.providerId
+            ? 'Saving...'
+            : favoriteProviderIds.has(service.providerId)
+            ? 'Saved'
+            : 'Add favourite'
+            }}
+          </button>
+
+        </div>
 
         <div class="service-main">
 
@@ -159,16 +154,13 @@
             {{ service.providerBusinessName }}
           </span>
 
-
           <h3>
             {{ service.title }}
           </h3>
 
-
           <p class="description">
             {{ service.description }}
           </p>
-
 
           <div class="service-meta">
 
@@ -179,24 +171,17 @@
               starting
             </span>
 
-
             <span>
-              {{ formatDuration(
-                service.estimatedDurationMinutes
-              ) }}
+              {{ formatDuration(service.estimatedDurationMinutes) }}
             </span>
 
-
             <span>
-              {{ formatRadius(
-                service.serviceRadiusKm
-              ) }}
+              {{ formatRadius(service.serviceRadiusKm) }}
             </span>
 
           </div>
 
         </div>
-
 
         <div class="service-action">
 
@@ -218,40 +203,27 @@
 
     </div>
 
-
-    <!-- EMPTY -->
-
     <div
       class="empty-state"
-      *ngIf="
-        !loading &&
-        !error &&
-        services.length === 0
-      "
+      *ngIf="!loading && !error && services.length === 0"
     >
 
       <div class="empty-icon">
         ✦
       </div>
 
-
       <h3>
         No professionals available
       </h3>
-
 
       <p>
         There are currently no active services
         available in this category.
       </p>
 
-
       <a
         class="back-button"
-        [routerLink]="[
-          '/services',
-          categoryId
-        ]"
+        [routerLink]="['/services', categoryId]"
       >
         Browse other services
       </a>

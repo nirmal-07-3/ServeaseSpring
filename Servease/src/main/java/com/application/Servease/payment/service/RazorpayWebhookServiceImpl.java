@@ -1,11 +1,15 @@
 
 package com.application.Servease.payment.service;
 
+import com.application.Servease.payment.entity.BookingCollection;
 import com.application.Servease.payment.entity.Payment;
 import com.application.Servease.payment.entity.PaymentAttempt;
 import com.application.Servease.payment.entity.RazorpayWebhookEvent;
+import com.application.Servease.payment.enums.CollectionMethod;
+import com.application.Servease.payment.enums.CollectionStatus;
 import com.application.Servease.payment.enums.PaymentAttemptStatus;
 import com.application.Servease.payment.enums.PaymentStatus;
+import com.application.Servease.payment.repository.BookingCollectionRepository;
 import com.application.Servease.payment.repository.PaymentAttemptRepository;
 import com.application.Servease.payment.repository.PaymentRepository;
 import com.application.Servease.payment.repository.RazorpayWebhookEventRepository;
@@ -27,6 +31,7 @@ public class RazorpayWebhookServiceImpl implements RazorpayWebhookService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentAttemptRepository paymentAttemptRepository;
+    private final BookingCollectionRepository collectionRepository;
     private final JsonMapper jsonMapper;
     private final RazorpayWebhookEventRepository webhookEventRepository;
 
@@ -35,23 +40,16 @@ public class RazorpayWebhookServiceImpl implements RazorpayWebhookService {
 
     @Override
     @Transactional
-    public void processWebhook(
-            String payload,
-            String signature,
-            String eventId) {
-
-        if (payload == null || payload.isBlank()
-                || signature == null || signature.isBlank()
+    public void processWebhook(String payload, String signature, String eventId) {
+        if (payload == null || payload.isBlank() || signature == null || signature.isBlank()
                 || eventId == null || eventId.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Required webhook data is missing.");
+            throw new IllegalArgumentException("Required webhook data is missing.");
         }
 
         try {
             Utils.verifyWebhookSignature(payload, signature, webhookSecret);
         } catch (Exception ex) {
-            throw new IllegalArgumentException(
-                    "Invalid Razorpay webhook signature.");
+            throw new IllegalArgumentException("Invalid Razorpay webhook signature.");
         }
 
         if (webhookEventRepository.existsByEventId(eventId)) {
@@ -60,124 +58,99 @@ public class RazorpayWebhookServiceImpl implements RazorpayWebhookService {
 
         try {
             JsonNode root = jsonMapper.readTree(payload);
-            String event = root.path("event").asText("");
-
-            if (event.isBlank()) {
-                throw new IllegalArgumentException(
-                        "Webhook event type is missing.");
+            String eventType = root.path("event").asText("");
+            if (eventType.isBlank()) {
+                throw new IllegalArgumentException("Webhook event type is missing.");
             }
 
-            if ("payment.captured".equals(event)) {
-                processCapturedPayment(root);
+            RazorpayWebhookEvent event = RazorpayWebhookEvent.builder()
+                    .eventId(eventId)
+                    .eventType(eventType)
+                    .receivedAt(LocalDateTime.now())
+                    .processingStatus("PROCESSING")
+                    .attemptCount(1)
+                    .build();
+            webhookEventRepository.saveAndFlush(event);
+
+            if ("payment.captured".equals(eventType)) {
+                JsonNode paymentEntity = root.path("payload").path("payment").path("entity");
+                String qrCodeId = paymentEntity.path("qr_code_id").asText("");
+                if (!qrCodeId.isBlank()) {
+                    processCapturedQrPayment(paymentEntity, qrCodeId);
+                } else {
+                    processCapturedOrderPayment(paymentEntity);
+                }
             }
 
-            RazorpayWebhookEvent webhookEvent =
-                    RazorpayWebhookEvent.builder()
-                            .eventId(eventId)
-                            .eventType(event)
-                            .receivedAt(LocalDateTime.now())
-                            .build();
-
-            webhookEventRepository.saveAndFlush(webhookEvent);
+            event.setProcessingStatus("PROCESSED");
+            event.setProcessedAt(LocalDateTime.now());
+            event.setNextRetryAt(null);
+            event.setLastError(null);
+            webhookEventRepository.saveAndFlush(event);
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    "Unable to process Razorpay webhook.", ex);
+                    "Unable to process Razorpay webhook. The gateway may retry this event.", ex);
         }
     }
 
-    private void processCapturedPayment(JsonNode root) {
-        JsonNode paymentEntity = root.path("payload")
-                .path("payment")
-                .path("entity");
-
-        String razorpayPaymentId = paymentEntity.path("id").asText("");
-        String razorpayOrderId = paymentEntity.path("order_id").asText("");
+    private void processCapturedOrderPayment(JsonNode paymentEntity) {
+        String paymentId = paymentEntity.path("id").asText("");
+        String orderId = paymentEntity.path("order_id").asText("");
         String currency = paymentEntity.path("currency").asText("");
-        String gatewayStatus = paymentEntity.path("status").asText("");
+        String status = paymentEntity.path("status").asText("");
         boolean captured = paymentEntity.path("captured").asBoolean(false);
-        long amountInPaise = paymentEntity.path("amount").asLong(-1);
+        long amountPaise = paymentEntity.path("amount").asLong(-1);
 
-        if (razorpayPaymentId.isBlank()
-                || razorpayOrderId.isBlank()
-                || amountInPaise <= 0
+        if (paymentId.isBlank() || orderId.isBlank() || amountPaise <= 0
                 || !"INR".equalsIgnoreCase(currency)
-                || (!captured && !"captured".equalsIgnoreCase(gatewayStatus))) {
-            throw new IllegalArgumentException(
-                    "Captured payment details are incomplete or invalid.");
+                || (!captured && !"captured".equalsIgnoreCase(status))) {
+            throw new IllegalArgumentException("Captured payment details are incomplete or invalid.");
         }
 
-        Payment payment = paymentRepository
-                .findByGatewayOrderIdForUpdate(razorpayOrderId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "No local payment matches this Razorpay order. "
-                                        + "The event requires reconciliation."));
-
-        PaymentAttempt attempt = paymentAttemptRepository
-                .findByGatewayOrderId(razorpayOrderId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "No payment attempt matches this Razorpay order. "
-                                        + "The event requires reconciliation."));
+        Payment payment = paymentRepository.findByGatewayOrderIdForUpdate(orderId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No local payment matches this Razorpay order. Reconciliation is required."));
+        PaymentAttempt attempt = paymentAttemptRepository.findByGatewayOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No payment attempt matches this Razorpay order. Reconciliation is required."));
 
         if (!payment.getBooking().getId().equals(attempt.getBooking().getId())) {
-            throw new IllegalArgumentException(
-                    "The payment and payment attempt belong to different bookings.");
+            throw new IllegalArgumentException("The payment and attempt belong to different bookings.");
+        }
+        if (payment.getAmount() == null || attempt.getAmount() == null
+                || payment.getAmount().compareTo(attempt.getAmount()) != 0
+                || !"INR".equalsIgnoreCase(attempt.getCurrency())) {
+            throw new IllegalArgumentException("The local payment amount or currency is inconsistent.");
         }
 
-        if (payment.getAmount() == null
-                || attempt.getAmount() == null
-                || payment.getAmount().compareTo(attempt.getAmount()) != 0) {
-            throw new IllegalArgumentException(
-                    "The legacy payment and payment attempt amounts do not match.");
+        long expectedPaise = payment.getAmount().multiply(BigDecimal.valueOf(100))
+                .setScale(0, RoundingMode.UNNECESSARY).longValueExact();
+
+        if (!"captured".equalsIgnoreCase(status) || !captured || expectedPaise != amountPaise) {
+            throw new IllegalArgumentException("Razorpay captured payment does not match the local amount.");
         }
-
-        BigDecimal expectedPaise = payment.getAmount()
-                .multiply(BigDecimal.valueOf(100))
-                .setScale(0, RoundingMode.UNNECESSARY);
-
-        if (expectedPaise.compareTo(BigDecimal.valueOf(amountInPaise)) != 0) {
-            throw new IllegalArgumentException(
-                    "Razorpay amount does not match the local payment.");
-        }
-
-        if (!"INR".equalsIgnoreCase(attempt.getCurrency())) {
-            throw new IllegalArgumentException(
-                    "The payment attempt currency is invalid.");
-        }
-
         if (payment.getStatus() == PaymentStatus.SUCCESS
-                && !razorpayPaymentId.equals(payment.getTransactionId())) {
-            throw new IllegalArgumentException(
-                    "A different transaction is already recorded for this payment.");
+                && !paymentId.equals(payment.getTransactionId())) {
+            throw new IllegalArgumentException("A different transaction is already recorded for this payment.");
         }
-
         if (attempt.getStatus() == PaymentAttemptStatus.CAPTURED
-                && !razorpayPaymentId.equals(attempt.getGatewayPaymentId())) {
-            throw new IllegalArgumentException(
-                    "A different gateway payment is already recorded for this attempt.");
+                && !paymentId.equals(attempt.getGatewayPaymentId())) {
+            throw new IllegalArgumentException("A different gateway payment is already recorded for this attempt.");
+        }
+        if (payment.getTransactionId() != null && !payment.getTransactionId().isBlank()
+                && !paymentId.equals(payment.getTransactionId())) {
+            throw new IllegalArgumentException("The local payment already references another transaction.");
+        }
+        if (attempt.getGatewayPaymentId() != null && !attempt.getGatewayPaymentId().isBlank()
+                && !paymentId.equals(attempt.getGatewayPaymentId())) {
+            throw new IllegalArgumentException("The attempt already references another gateway payment.");
         }
 
-        if (payment.getTransactionId() != null
-                && !payment.getTransactionId().isBlank()
-                && !razorpayPaymentId.equals(payment.getTransactionId())) {
-            throw new IllegalArgumentException(
-                    "The local payment already references another transaction.");
-        }
-
-        if (attempt.getGatewayPaymentId() != null
-                && !attempt.getGatewayPaymentId().isBlank()
-                && !razorpayPaymentId.equals(attempt.getGatewayPaymentId())) {
-            throw new IllegalArgumentException(
-                    "The payment attempt already references another gateway payment.");
-        }
-
-        payment.setTransactionId(razorpayPaymentId);
+        payment.setTransactionId(paymentId);
         payment.setStatus(PaymentStatus.SUCCESS);
-
-        attempt.setGatewayPaymentId(razorpayPaymentId);
+        attempt.setGatewayPaymentId(paymentId);
         attempt.setStatus(PaymentAttemptStatus.CAPTURED);
 
         if (attempt.getCapturedAt() == null) {
@@ -186,5 +159,75 @@ public class RazorpayWebhookServiceImpl implements RazorpayWebhookService {
 
         paymentAttemptRepository.saveAndFlush(attempt);
         paymentRepository.saveAndFlush(payment);
+    }
+
+    private void processCapturedQrPayment(JsonNode paymentEntity, String qrCodeId) {
+        String paymentId = paymentEntity.path("id").asText("");
+        String currency = paymentEntity.path("currency").asText("");
+        String status = paymentEntity.path("status").asText("");
+        boolean captured = paymentEntity.path("captured").asBoolean(false);
+        long amountPaise = paymentEntity.path("amount").asLong(-1);
+
+        if (paymentId.isBlank() || amountPaise <= 0 || !"INR".equalsIgnoreCase(currency)
+                || !captured || !"captured".equalsIgnoreCase(status)) {
+            throw new IllegalArgumentException("Captured QR payment details are incomplete or invalid.");
+        }
+
+        BookingCollection collection = collectionRepository.findByGatewayQrCodeIdForUpdate(qrCodeId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No booking collection matches this QR code. Reconciliation is required."));
+
+        long expectedPaise = collection.getAmount().multiply(BigDecimal.valueOf(100))
+                .setScale(0, RoundingMode.UNNECESSARY).longValueExact();
+
+        if (expectedPaise != amountPaise || !"INR".equalsIgnoreCase(collection.getCurrency())) {
+            throw new IllegalArgumentException("QR payment amount or currency does not match the booking collection.");
+        }
+
+        if (collection.getStatus() == CollectionStatus.CONFIRMED) {
+            if (paymentId.equals(collection.getGatewayPaymentId())) {
+                return;
+            }
+            throw new IllegalArgumentException("A different payment already confirmed this collection.");
+        }
+        if (collection.getStatus() != CollectionStatus.PENDING) {
+            throw new IllegalArgumentException("This collection is not awaiting payment.");
+        }
+
+        PaymentAttempt attempt = collection.getPaymentAttempt();
+        if (attempt == null || !attempt.getBooking().getId().equals(collection.getBooking().getId())) {
+            throw new IllegalArgumentException("The collection does not have a valid payment attempt.");
+        }
+        if (attempt.getAmount() == null || attempt.getAmount().compareTo(collection.getAmount()) != 0
+                || !"INR".equalsIgnoreCase(attempt.getCurrency())) {
+            throw new IllegalArgumentException("The QR payment attempt amount or currency is inconsistent.");
+        }
+        if (attempt.getGatewayPaymentId() != null && !attempt.getGatewayPaymentId().isBlank()
+                && !paymentId.equals(attempt.getGatewayPaymentId())) {
+            throw new IllegalArgumentException("The attempt already references a different gateway payment.");
+        }
+        if (paymentAttemptRepository.findByGatewayPaymentId(paymentId)
+                .filter(existing -> !existing.getId().equals(attempt.getId())).isPresent()) {
+            throw new IllegalArgumentException("This Razorpay payment ID is already assigned to another attempt.");
+        }
+        if (collectionRepository.findByGatewayPaymentId(paymentId)
+                .filter(existing -> !existing.getId().equals(collection.getId())).isPresent()) {
+            throw new IllegalArgumentException("This Razorpay payment ID is already assigned to another collection.");
+        }
+
+        attempt.setGatewayPaymentId(paymentId);
+        attempt.setStatus(PaymentAttemptStatus.CAPTURED);
+        if (attempt.getCapturedAt() == null) {
+            attempt.setCapturedAt(LocalDateTime.now());
+        }
+
+        collection.setCollectionMethod(CollectionMethod.ONLINE);
+        collection.setGatewayPaymentId(paymentId);
+        collection.setStatus(CollectionStatus.CONFIRMED);
+        collection.setConfirmedAt(LocalDateTime.now());
+        collection.setConfirmedBy(null);
+
+        paymentAttemptRepository.saveAndFlush(attempt);
+        collectionRepository.saveAndFlush(collection);
     }
 }

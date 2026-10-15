@@ -21,6 +21,7 @@ import com.application.Servease.payment.repository.PaymentRepository;
 import com.application.Servease.provider.entity.ProviderAvailability;
 import com.application.Servease.provider.entity.ProviderProfile;
 import com.application.Servease.provider.enums.VerificationStatus;
+import com.application.Servease.payment.enums.CollectionMethod;
 import com.application.Servease.provider.repository.ProviderAvailabilityRepository;
 import com.application.Servease.providerservice.entity.ProviderService;
 import com.application.Servease.providerservice.repository.ProviderServiceRepository;
@@ -238,6 +239,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toResponse(bookingRepository.save(booking));
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public List<BookingResponse> getMyBookings() {
@@ -245,7 +247,10 @@ public class BookingServiceImpl implements BookingService {
 
         return bookingRepository.findByCustomerOrderByCreatedAtDesc(customer)
                 .stream()
-                .map(bookingMapper::toResponse)
+                .map(booking -> populatePaymentDetails(
+                        booking,
+                        bookingMapper.toResponse(booking)
+                ))
                 .toList();
     }
 
@@ -255,10 +260,81 @@ public class BookingServiceImpl implements BookingService {
         User customer = userService.getAuthenticatedUser();
 
         Booking booking = bookingRepository.findByIdAndCustomer(id, customer)
-                .orElseThrow(() -> new BookingNotFoundException("Booking not found."));
+                .orElseThrow(() -> new BookingNotFoundException(
+                        "Booking not found."
+                ));
 
-        return bookingMapper.toResponse(booking);
+        return populatePaymentDetails(
+                booking,
+                bookingMapper.toResponse(booking)
+        );
     }
+
+    private BookingResponse populatePaymentDetails(
+            Booking booking,
+            BookingResponse response
+    ) {
+        Payment payment = paymentRepository
+                .findByBookingId(booking.getId())
+                .orElse(null);
+
+        BookingCollection collection = bookingCollectionRepository
+                .findByBookingId(booking.getId())
+                .orElse(null);
+
+        if (payment != null) {
+            response.setPaymentStatus(payment.getStatus());
+        } else if (collection != null) {
+            switch (collection.getStatus()) {
+                case CONFIRMED ->
+                        response.setPaymentStatus(PaymentStatus.SUCCESS);
+                case FAILED, REVERSED ->
+                        response.setPaymentStatus(PaymentStatus.FAILED);
+                case PENDING ->
+                        response.setPaymentStatus(PaymentStatus.PENDING);
+            }
+        }
+
+        List<PaymentAttempt> attempts =
+                paymentAttemptRepository
+                        .findByBookingIdOrderByAttemptNumberDesc(
+                                booking.getId()
+                        );
+
+        boolean reconciliationRequired = attempts.stream()
+                .anyMatch(attempt -> {
+                    if (attempt.getStatus()
+                            == PaymentAttemptStatus.RECONCILIATION_REQUIRED) {
+                        return true;
+                    }
+
+                    if (attempt.getStatus() != PaymentAttemptStatus.CAPTURED) {
+                        return false;
+                    }
+
+                    boolean paymentMatched = payment != null
+                            && payment.getStatus() == PaymentStatus.SUCCESS
+                            && payment.getTransactionId() != null
+                            && payment.getTransactionId().equals(
+                            attempt.getGatewayPaymentId()
+                    );
+
+                    boolean collectionMatched = collection != null
+                            && collection.getStatus() == CollectionStatus.CONFIRMED
+                            && collection.getGatewayPaymentId() != null
+                            && collection.getGatewayPaymentId().equals(
+                            attempt.getGatewayPaymentId()
+                    );
+
+                    return !paymentMatched && !collectionMatched;
+                });
+
+
+        response.setPaymentReconciliationRequired(reconciliationRequired);
+
+        return response;
+    }
+
 
     @Override
     public void cancelBooking(Long id) {
@@ -397,14 +473,19 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found."));
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public List<BookingResponse> getProviderBookings() {
         ProviderProfile provider = getAuthenticatedProvider();
 
-        return bookingRepository.findByProviderServiceProviderOrderByCreatedAtDesc(provider)
+        return bookingRepository
+                .findByProviderServiceProviderOrderByCreatedAtDesc(provider)
                 .stream()
-                .map(bookingMapper::toResponse)
+                .map(booking -> populatePaymentDetails(
+                        booking,
+                        bookingMapper.toResponse(booking)
+                ))
                 .toList();
     }
 
@@ -413,11 +494,18 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse getProviderBooking(Long id) {
         ProviderProfile provider = getAuthenticatedProvider();
 
-        Booking booking = bookingRepository.findByIdAndProviderServiceProvider(id, provider)
-                .orElseThrow(() -> new BookingNotFoundException("Booking not found."));
+        Booking booking = bookingRepository
+                .findByIdAndProviderServiceProvider(id, provider)
+                .orElseThrow(() -> new BookingNotFoundException(
+                        "Booking not found."
+                ));
 
-        return bookingMapper.toResponse(booking);
+        return populatePaymentDetails(
+                booking,
+                bookingMapper.toResponse(booking)
+        );
     }
+
 
     @Override
     public void acceptBooking(Long id) {
