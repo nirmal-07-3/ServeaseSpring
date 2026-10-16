@@ -3,6 +3,7 @@ package com.application.Servease.booking.service;
 
 import com.application.Servease.booking.dto.BookingResponse;
 import com.application.Servease.booking.dto.CreateBookingRequest;
+import com.application.Servease.booking.enums.BookingStatus;
 
 import java.util.List;
 
@@ -29,4 +30,5 @@ public interface BookingService {
     void startBooking(Long id);
 
     void completeBooking(Long id);
+    BookingStatus getBookingStatusForMessaging(Long id);
 }

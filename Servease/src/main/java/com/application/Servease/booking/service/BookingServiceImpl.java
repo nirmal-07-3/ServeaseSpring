@@ -212,10 +212,6 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime responseDeadline =
                 now.plusMinutes(providerResponseTimeoutMinutes);
 
-        if (!responseDeadline.isBefore(appointmentStart)) {
-            responseDeadline = appointmentStart;
-        }
-
         Booking booking = Booking.builder()
                 .customer(customer)
                 .providerService(providerService)
@@ -286,12 +282,9 @@ public class BookingServiceImpl implements BookingService {
             response.setPaymentStatus(payment.getStatus());
         } else if (collection != null) {
             switch (collection.getStatus()) {
-                case CONFIRMED ->
-                        response.setPaymentStatus(PaymentStatus.SUCCESS);
-                case FAILED, REVERSED ->
-                        response.setPaymentStatus(PaymentStatus.FAILED);
-                case PENDING ->
-                        response.setPaymentStatus(PaymentStatus.PENDING);
+                case CONFIRMED -> response.setPaymentStatus(PaymentStatus.SUCCESS);
+                case FAILED, REVERSED -> response.setPaymentStatus(PaymentStatus.FAILED);
+                case PENDING -> response.setPaymentStatus(PaymentStatus.PENDING);
             }
         }
 
@@ -507,9 +500,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
+
     @Override
     public void acceptBooking(Long id) {
-        Booking booking = getProviderBookingForUpdate(id, getAuthenticatedProvider());
+        Booking booking = getProviderBookingForUpdate(
+                id,
+                getAuthenticatedProvider()
+        );
 
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new InvalidBookingStatusException(
@@ -518,11 +515,14 @@ public class BookingServiceImpl implements BookingService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime responseDeadline = booking.getProviderResponseDeadlineAt();
+        LocalDateTime responseDeadline =
+                booking.getProviderResponseDeadlineAt();
 
-        if (responseDeadline != null && !now.isBefore(responseDeadline)) {
+        if (responseDeadline == null
+                || !now.isBefore(responseDeadline)) {
             throw new InvalidBookingStatusException(
-                    "The provider acceptance deadline has passed. This booking must expire."
+                    "The 15-minute provider response deadline has expired. "
+                            + "This booking can no longer be accepted."
             );
         }
 
@@ -530,6 +530,12 @@ public class BookingServiceImpl implements BookingService {
                 booking.getBookingDate(),
                 booking.getBookingTime()
         );
+
+        if (!appointmentStart.isAfter(now)) {
+            throw new InvalidBookingStatusException(
+                    "The appointment start time has passed."
+            );
+        }
 
         booking.setStatus(BookingStatus.ACCEPTED);
         booking.setProviderAcceptedAt(now);
@@ -547,12 +553,15 @@ public class BookingServiceImpl implements BookingService {
             booking.setPaymentDeadlineAt(null);
         }
 
-        bookingRepository.save(booking);
+        bookingRepository.saveAndFlush(booking);
     }
 
     @Override
     public void rejectBooking(Long id) {
-        Booking booking = getProviderBookingForUpdate(id, getAuthenticatedProvider());
+        Booking booking = getProviderBookingForUpdate(
+                id,
+                getAuthenticatedProvider()
+        );
 
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new InvalidBookingStatusException(
@@ -560,10 +569,24 @@ public class BookingServiceImpl implements BookingService {
             );
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime responseDeadline =
+                booking.getProviderResponseDeadlineAt();
+
+        if (responseDeadline == null
+                || !now.isBefore(responseDeadline)) {
+            throw new InvalidBookingStatusException(
+                    "The 15-minute provider response deadline has expired. "
+                            + "This booking can no longer be rejected manually."
+            );
+        }
+
         booking.setStatus(BookingStatus.REJECTED);
         booking.setCancellationReason("PROVIDER_REJECTED");
-        bookingRepository.save(booking);
+
+        bookingRepository.saveAndFlush(booking);
     }
+
 
     @Override
     public void startBooking(Long id) {
@@ -577,5 +600,99 @@ public class BookingServiceImpl implements BookingService {
         throw new InvalidBookingStatusException(
                 "Direct service completion is disabled. Confirm collection when applicable, then verify a COMPLETION code."
         );
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public BookingStatus getBookingStatusForMessaging(Long id) {
+        User user = userService.getAuthenticatedUser();
+
+        Booking booking = bookingRepository.findByIdAndParticipant(id, user)
+                .orElseThrow(() -> new BookingNotFoundException(
+                        "Booking not found."
+                ));
+
+        return booking.getStatus();
+    }
+
+    private void processExpiredOnlinePaymentBookings(LocalDateTime now) {
+        List<Booking> bookings =
+                bookingRepository.findExpiredOnlinePaymentBookingsForUpdate(
+                        BookingStatus.ACCEPTED,
+                        now
+                );
+
+        for (Booking booking : bookings) {
+            if (booking.getPaymentPreference() != PaymentPreference.PAY_ONLINE) {
+                continue;
+            }
+
+            String effectivePreference = booking.getEffectivePaymentPreference();
+
+            if (effectivePreference != null
+                    && !effectivePreference.isBlank()
+                    && !PaymentPreference.PAY_ONLINE.name().equals(effectivePreference)) {
+                continue;
+            }
+
+            LocalDateTime appointmentStart = LocalDateTime.of(
+                    booking.getBookingDate(),
+                    booking.getBookingTime()
+            );
+
+            if (!appointmentStart.isAfter(now)) {
+                continue;
+            }
+
+            Payment payment = paymentRepository
+                    .findByBookingId(booking.getId())
+                    .orElse(null);
+
+            if (payment != null
+                    && payment.getStatus() != PaymentStatus.FAILED) {
+                continue;
+            }
+
+            BookingCollection collection = bookingCollectionRepository
+                    .findByBookingId(booking.getId())
+                    .orElse(null);
+
+            if (collection != null
+                    && collection.getStatus() != CollectionStatus.FAILED
+                    && collection.getStatus() != CollectionStatus.REVERSED) {
+                continue;
+            }
+
+            List<PaymentAttempt> attempts =
+                    paymentAttemptRepository
+                            .findByBookingIdOrderByAttemptNumberDesc(booking.getId());
+
+            boolean unresolvedAttempt = attempts.stream().anyMatch(attempt -> {
+                PaymentAttemptStatus status = attempt.getStatus();
+
+                if (status == PaymentAttemptStatus.CAPTURED
+                        || status == PaymentAttemptStatus.RECONCILIATION_REQUIRED) {
+                    return true;
+                }
+
+                return attempt.getGatewayOrderId() != null
+                        && !attempt.getGatewayOrderId().isBlank()
+                        && (status == PaymentAttemptStatus.CREATED
+                        || status == PaymentAttemptStatus.PENDING
+                        || status == PaymentAttemptStatus.AUTHORIZED);
+            });
+
+            if (unresolvedAttempt) {
+                continue;
+            }
+
+            booking.setEffectivePaymentPreference(
+                    PaymentPreference.PAY_AT_SERVICE.name()
+            );
+            booking.setPaymentPreferenceSwitchedAt(now);
+
+            bookingRepository.save(booking);
+        }
     }
 }

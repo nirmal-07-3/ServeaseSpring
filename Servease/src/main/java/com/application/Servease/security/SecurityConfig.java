@@ -128,6 +128,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/customer/favorites/**")
                         .hasRole("CUSTOMER")
 
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/services/search"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

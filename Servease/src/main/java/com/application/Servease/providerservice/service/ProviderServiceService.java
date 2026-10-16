@@ -6,6 +6,7 @@ import com.application.Servease.providerservice.dto.UpdateProviderServiceRequest
 import com.application.Servease.providerservice.dto.UpdateProviderServiceStatusRequest;
 import com.application.Servease.providerservice.entity.ProviderService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProviderServiceService {
@@ -35,4 +36,13 @@ public interface ProviderServiceService {
     );
 
     ProviderService getServiceEntity(Long id);
+
+    List<ProviderServiceResponse> searchServices(
+            String keyword,
+            Long categoryId,
+            Long subCategoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String sort
+    );
 }

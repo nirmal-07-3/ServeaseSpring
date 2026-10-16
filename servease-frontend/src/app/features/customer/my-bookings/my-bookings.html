@@ -201,6 +201,15 @@
             View Details
           </a>
 
+          <a
+            [routerLink]="['/customer/messages']"
+            [queryParams]="{ bookingId: booking.id }"
+            class="secondary-btn"
+          >
+            <span aria-hidden="true">✉</span>
+            Message Provider
+          </a>
+
           <button
             *ngIf="canSwitchToPayAtService(booking)"
             type="button"

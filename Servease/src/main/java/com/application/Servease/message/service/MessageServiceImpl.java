@@ -12,16 +12,24 @@ import com.application.Servease.message.repository.MessageRepository;
 import com.application.Servease.user.entity.User;
 import com.application.Servease.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class MessageServiceImpl
-        implements MessageService {
+public class MessageServiceImpl implements MessageService {
+
+    private static final Set<String> MESSAGING_ALLOWED_STATUSES = Set.of(
+            "PENDING",
+            "ACCEPTED",
+            "IN_PROGRESS"
+    );
 
     private final MessageRepository messageRepository;
     private final BookingRepository bookingRepository;
@@ -29,59 +37,59 @@ public class MessageServiceImpl
     private final MessageMapper messageMapper;
 
     @Override
-    public MessageResponse sendMessage(
-            SendMessageRequest request
-    ) {
+    public MessageResponse sendMessage(SendMessageRequest request) {
+        User currentUser = userService.getAuthenticatedUser();
 
-        User currentUser =
-                userService.getAuthenticatedUser();
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
 
-        Booking booking =
-                bookingRepository.findById(
-                        request.getBookingId()
-                ).orElseThrow(() ->
-                        new BookingNotFoundException(
-                                "Booking not found."
-                        )
-                );
+        User recipient = getRecipient(booking, currentUser);
 
-        User recipient =
-                getRecipient(
-                        booking,
-                        currentUser
-                );
-
-        String content =
-                request.getContent().trim();
+        String content = request.getContent() == null
+                ? ""
+                : request.getContent().trim();
 
         if (content.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Message cannot be empty."
             );
         }
 
-        Message message =
-                Message.builder()
-                        .booking(booking)
-                        .sender(currentUser)
-                        .recipient(recipient)
-                        .content(content)
-                        .build();
+        if (content.length() > 2000) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Messages cannot exceed 2000 characters."
+            );
+        }
 
-        Message savedMessage =
-                messageRepository.save(message);
+        String bookingStatus = booking.getStatus() == null
+                ? ""
+                : booking.getStatus().name();
 
-        return messageMapper.toResponse(
-                savedMessage
-        );
+        if (!MESSAGING_ALLOWED_STATUSES.contains(bookingStatus)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Messaging is closed for this booking. You can still view its conversation history."
+            );
+        }
+
+        Message message = Message.builder()
+                .booking(booking)
+                .sender(currentUser)
+                .recipient(recipient)
+                .content(content)
+                .isRead(false)
+                .build();
+
+        return messageMapper.toResponse(messageRepository.save(message));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<MessageResponse> getMyMessages() {
-
-        User currentUser =
-                userService.getAuthenticatedUser();
+        User currentUser = userService.getAuthenticatedUser();
 
         return messageRepository
                 .findBySenderOrRecipientOrderByCreatedAtDesc(
@@ -95,58 +103,65 @@ public class MessageServiceImpl
 
     @Override
     @Transactional(readOnly = true)
-    public List<MessageResponse> getBookingMessages(
-            Long bookingId
-    ) {
+    public List<MessageResponse> getBookingMessages(Long bookingId) {
+        User currentUser = userService.getAuthenticatedUser();
 
-        User currentUser =
-                userService.getAuthenticatedUser();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
 
-        Booking booking =
-                bookingRepository.findById(
-                        bookingId
-                ).orElseThrow(() ->
-                        new BookingNotFoundException(
-                                "Booking not found."
-                        )
-                );
-
-        verifyAccess(
-                booking,
-                currentUser
-        );
+        verifyAccess(booking, currentUser);
 
         return messageRepository
-                .findByBookingOrderByCreatedAtAsc(
-                        booking
-                )
+                .findByBookingOrderByCreatedAtAsc(booking)
                 .stream()
                 .map(messageMapper::toResponse)
                 .toList();
     }
 
-    private User getRecipient(
-            Booking booking,
-            User currentUser
-    ) {
+    @Override
+    public int markBookingMessagesRead(Long bookingId) {
+        User currentUser = userService.getAuthenticatedUser();
 
-        User customer =
-                booking.getCustomer();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
 
-        User providerUser =
-                booking.getProviderService()
-                        .getProvider()
-                        .getUser();
+        verifyAccess(booking, currentUser);
 
-        if (customer.getId().equals(
-                currentUser.getId()
-        )) {
+        List<Message> unreadMessages =
+                messageRepository.findUnreadMessagesByBookingAndRecipient(
+                        booking,
+                        currentUser
+                );
+
+        unreadMessages.forEach(message -> message.setRead(true));
+
+        messageRepository.saveAll(unreadMessages);
+
+        return unreadMessages.size();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getUnreadMessageCount() {
+        User currentUser = userService.getAuthenticatedUser();
+
+        return messageRepository.countUnreadMessagesByRecipient(currentUser);
+    }
+
+    private User getRecipient(Booking booking, User currentUser) {
+        User customer = booking.getCustomer();
+
+        User providerUser = booking.getProviderService()
+                .getProvider()
+                .getUser();
+
+        if (customer.getId().equals(currentUser.getId())) {
             return providerUser;
         }
 
-        if (providerUser.getId().equals(
-                currentUser.getId()
-        )) {
+        if (providerUser.getId().equals(currentUser.getId())) {
             return customer;
         }
 
@@ -155,28 +170,18 @@ public class MessageServiceImpl
         );
     }
 
-    private void verifyAccess(
-            Booking booking,
-            User currentUser
-    ) {
+    private void verifyAccess(Booking booking, User currentUser) {
+        User customer = booking.getCustomer();
 
-        User customer =
-                booking.getCustomer();
-
-        User providerUser =
-                booking.getProviderService()
-                        .getProvider()
-                        .getUser();
+        User providerUser = booking.getProviderService()
+                .getProvider()
+                .getUser();
 
         boolean isCustomer =
-                customer.getId().equals(
-                        currentUser.getId()
-                );
+                customer.getId().equals(currentUser.getId());
 
         boolean isProvider =
-                providerUser.getId().equals(
-                        currentUser.getId()
-                );
+                providerUser.getId().equals(currentUser.getId());
 
         if (!isCustomer && !isProvider) {
             throw new UserNotFoundException(

@@ -62,7 +62,7 @@ public class BookingCollection {
     @Column(name = "gateway_qr_code_id", length = 100)
     private String gatewayQrCodeId;
 
-    @Column(name = "gateway_qr_image_url", length = 1000)
+    @Column(name = "gateway_qr_image_url", columnDefinition = "LONGTEXT")
     private String gatewayQrImageUrl;
 
     @Column(name = "gateway_payment_id", length = 100)

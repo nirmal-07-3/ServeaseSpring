@@ -1,0 +1,288 @@
+<div class="messages-page">
+  <div class="messages-header">
+    <div>
+      <span class="eyebrow">CUSTOMER COMMUNICATION</span>
+      <h1>Messages</h1>
+      <p>Communicate with your customers about their bookings.</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="loader"></div>
+    <span>Loading messages...</span>
+  </div>
+
+  <div *ngIf="!loading && errorMessage" class="error-state">
+    <div class="error-icon">!</div>
+    <div class="error-content">
+      <strong>Unable to load messages</strong>
+      <p>{{ errorMessage }}</p>
+      <button type="button" (click)="retry()">Try Again</button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !errorMessage" class="messages-container">
+    <aside class="conversation-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Conversations</h2>
+          <span>
+            {{ conversations.length }}
+            conversation{{ conversations.length === 1 ? '' : 's' }}
+          </span>
+        </div>
+      </div>
+
+      <div
+        *ngIf="conversations.length === 0 && selectedBookingId === null"
+        class="empty-conversations"
+      >
+        <div class="empty-icon">💬</div>
+        <h3>No conversations yet</h3>
+        <p>
+          Open a booking and choose Message Customer to start a conversation.
+        </p>
+      </div>
+
+      <div
+        *ngIf="conversations.length > 0 || selectedConversation"
+        class="conversation-list"
+      >
+        <button
+          *ngIf="
+            selectedConversation &&
+            !conversations.some(
+              item => item.bookingId === selectedConversation?.bookingId
+            )
+          "
+          type="button"
+          class="conversation-item active"
+        >
+          <div class="avatar">
+            {{ getInitials(selectedConversation.otherUserName) }}
+          </div>
+
+          <div class="conversation-info">
+            <div class="conversation-top">
+              <strong>{{ selectedConversation.otherUserName }}</strong>
+            </div>
+            <div class="conversation-bottom">
+              <span>Booking #{{ selectedConversation.bookingId }}</span>
+              <p>Start a conversation</p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          *ngFor="
+            let conversation of conversations;
+            trackBy: trackByConversation
+          "
+          type="button"
+          class="conversation-item"
+          [class.active]="selectedBookingId === conversation.bookingId"
+          (click)="selectConversation(conversation)"
+        >
+          <div class="avatar">
+            {{ getInitials(conversation.otherUserName) }}
+          </div>
+
+          <div class="conversation-info">
+            <div class="conversation-top">
+              <strong>{{ conversation.otherUserName }}</strong>
+              <span>{{ formatTime(conversation.lastMessageTime) }}</span>
+
+              <span
+                *ngIf="conversation.unreadCount > 0"
+                class="unread-badge"
+              >
+                {{ conversation.unreadCount }}
+              </span>
+            </div>
+
+            <div class="conversation-bottom">
+              <span>Booking #{{ conversation.bookingId }}</span>
+              <p>{{ conversation.lastMessage }}</p>
+            </div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <section class="chat-panel">
+      <div *ngIf="!selectedConversation" class="no-chat-selected">
+        <div class="chat-empty-icon">✦</div>
+        <h2>Select a conversation</h2>
+        <p>
+          Open an existing booking to start messaging with the customer.
+        </p>
+      </div>
+
+      <ng-container *ngIf="selectedConversation">
+        <header class="chat-header">
+          <div class="chat-user">
+            <div class="avatar large">
+              {{ getInitials(selectedConversation.otherUserName) }}
+            </div>
+
+            <div>
+              <h2>{{ selectedConversation.otherUserName }}</h2>
+              <span>Booking #{{ selectedConversation.bookingId }}</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="chat-body">
+          <div *ngIf="conversationLoading" class="conversation-loader">
+            <div class="loader"></div>
+            <span>Loading conversation...</span>
+          </div>
+
+          <div
+            *ngIf="!conversationLoading && sendError"
+            class="conversation-error"
+          >
+            <p>{{ sendError }}</p>
+            <button type="button" (click)="retryConversation()">
+              Retry Loading
+            </button>
+          </div>
+
+          <ng-container *ngIf="!conversationLoading">
+            <div
+              *ngIf="!sendError && selectedMessages.length === 0"
+              class="empty-chat"
+            >
+              <div class="empty-chat-icon">💬</div>
+              <h3>
+                {{
+                isReadOnly
+                ? 'No messages in this conversation'
+                : 'Start the conversation'
+                }}
+              </h3>
+              <p>
+                {{
+                isReadOnly
+                ? 'This booking is closed. There are no messages to display.'
+                : 'Write your first message below. Messages are associated with this booking.'
+                }}
+              </p>
+            </div>
+
+            <div
+              *ngIf="selectedMessages.length > 0"
+              class="message-list"
+            >
+              <div
+                *ngFor="
+                  let message of selectedMessages;
+                  trackBy: trackByMessage
+                "
+                class="message-row"
+                [class.my-message]="isMyMessage(message)"
+                [class.their-message]="!isMyMessage(message)"
+              >
+                <div
+                  *ngIf="!isMyMessage(message)"
+                  class="message-avatar"
+                >
+                  {{ getInitials(message.senderName) }}
+                </div>
+
+                <div class="message-content">
+                  <div class="message-bubble">
+                    {{ message.content }}
+                  </div>
+
+                  <span class="message-time">
+                    {{ formatDate(message.createdAt) }} ·
+                    {{ formatTime(message.createdAt) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <footer class="message-composer">
+          <div
+            *ngIf="readOnlyNotice"
+            class="readonly-notice"
+            role="status"
+          >
+            <span aria-hidden="true">🔒</span>
+            {{ readOnlyNotice }}
+          </div>
+
+          <div
+            *ngIf="bookingStatusLoading"
+            class="status-check-notice"
+            role="status"
+          >
+            Checking booking status...
+          </div>
+
+          <div
+            *ngIf="bookingStatusError"
+            class="send-error"
+            role="alert"
+          >
+            {{ bookingStatusError }}
+            <button
+              type="button"
+              class="status-retry-button"
+              (click)="retryConversation()"
+            >
+              Retry
+            </button>
+          </div>
+
+          <div
+            *ngIf="sendError && selectedMessages.length > 0"
+            class="send-error"
+            role="alert"
+          >
+            {{ sendError }}
+          </div>
+
+          <div class="composer-box" *ngIf="!isReadOnly">
+            <textarea
+              [(ngModel)]="newMessage"
+              (keydown)="handleEnter($event)"
+              [disabled]="!canSendMessage"
+              maxlength="2000"
+              rows="1"
+              [placeholder]="
+                bookingStatusLoading
+                  ? 'Checking booking status...'
+                  : bookingStatusError
+                    ? 'Sending unavailable'
+                    : 'Type your message...'
+              "
+            ></textarea>
+
+            <button
+              type="button"
+              class="send-button"
+              [disabled]="
+                !canSendMessage ||
+                !newMessage.trim() ||
+                !!sendError
+              "
+              (click)="sendMessage()"
+            >
+              <span *ngIf="!sending">Send</span>
+              <span *ngIf="sending">Sending...</span>
+              <span *ngIf="!sending" class="send-arrow">→</span>
+            </button>
+          </div>
+
+          <span class="composer-hint" *ngIf="!isReadOnly">
+            Maximum 2000 characters · Enter to send · Shift + Enter for a new line
+          </span>
+        </footer>
+      </ng-container>
+    </section>
+  </div>
+</div>

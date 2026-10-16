@@ -87,6 +87,34 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("customer") User customer
     );
 
+
+    @Query("""
+    select b
+    from Booking b
+    where b.id = :bookingId
+      and (
+          b.customer = :user
+          or b.providerService.provider.user = :user
+      )
+    """)
+    Optional<Booking> findByIdAndParticipant(
+            @Param("bookingId") Long bookingId,
+            @Param("user") User user
+    );
+
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select b
+        from Booking b
+        where b.status = :status
+          and b.paymentDeadlineAt is not null
+          and b.paymentDeadlineAt <= :now
+        """)
+    List<Booking> findExpiredOnlinePaymentBookingsForUpdate(
+            @Param("status") BookingStatus status,
+            @Param("now") LocalDateTime now
+    );
 }
 
 

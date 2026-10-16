@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -176,6 +178,74 @@ public class ProviderServiceServiceImpl
                                 ));
 
         return providerServiceMapper.toResponse(providerService);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProviderServiceResponse> searchServices(
+            String keyword,
+            Long categoryId,
+            Long subCategoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String sort) {
+
+        if (minPrice != null && minPrice.signum() < 0) {
+            throw new IllegalArgumentException(
+                    "Minimum price cannot be negative."
+            );
+        }
+
+        if (maxPrice != null && maxPrice.signum() < 0) {
+            throw new IllegalArgumentException(
+                    "Maximum price cannot be negative."
+            );
+        }
+
+        if (minPrice != null && maxPrice != null
+                && minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException(
+                    "Minimum price cannot exceed maximum price."
+            );
+        }
+
+        String normalizedKeyword =
+                keyword == null || keyword.isBlank()
+                        ? null
+                        : keyword.trim();
+
+        List<ProviderService> services =
+                providerServiceRepository.searchActiveServices(
+                        normalizedKeyword,
+                        categoryId,
+                        subCategoryId,
+                        minPrice,
+                        maxPrice,
+                        VerificationStatus.APPROVED
+                );
+
+        Comparator<ProviderService> comparator;
+
+        if ("priceLow".equals(sort)) {
+            comparator = Comparator.comparing(
+                    ProviderService::getBasePrice
+            );
+        } else if ("priceHigh".equals(sort)) {
+            comparator = Comparator.comparing(
+                    ProviderService::getBasePrice,
+                    Comparator.reverseOrder()
+            );
+        } else {
+            comparator = Comparator.comparing(
+                    ProviderService::getCreatedAt,
+                    Comparator.nullsLast(Comparator.reverseOrder())
+            );
+        }
+
+        return services.stream()
+                .sorted(comparator)
+                .map(providerServiceMapper::toResponse)
+                .toList();
     }
 
     @Override

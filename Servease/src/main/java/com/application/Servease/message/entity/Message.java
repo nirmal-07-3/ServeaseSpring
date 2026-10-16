@@ -36,6 +36,10 @@ public class Message {
     @Column(nullable = false, length = 2000)
     private String content;
 
+    @Column(name = "is_read", nullable = false)
+    @Builder.Default
+    private boolean isRead = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

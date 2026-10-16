@@ -1,89 +1,63 @@
-<div class="app-shell">
+<ng-container *ngIf="isProviderRoute; else sharedLayout">
+  <router-outlet></router-outlet>
+</ng-container>
 
-  <!-- Mobile overlay -->
-  <div
-    class="sidebar-overlay"
-    [class.visible]="sidebarOpen"
-    (click)="closeSidebar()"
-  ></div>
+<ng-template #sharedLayout>
+  <div class="app-shell">
+    <div
+      class="sidebar-overlay"
+      [class.visible]="sidebarOpen"
+      (click)="closeSidebar()"
+    ></div>
 
+    <app-sidebar
+      [isOpen]="sidebarOpen"
+      (close)="closeSidebar()"
+    ></app-sidebar>
 
-  <!-- Sidebar -->
-  <app-sidebar
-    [isOpen]="sidebarOpen"
-    (close)="closeSidebar()"
-  ></app-sidebar>
+    <div class="main-area">
+      <header class="topbar">
+        <button
+          class="menu-button"
+          type="button"
+          (click)="toggleSidebar()"
+          aria-label="Open navigation"
+        >
+          ☰
+        </button>
 
+        <div class="topbar-spacer"></div>
 
-  <!-- Main area -->
-  <div class="main-area">
+        <button
+          class="icon-button"
+          type="button"
+          aria-label="Notifications"
+        >
+          <span>♧</span>
+          <span class="notification-dot"></span>
+        </button>
 
-    <!-- Top bar -->
-    <header class="topbar">
+        <a
+          class="user-button"
+          routerLink="/profile"
+          aria-label="Open profile"
+        >
+          <div class="avatar">
+            {{ getUserInitials() }}
+          </div>
 
-      <button
-        class="menu-button"
-        type="button"
-        (click)="toggleSidebar()"
-        aria-label="Open navigation"
-      >
-        ☰
-      </button>
+          <div class="user-info">
+            <span class="user-name">{{ userName }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
 
+          <span class="chevron">˅</span>
+        </a>
+      </header>
 
-      <div class="topbar-spacer"></div>
-
-
-      <!-- Notification -->
-      <button
-        class="icon-button"
-        type="button"
-        aria-label="Notifications"
-      >
-        <span>♧</span>
-        <span class="notification-dot"></span>
-      </button>
-
-
-      <!-- User -->
-      <a
-        class="user-button"
-        routerLink="/profile"
-        aria-label="Open profile"
-      >
-
-        <div class="avatar">
-          {{ getUserInitials() }}
-        </div>
-
-        <div class="user-info">
-
-          <span class="user-name">
-            {{ userName }}
-          </span>
-
-          <span class="user-role">
-            Customer
-          </span>
-
-        </div>
-
-        <span class="chevron">
-          ˅
-        </span>
-
-      </a>
-
-    </header>
-
-
-    <!-- Page content -->
-    <main class="page-content">
-
-      <router-outlet></router-outlet>
-
-    </main>
-
+      <main class="page-content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
   </div>
-
-</div>
+</ng-template>

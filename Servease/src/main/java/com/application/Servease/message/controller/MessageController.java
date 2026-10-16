@@ -16,10 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-@Tag(
-        name = "Messages",
-        description = "Customer and provider messaging APIs"
-)
+@Tag(name = "Messages",
+        description = "Customer and provider messaging APIs")
 public class MessageController {
 
     private final MessageService messageService;
@@ -27,8 +25,7 @@ public class MessageController {
     @PostMapping
     @Operation(summary = "Send a message")
     public ResponseEntity<ApiResponse<MessageResponse>> sendMessage(
-            @Valid @RequestBody SendMessageRequest request
-    ) {
+            @Valid @RequestBody SendMessageRequest request) {
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
@@ -42,7 +39,6 @@ public class MessageController {
     @GetMapping
     @Operation(summary = "Get my messages")
     public ResponseEntity<ApiResponse<List<MessageResponse>>> getMyMessages() {
-
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
@@ -55,16 +51,39 @@ public class MessageController {
     @GetMapping("/booking/{bookingId}")
     @Operation(summary = "Get booking conversation")
     public ResponseEntity<ApiResponse<List<MessageResponse>>> getBookingMessages(
-            @PathVariable Long bookingId
-    ) {
+            @PathVariable Long bookingId) {
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
                         "Conversation fetched successfully.",
-                        messageService.getBookingMessages(
-                                bookingId
-                        )
+                        messageService.getBookingMessages(bookingId)
+                )
+        );
+    }
+
+    @PatchMapping("/booking/{bookingId}/read")
+    @Operation(summary = "Mark received booking messages as read")
+    public ResponseEntity<ApiResponse<Integer>> markBookingMessagesRead(
+            @PathVariable Long bookingId) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Messages marked as read.",
+                        messageService.markBookingMessagesRead(bookingId)
+                )
+        );
+    }
+
+    @GetMapping("/unread-count")
+    @Operation(summary = "Get unread message count")
+    public ResponseEntity<ApiResponse<Long>> getUnreadMessageCount() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Unread message count fetched successfully.",
+                        messageService.getUnreadMessageCount()
                 )
         );
     }

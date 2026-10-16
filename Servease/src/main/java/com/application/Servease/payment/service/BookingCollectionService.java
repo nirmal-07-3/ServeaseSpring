@@ -247,6 +247,9 @@ public class BookingCollectionService {
         collection.setConfirmedBy(providerUser);
         collection.setConfirmedAt(LocalDateTime.now());
         collectionRepository.saveAndFlush(collection);
+
+        booking.setStatus(BookingStatus.COMPLETED);
+        bookingRepository.saveAndFlush(booking);
     }
 
     private void expireAndClearUnpaidQr(BookingCollection collection) {

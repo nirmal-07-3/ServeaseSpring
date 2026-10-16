@@ -3,6 +3,7 @@ package com.application.Servease.booking.controller;
 
 import com.application.Servease.booking.dto.BookingResponse;
 import com.application.Servease.booking.dto.CreateBookingRequest;
+import com.application.Servease.booking.enums.BookingStatus;
 import com.application.Servease.booking.service.BookingService;
 import com.application.Servease.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -99,6 +100,21 @@ public class BookingController {
                         true,
                         "Payment preference switched to payment at service.",
                         booking
+                )
+        );
+    }
+
+
+
+    @GetMapping("/{id}/messaging-status")
+    public ResponseEntity<ApiResponse<BookingStatus>> getBookingStatusForMessaging(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Booking status fetched successfully.",
+                        bookingService.getBookingStatusForMessaging(id)
                 )
         );
     }

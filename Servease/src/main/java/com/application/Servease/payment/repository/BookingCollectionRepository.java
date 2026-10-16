@@ -31,4 +31,6 @@ public interface BookingCollectionRepository extends JpaRepository<BookingCollec
     Optional<BookingCollection> findByGatewayQrCodeIdForUpdate(@Param("qrCodeId") String qrCodeId);
 
     List<BookingCollection> findByStatusOrderByCreatedAtAsc(CollectionStatus status);
+
+
 }

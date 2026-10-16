@@ -10,18 +10,12 @@ import java.time.LocalDateTime;
 public class MessageResponse {
 
     private Long id;
-
     private Long bookingId;
-
     private Long senderId;
-
     private String senderName;
-
     private Long recipientId;
-
     private String recipientName;
-
     private String content;
-
+    private boolean isRead;
     private LocalDateTime createdAt;
 }

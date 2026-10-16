@@ -1,3 +1,4 @@
+
 :host {
   display: block;
   min-height: 100%;
@@ -372,12 +373,21 @@
 }
 
 .booking-actions button,
+.booking-actions a,
 .modal-actions button,
+.modal-actions a,
 .collection-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   border-radius: 9px;
   padding: 10px 15px;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -399,6 +409,32 @@
 
 .secondary-button:hover:not(:disabled) {
   border-color: #111;
+}
+
+.message-customer-button {
+  border: 1px solid #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease,
+  box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.message-customer-button:hover:not(:disabled) {
+  border-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.message-customer-button:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 3px;
+}
+
+.message-customer-button:active {
+  transform: translateY(0);
 }
 
 .danger-button {
@@ -513,6 +549,8 @@
 .modal-actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 9px;
   margin-top: 24px;
 }
 
@@ -747,6 +785,10 @@
     flex: 1 1 auto;
   }
 
+  .booking-actions .message-customer-button {
+    flex: 1 1 auto;
+  }
+
   .collection-actions {
     flex-direction: column;
   }
@@ -769,5 +811,13 @@
 
   .verification-panel button {
     width: 100%;
+  }
+
+  .modal-actions {
+    justify-content: stretch;
+  }
+
+  .modal-actions button {
+    flex: 1 1 auto;
   }
 }

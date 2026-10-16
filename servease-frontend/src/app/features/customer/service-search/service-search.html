@@ -1,0 +1,216 @@
+
+<div class="search-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">SERVEASE • CUSTOMER</span>
+      <h1>Find the right service</h1>
+      <p>Discover trusted services for your everyday needs.</p>
+    </div>
+
+    <a routerLink="/home" class="back-link">
+      <span aria-hidden="true">←</span>
+      Dashboard
+    </a>
+  </header>
+
+  <section class="search-panel">
+    <form class="filters" (ngSubmit)="searchServices()">
+      <div class="field keyword-field">
+        <label for="keyword">Search services</label>
+        <input
+          id="keyword"
+          type="search"
+          name="keyword"
+          [(ngModel)]="keyword"
+          placeholder="Try AC repair, plumbing, cleaning..."
+        />
+      </div>
+
+      <div class="field">
+        <label for="category">Category</label>
+        <select
+          id="category"
+          name="category"
+          [(ngModel)]="selectedCategoryId"
+          (ngModelChange)="onCategoryChange()"
+          [disabled]="categoriesLoading"
+        >
+          <option value="">
+            {{ categoriesLoading ? 'Loading categories...' : 'All categories' }}
+          </option>
+
+          <option
+            *ngFor="let category of categories"
+            [value]="category.id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+
+        <small class="field-error" *ngIf="categoryError">
+          {{ categoryError }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="subcategory">Subcategory</label>
+        <select
+          id="subcategory"
+          name="subcategory"
+          [(ngModel)]="selectedSubCategoryId"
+          [disabled]="!selectedCategoryId || subcategoriesLoading"
+        >
+          <option value="">
+            {{
+            !selectedCategoryId
+            ? 'Select a category first'
+            : subcategoriesLoading
+            ? 'Loading subcategories...'
+            : 'All subcategories'
+            }}
+          </option>
+
+          <option
+            *ngFor="let subcategory of subcategories"
+            [value]="subcategory.id"
+          >
+            {{ subcategory.name }}
+          </option>
+        </select>
+
+        <small class="field-error" *ngIf="subcategoryError">
+          {{ subcategoryError }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="minPrice">Minimum price (₹)</label>
+        <input
+          id="minPrice"
+          type="number"
+          name="minPrice"
+          min="0"
+          [(ngModel)]="minPrice"
+          placeholder="Min price"
+        />
+      </div>
+
+      <div class="field">
+        <label for="maxPrice">Maximum price (₹)</label>
+        <input
+          id="maxPrice"
+          type="number"
+          name="maxPrice"
+          min="0"
+          [(ngModel)]="maxPrice"
+          placeholder="Max price"
+        />
+      </div>
+
+      <div class="field">
+        <label for="sort">Sort by</label>
+        <select id="sort" name="sort" [(ngModel)]="sort">
+          <option value="newest">Newest first</option>
+          <option value="priceLow">Price: Low to high</option>
+          <option value="priceHigh">Price: High to low</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button class="search-button" type="submit" [disabled]="loading">
+          {{ loading ? 'Searching...' : 'Search services' }}
+        </button>
+
+        <button
+          class="reset-button"
+          type="button"
+          (click)="resetFilters()"
+        >
+          Reset filters
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="results-section">
+    <div class="results-header">
+      <div>
+        <h2>Available services</h2>
+        <p>Compare services and choose what works for you.</p>
+      </div>
+
+      <span class="result-count" *ngIf="!loading">
+        {{ services.length }} result{{ services.length === 1 ? '' : 's' }}
+      </span>
+    </div>
+
+    <div class="status-panel" *ngIf="loading">
+      <span class="loader"></span>
+      <p>Finding the best services for you...</p>
+    </div>
+
+    <div class="error-panel" *ngIf="!loading && errorMessage">
+      <p>{{ errorMessage }}</p>
+      <button type="button" (click)="searchServices()">Try again</button>
+    </div>
+
+    <div
+      class="empty-panel"
+      *ngIf="!loading && !errorMessage && services.length === 0"
+    >
+      <div class="empty-icon">⌕</div>
+      <h3>No services found</h3>
+      <p>Try another keyword or adjust your category and price filters.</p>
+      <button type="button" (click)="resetFilters()">Clear all filters</button>
+    </div>
+
+    <div class="service-grid" *ngIf="!loading && !errorMessage && services.length">
+      <article
+        class="service-card"
+        *ngFor="let service of services; trackBy: trackByServiceId"
+      >
+        <div class="card-top">
+          <span class="service-category">
+            {{ service.subCategoryName || 'General service' }}
+          </span>
+          <span class="active-label" *ngIf="service.active">Available</span>
+        </div>
+
+        <h3>{{ service.title }}</h3>
+
+        <p class="service-description">
+          {{ service.description || 'Professional service for your needs.' }}
+        </p>
+
+        <div class="service-meta">
+          <div>
+            <span class="meta-label">Starting price</span>
+            <strong class="price">
+              {{ service.basePrice | currency:'INR':'symbol':'1.0-2':'en-IN' }}
+            </strong>
+          </div>
+
+          <div *ngIf="service.estimatedDurationMinutes">
+            <span class="meta-label">Estimated duration</span>
+            <strong>{{ service.estimatedDurationMinutes }} min</strong>
+          </div>
+        </div>
+
+        <div class="provider-info">
+          <span class="provider-avatar" aria-hidden="true">✦</span>
+          <div>
+            <span class="meta-label">Service provider</span>
+            <strong>{{ service.providerBusinessName || 'Service provider' }}</strong>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span class="radius" *ngIf="service.serviceRadiusKm">
+            {{ service.serviceRadiusKm }} km service radius
+          </span>
+          <span class="service-id">Service #{{ service.id }}</span>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

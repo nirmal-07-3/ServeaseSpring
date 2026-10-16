@@ -212,7 +212,7 @@ export class MyBookings implements OnInit {
 
   switchToPayAtService(booking: Booking): void {
     if (!this.canSwitchToPayAtService(booking) ||
-        this.switchingPaymentPreferenceId !== null) {
+      this.switchingPaymentPreferenceId !== null) {
       return;
     }
 
@@ -238,20 +238,17 @@ export class MyBookings implements OnInit {
           this.showFeedback(
             'success',
             response?.message ||
-              'Payment preference updated successfully.'
+            'Payment preference updated successfully.'
           );
-
           this.loadBookings();
         },
         error: err => {
           console.error('Failed to switch payment preference:', err);
-
           this.showFeedback(
             'error',
             err?.error?.message ||
-              'Unable to switch to Pay at Service. Please refresh your bookings and try again.'
+            'Unable to switch to Pay at Service. Please refresh your bookings and try again.'
           );
-
           this.loadBookings();
         }
       });
@@ -266,67 +263,68 @@ export class MyBookings implements OnInit {
 
     this.api.patch<ApiResponse<void>>(
       `/bookings/${booking.id}/cancel`
-)
-.pipe(finalize(() => {
-  this.cancellingId = null;
-  this.cdr.detectChanges();
-}))
-  .subscribe({
-    next: response => {
-      this.showFeedback(
-        'success',
-        response?.message ||
-        'Your booking has been cancelled successfully.'
-      );
-      this.loadBookings();
-    },
-    error: err => {
-      console.error('Failed to cancel booking:', err);
-      this.showFeedback(
-        'error',
-        err?.error?.message ||
-        'Unable to cancel the booking. Please try again.'
-      );
+    )
+      .pipe(finalize(() => {
+        this.cancellingId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: response => {
+          this.showFeedback(
+            'success',
+            response?.message ||
+            'Your booking has been cancelled successfully.'
+          );
+          this.loadBookings();
+        },
+        error: err => {
+          console.error('Failed to cancel booking:', err);
+          this.showFeedback(
+            'error',
+            err?.error?.message ||
+            'Unable to cancel the booking. Please try again.'
+          );
+        }
+      });
+  }
+
+  formatDate(date: string): string {
+    if (!date) {
+      return '';
     }
-  });
-}
 
-formatDate(date: string): string {
-  if (!date) {
-    return '';
+    return new Date(`${date.slice(0, 10)}T00:00:00`)
+      .toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
   }
 
-  return new Date(`${date.slice(0, 10)}T00:00:00`)
-    .toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+  formatTime(time: string): string {
+    if (!time) {
+      return '';
+    }
+
+    const [hours, minutes] = time.split(':');
+    const date = new Date();
+    date.setHours(Number(hours), Number(minutes), 0, 0);
+
+    return date.toLocaleTimeString('en-IN', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
     });
-}
-
-formatTime(time: string): string {
-  if (!time) {
-    return '';
   }
 
-  const [hours, minutes] = time.split(':');
-  const date = new Date();
-  date.setHours(Number(hours), Number(minutes), 0, 0);
-
-  return date.toLocaleTimeString('en-IN', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-}
-
-getProgressStep(status: BookingStatus): number {
-  switch (status) {
-    case 'PENDING': return 1;
-    case 'ACCEPTED': return 2;
-    case 'IN_PROGRESS': return 3;
-    case 'COMPLETED': return 4;
-    default: return 0;
+  getProgressStep(status: BookingStatus): number {
+    switch (status) {
+      case 'PENDING': return 1;
+      case 'ACCEPTED': return 2;
+      case 'IN_PROGRESS': return 3;
+      case 'COMPLETED': return 4;
+      default: return 0;
+    }
   }
 }
-}
+
