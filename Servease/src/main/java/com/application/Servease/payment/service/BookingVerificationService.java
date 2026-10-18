@@ -9,6 +9,8 @@ import com.application.Servease.common.exception.BookingNotFoundException;
 import com.application.Servease.common.exception.InvalidBookingStatusException;
 import com.application.Servease.common.exception.ProviderNotFoundException;
 import com.application.Servease.common.service.EmailService;
+import com.application.Servease.notification.enums.NotificationType;
+import com.application.Servease.notification.service.NotificationService;
 import com.application.Servease.payment.dto.BookingVerificationRequest;
 import com.application.Servease.payment.entity.BookingCollection;
 import com.application.Servease.payment.entity.BookingVerification;
@@ -51,6 +53,7 @@ public class BookingVerificationService {
     private final PasswordEncoder passwordEncoder;
     private final TransactionTemplate transactionTemplate;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final NotificationService notificationService;
 
     @Value("${servease.booking.verification.enabled:true}")
     private boolean verificationEnabled;
@@ -63,7 +66,8 @@ public class BookingVerificationService {
             UserService userService,
             EmailService emailService,
             PasswordEncoder passwordEncoder,
-            PlatformTransactionManager transactionManager
+            PlatformTransactionManager transactionManager,
+            NotificationService notificationService
     ) {
         this.bookingRepository = bookingRepository;
         this.verificationRepository = verificationRepository;
@@ -72,6 +76,7 @@ public class BookingVerificationService {
         this.userService = userService;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
 
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setPropagationBehavior(
@@ -241,6 +246,18 @@ public class BookingVerificationService {
         }
 
         bookingRepository.saveAndFlush(booking);
+
+        if (purpose == VerificationPurpose.COMPLETION) {
+            notificationService.createNotification(
+                    booking.getCustomer(),
+                    NotificationType.SERVICE_COMPLETED,
+                    "Service completed",
+                    "Your service booking has been completed successfully.",
+                    "/bookings",
+                    "BOOKING",
+                    booking.getId()
+            );
+        }
 
         return null;
     }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,5 +33,13 @@ public interface BookingCollectionRepository extends JpaRepository<BookingCollec
 
     List<BookingCollection> findByStatusOrderByCreatedAtAsc(CollectionStatus status);
 
+    @Query("""
+        select coalesce(sum(c.platformFeeAmountSnapshot), 0)
+        from BookingCollection c
+        where c.status = :status
+        """)
+    BigDecimal sumPlatformFeesByStatus(
+            @Param("status") CollectionStatus status
+    );
 
 }

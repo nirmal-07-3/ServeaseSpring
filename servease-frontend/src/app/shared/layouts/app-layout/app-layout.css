@@ -1,3 +1,4 @@
+
 :host {
   display: block;
   min-height: 100vh;
@@ -10,37 +11,23 @@
   color: #111827;
 }
 
-/* =========================
-   MAIN AREA
-========================= */
-
 .main-area {
   min-width: 0;
   flex: 1;
   width: 100%;
 }
 
-/* =========================
-   TOPBAR
-========================= */
-
 .topbar {
   height: 72px;
   width: 100%;
-
   display: flex;
   align-items: center;
-
   padding: 0 28px;
-
-  background: rgba(255, 255, 255, 0.92);
-
+  background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid #e9ebf0;
-
   position: sticky;
   top: 0;
   z-index: 20;
-
   backdrop-filter: blur(12px);
 }
 
@@ -48,37 +35,21 @@
   flex: 1;
 }
 
-/* =========================
-   MENU
-========================= */
-
 .menu-button {
   width: 42px;
   height: 42px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   margin-right: 15px;
-
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-
   background: white;
-
   color: #374151;
-
   font-size: 20px;
   line-height: 1;
-
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .menu-button:hover {
@@ -91,69 +62,290 @@
   transform: scale(0.96);
 }
 
-/* =========================
-   ICON BUTTON
-========================= */
+.notification-wrapper {
+  position: relative;
+  margin-right: 18px;
+}
 
 .icon-button {
   position: relative;
-
   width: 42px;
   height: 42px;
-
-  margin-right: 18px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border: none;
-  border-radius: 10px;
-
+  border: 1px solid transparent;
+  border-radius: 12px;
   background: transparent;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
 
-  font-size: 20px;
+.icon-button:hover,
+.icon-button[aria-expanded="true"] {
+  background: #eff4ff;
+  color: #2563eb;
+}
 
+.notification-count {
+  position: absolute;
+  top: -4px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  border-radius: 20px;
+  background: #2563eb;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: -12px;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  max-height: min(520px, calc(100vh - 110px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e5eaf3;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.16);
+  animation: notification-appear 0.18s ease-out;
+}
+
+@keyframes notification-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 15px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.notification-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.notification-header p {
+  margin: 5px 0 0;
+  color: #7b8496;
+  font-size: 12px;
+}
+
+.mark-all-button {
+  flex-shrink: 0;
+  padding: 7px 9px;
+  border: 1px solid #dbe5ff;
+  border-radius: 8px;
+  background: #f3f6ff;
+  color: #2459cb;
+  font-size: 11px;
+  font-weight: 650;
   cursor: pointer;
 }
 
-.icon-button:hover {
-  background: #f3f4f6;
+.mark-all-button:hover:not(:disabled) {
+  background: #e7eeff;
 }
 
-.notification-dot {
-  position: absolute;
+.mark-all-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-  top: 8px;
-  right: 8px;
+.notification-list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
-  width: 7px;
-  height: 7px;
+.notification-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px 16px;
+  border: none;
+  border-bottom: 1px solid #f0f2f7;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
 
-  background: #2563eb;
+.notification-item:hover {
+  background: #f7f9ff;
+}
 
-  border: 2px solid white;
+.notification-item.unread {
+  background: #f2f6ff;
+}
 
+.notification-item.unread:hover {
+  background: #eaf0ff;
+}
+
+.notification-item:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: #e6edff;
+  color: #245bd1;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.notification-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.notification-title {
+  color: #172033;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.notification-message {
+  color: #596579;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.notification-date {
+  margin-top: 2px;
+  color: #8a94a6;
+  font-size: 10px;
+}
+
+.unread-indicator {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
   border-radius: 50%;
+  background: #2563eb;
 }
 
-/* =========================
-   USER BUTTON
-========================= */
+.notification-loading,
+.notification-empty {
+  padding: 32px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #788398;
+  font-size: 12px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 23px;
+  height: 23px;
+  border: 2px solid #dbe5ff;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: notification-spin 0.7s linear infinite;
+}
+
+@keyframes notification-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-bell {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f0f4ff;
+  color: #4773d3;
+  font-size: 23px;
+}
+
+.notification-empty strong {
+  color: #263248;
+  font-size: 13px;
+}
+
+.notification-empty p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.notification-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.notification-error button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #2459cb;
+  font-weight: 700;
+  cursor: pointer;
+}
 
 .user-button {
   display: flex;
   align-items: center;
-
   gap: 10px;
-
   padding: 6px 8px;
-
   border: none;
   border-radius: 12px;
-
   background: transparent;
-
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -164,17 +356,12 @@
 .avatar {
   width: 38px;
   height: 38px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 50%;
-
   background: #2563eb;
-
   color: white;
-
   font-size: 14px;
   font-weight: 700;
 }
@@ -182,46 +369,32 @@
 .user-info {
   display: flex;
   flex-direction: column;
-
   align-items: flex-start;
-
   line-height: 1.2;
 }
 
 .user-name {
+  color: #111827;
   font-size: 14px;
   font-weight: 600;
 }
 
 .user-role {
   margin-top: 3px;
-
-  font-size: 12px;
-
   color: #6b7280;
+  font-size: 12px;
 }
 
 .chevron {
   margin-left: 5px;
-
   color: #6b7280;
-
   font-size: 16px;
 }
 
-/* =========================
-   PAGE CONTENT
-========================= */
-
 .page-content {
   min-height: calc(100vh - 72px);
-
   padding: 32px;
 }
-
-/* =========================
-   SIDEBAR OVERLAY
-========================= */
 
 .sidebar-overlay {
   display: none;
@@ -229,56 +402,33 @@
 
 .sidebar-overlay.visible {
   display: block;
-
   position: fixed;
   inset: 0;
-
   background: rgba(0, 0, 0, 0.35);
-
   z-index: 40;
-
   cursor: pointer;
 }
 
-/* =========================
-   DESKTOP
-========================= */
-
 @media (min-width: 901px) {
-
   .page-content {
     padding: 32px;
   }
-
 }
 
-/* =========================
-   TABLET
-========================= */
-
 @media (max-width: 900px) {
-
   .page-content {
     padding: 24px;
   }
-
 }
 
-/* =========================
-   MOBILE
-========================= */
-
 @media (max-width: 600px) {
-
   .topbar {
     height: 64px;
-
     padding: 0 16px;
   }
 
   .page-content {
     min-height: calc(100vh - 64px);
-
     padding: 20px 16px;
   }
 
@@ -287,15 +437,21 @@
     display: none;
   }
 
-  .icon-button {
+  .notification-wrapper {
     margin-right: 5px;
+  }
+
+  .notification-panel {
+    position: fixed;
+    top: 72px;
+    right: 12px;
+    width: 380px;
+    max-height: calc(100vh - 90px);
   }
 
   .menu-button {
     width: 40px;
     height: 40px;
-
     margin-right: 10px;
   }
-
 }

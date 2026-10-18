@@ -188,6 +188,24 @@ export const routes: Routes = [
           import('./features/provider/dashboard/dashboard')
             .then(m => m.Dashboard)
       },
+
+      {
+        path: 'admin/profile',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/customer/profile/profile')
+            .then(m => m.Profile)
+      },
+      {
+        path: 'admin/settings',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/admin/settings/settings')
+            .then(m => m.AdminSettings)
+      },
+
       {
         path: 'provider/profile',
         canActivate: [roleGuard],

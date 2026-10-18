@@ -9,6 +9,8 @@ import com.application.Servease.booking.enums.PaymentPreference;
 import com.application.Servease.booking.mapper.BookingMapper;
 import com.application.Servease.booking.repository.BookingRepository;
 import com.application.Servease.common.exception.*;
+import com.application.Servease.notification.enums.NotificationType;
+import com.application.Servease.notification.service.NotificationService;
 import com.application.Servease.payment.entity.BookingCollection;
 import com.application.Servease.payment.entity.Payment;
 import com.application.Servease.payment.entity.PaymentAttempt;
@@ -31,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.application.Servease.admin.dto.PlatformSettingsResponse;
+import com.application.Servease.admin.service.PlatformSettingsService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -52,19 +56,25 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentRepository paymentRepository;
     private final PaymentAttemptRepository paymentAttemptRepository;
     private final BookingCollectionRepository bookingCollectionRepository;
+    private final PlatformSettingsService platformSettingsService;
+    private final NotificationService notificationService;
 
-    @Value("${servease.platform-fee-rate:10.00}")
-    private BigDecimal platformFeeRate;
 
-    @Value("${servease.booking.provider-response-timeout-minutes:15}")
-    private long providerResponseTimeoutMinutes;
-
-    @Value("${servease.booking.online-payment-timeout-minutes:30}")
-    private long onlinePaymentTimeoutMinutes;
 
     @Override
     public BookingResponse createBooking(CreateBookingRequest request) {
         User customer = userService.getAuthenticatedUser();
+
+        PlatformSettingsResponse settings =
+                platformSettingsService.getSettings();
+
+        BigDecimal platformFeeRate = settings.getPlatformFeeRate();
+
+        long providerResponseTimeoutMinutes =
+                settings.getProviderResponseTimeoutMinutes();
+
+        long onlinePaymentTimeoutMinutes =
+                settings.getOnlinePaymentTimeoutMinutes();
 
         if (request.getPaymentPreference() == null) {
             throw new BookingConflictException("Payment preference is required.");
@@ -232,7 +242,19 @@ public class BookingServiceImpl implements BookingService {
                 .effectivePaymentPreference(request.getPaymentPreference().name())
                 .build();
 
+
+        notificationService.createNotification(
+                provider.getUser(),
+                NotificationType.BOOKING_CREATED,
+                "New booking request",
+                customer.getName() + " has requested your service.",
+                "/provider/bookings",
+                "BOOKING",
+                booking.getId()
+        );
         return bookingMapper.toResponse(bookingRepository.save(booking));
+
+
     }
 
 
@@ -346,6 +368,16 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setCancellationReason("CUSTOMER_CANCELLED");
         bookingRepository.save(booking);
+
+        notificationService.createNotification(
+                booking.getProviderService().getProvider().getUser(),
+                NotificationType.BOOKING_CANCELLED,
+                "Booking cancelled",
+                "A customer has cancelled a service booking.",
+                "/provider/bookings",
+                "BOOKING",
+                booking.getId()
+        );
     }
 
     @Override
@@ -521,7 +553,7 @@ public class BookingServiceImpl implements BookingService {
         if (responseDeadline == null
                 || !now.isBefore(responseDeadline)) {
             throw new InvalidBookingStatusException(
-                    "The 15-minute provider response deadline has expired. "
+                    "The provider response deadline has expired. "
                             + "This booking can no longer be accepted."
             );
         }
@@ -537,8 +569,14 @@ public class BookingServiceImpl implements BookingService {
             );
         }
 
+
+
         booking.setStatus(BookingStatus.ACCEPTED);
         booking.setProviderAcceptedAt(now);
+
+        long onlinePaymentTimeoutMinutes =
+                platformSettingsService.getSettings()
+                        .getOnlinePaymentTimeoutMinutes();
 
         if (booking.getPaymentPreference() == PaymentPreference.PAY_ONLINE) {
             LocalDateTime paymentDeadline =
@@ -554,6 +592,16 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.saveAndFlush(booking);
+
+        notificationService.createNotification(
+                booking.getCustomer(),
+                NotificationType.BOOKING_ACCEPTED,
+                "Booking accepted",
+                "Your booking has been accepted by the provider.",
+                "/bookings",
+                "BOOKING",
+                booking.getId()
+        );
     }
 
     @Override
@@ -576,7 +624,7 @@ public class BookingServiceImpl implements BookingService {
         if (responseDeadline == null
                 || !now.isBefore(responseDeadline)) {
             throw new InvalidBookingStatusException(
-                    "The 15-minute provider response deadline has expired. "
+                    "The provider response deadline has expired. "
                             + "This booking can no longer be rejected manually."
             );
         }
@@ -585,6 +633,16 @@ public class BookingServiceImpl implements BookingService {
         booking.setCancellationReason("PROVIDER_REJECTED");
 
         bookingRepository.saveAndFlush(booking);
+
+        notificationService.createNotification(
+                booking.getCustomer(),
+                NotificationType.BOOKING_REJECTED,
+                "Booking rejected",
+                "Your booking request was rejected by the provider.",
+                "/bookings",
+                "BOOKING",
+                booking.getId()
+        );
     }
 
 
@@ -600,6 +658,8 @@ public class BookingServiceImpl implements BookingService {
         throw new InvalidBookingStatusException(
                 "Direct service completion is disabled. Confirm collection when applicable, then verify a COMPLETION code."
         );
+
+
     }
 
 

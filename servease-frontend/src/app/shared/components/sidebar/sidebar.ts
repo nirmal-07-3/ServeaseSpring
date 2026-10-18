@@ -1,3 +1,4 @@
+
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
@@ -21,6 +22,7 @@ export class Sidebar {
 
   navigationItems: NavigationItem[] = [];
   dashboardRoute = '/home';
+  profileRoute = '/profile';
   settingsRoute = '/settings';
   userRole = '';
 
@@ -32,21 +34,31 @@ export class Sidebar {
   }
 
   private configureNavigation(): void {
-    this.userRole = (this.auth.getRole() ?? '').toUpperCase().replace('ROLE_', '');
+    this.userRole = (this.auth.getRole() ?? '')
+      .toUpperCase()
+      .replace('ROLE_', '');
 
     if (this.userRole === 'ADMIN') {
       this.dashboardRoute = '/admin/dashboard';
+      this.profileRoute = '/admin/profile';
+      this.settingsRoute = '/admin/settings';
+
       this.navigationItems = [
         { label: 'Dashboard', icon: '⌂', route: '/admin/dashboard' },
-        { label: 'Providers', icon: '♙', route: '/admin/providers' },
-        { label: 'Categories', icon: '◈', route: '/admin/categories' },
         { label: 'Users', icon: '♙', route: '/admin/users' },
+        { label: 'Providers', icon: '♟', route: '/admin/providers' },
+        { label: 'Categories', icon: '◈', route: '/admin/categories' },
+        { label: 'Profile', icon: '○', route: '/admin/profile' },
+        { label: 'Platform Settings', icon: '⚙', route: '/admin/settings' }
       ];
+
       return;
     }
 
     if (this.userRole === 'PROVIDER') {
       this.dashboardRoute = '/provider/dashboard';
+      this.profileRoute = '/provider/profile';
+
       this.navigationItems = [
         { label: 'Dashboard', icon: '⌂', route: '/provider/dashboard' },
         { label: 'My Services', icon: '◈', route: '/provider/services' },
@@ -56,10 +68,14 @@ export class Sidebar {
         { label: 'Profile', icon: '○', route: '/provider/profile' },
         { label: 'Verification', icon: '✓', route: '/provider/verification' }
       ];
+
       return;
     }
 
     this.dashboardRoute = '/home';
+    this.profileRoute = '/profile';
+    this.settingsRoute = '/settings';
+
     this.navigationItems = [
       { label: 'Dashboard', icon: '⌂', route: '/home' },
       { label: 'Services', icon: '◈', route: '/services' },

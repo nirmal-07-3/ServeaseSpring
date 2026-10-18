@@ -1,380 +1,181 @@
+
 <div class="admin-dashboard">
-
   <section class="dashboard-header">
-
     <div class="header-content">
-
-      <span class="eyebrow">
-        ADMINISTRATION
-      </span>
-
-      <h1>
-        Welcome back, <span>{{ adminName }}.</span>
-      </h1>
-
-      <p>
-        Here's what's happening across Servease today.
-      </p>
-
+      <span class="eyebrow">ADMINISTRATION</span>
+      <h1>Welcome back, <span>{{ adminName }}.</span></h1>
+      <p>Monitor and manage your Servease platform from one place.</p>
     </div>
 
-    <div class="header-status">
-      <span class="status-dot"></span>
-
-      <div>
-        <strong>System operational</strong>
-        <span>All core services are running</span>
-      </div>
-    </div>
-
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadAnalytics()"
+    >
+      <span aria-hidden="true">↻</span>
+      {{ loading ? 'Refreshing…' : 'Refresh analytics' }}
+    </button>
   </section>
 
+  <div class="error-state" *ngIf="errorMessage" role="alert">
+    <div>
+      <strong>Unable to load analytics</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
 
-  <section class="stats-grid">
+    <button
+      type="button"
+      (click)="loadAnalytics()"
+      [disabled]="loading"
+    >
+      Try again
+    </button>
+  </div>
 
+  <section class="stats-grid" aria-label="Platform statistics">
     @for (stat of stats; track stat.label) {
-
     <article class="stat-card">
-
       <div class="stat-card-top">
-
-        <div class="stat-icon">
+        <div class="stat-icon" aria-hidden="true">
           {{ stat.icon }}
         </div>
-
-        <span
-          class="stat-change"
-          [class.negative]="!stat.positive"
-        >
-            {{ stat.change }}
-          </span>
-
       </div>
 
-      <div class="stat-value">
-        {{ stat.value }}
-      </div>
-
-      <div class="stat-label">
-        {{ stat.label }}
-      </div>
-
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.label }}</div>
     </article>
-
     }
-
   </section>
 
-
   <div class="content-grid">
-
-
-    <section class="panel activity-panel">
-
+    <section class="panel">
       <div class="panel-header">
-
         <div>
-          <span class="section-eyebrow">
-            PLATFORM
-          </span>
+          <span class="section-eyebrow">PLATFORM OVERVIEW</span>
+          <h2>Administration summary</h2>
+        </div>
+      </div>
 
-          <h2>
-            Recent activity
-          </h2>
+      <div class="summary-list">
+        <div class="summary-row">
+          <span>Provider verifications pending</span>
+          <strong>
+            {{ loading && !analytics ? 'Loading…' : pendingProviders }}
+          </strong>
         </div>
 
-        <span class="panel-count">
-          {{ activities.length }} updates
-        </span>
-
+        <div class="summary-row">
+          <span>Analytics status</span>
+          <strong>
+            {{
+            loading
+            ? 'Updating'
+            : errorMessage
+            ? 'Unavailable'
+            : analytics
+            ? 'Available'
+            : 'Not loaded'
+            }}
+          </strong>
+        </div>
       </div>
-
-
-      <div class="activity-list">
-
-        @for (
-        activity of activities;
-        track activity.title
-        ) {
-
-        <article class="activity-item">
-
-          <div class="activity-icon">
-            {{ activity.icon }}
-          </div>
-
-          <div class="activity-content">
-
-            <h3>
-              {{ activity.title }}
-            </h3>
-
-            <p>
-              {{ activity.description }}
-            </p>
-
-          </div>
-
-          <span class="activity-time">
-              {{ activity.time }}
-            </span>
-
-        </article>
-
-        }
-
-      </div>
-
     </section>
 
-
-    <aside class="panel pending-panel">
-
+    <aside class="panel">
       <div class="panel-header">
-
         <div>
-          <span class="section-eyebrow">
-            ATTENTION
-          </span>
-
-          <h2>
-            Pending actions
-          </h2>
+          <span class="section-eyebrow">ATTENTION</span>
+          <h2>Pending actions</h2>
         </div>
-
       </div>
 
-
       <div class="pending-list">
-
         <a
           routerLink="/admin/providers"
           class="pending-item"
         >
+          <span class="pending-icon" aria-hidden="true">♙</span>
 
-          <div class="pending-icon">
-            ♙
-          </div>
-
-          <div class="pending-content">
-
-            <strong>
-              Provider verification
-            </strong>
-
+          <span class="pending-content">
+            <strong>Provider verification</strong>
             <span>
-              12 providers waiting
+              {{ pendingProviders }} pending verification(s)
             </span>
-
-          </div>
-
-          <span class="arrow">
-            →
           </span>
 
+          <span class="arrow" aria-hidden="true">→</span>
         </a>
-
-
-        <a
-          routerLink="/admin/services"
-          class="pending-item"
-        >
-
-          <div class="pending-icon">
-            ◈
-          </div>
-
-          <div class="pending-content">
-
-            <strong>
-              Service requests
-            </strong>
-
-            <span>
-              5 requests to review
-            </span>
-
-          </div>
-
-          <span class="arrow">
-            →
-          </span>
-
-        </a>
-
-
-        <a
-          routerLink="/admin/users"
-          class="pending-item"
-        >
-
-          <div class="pending-icon">
-            ◉
-          </div>
-
-          <div class="pending-content">
-
-            <strong>
-              User reports
-            </strong>
-
-            <span>
-              3 reports need attention
-            </span>
-
-          </div>
-
-          <span class="arrow">
-            →
-          </span>
-
-        </a>
-
       </div>
-
     </aside>
-
   </div>
 
-
   <section class="management-section">
-
     <div class="section-heading">
-
       <div>
-        <span class="section-eyebrow">
-          MANAGEMENT
-        </span>
-
-        <h2>
-          Quick access
-        </h2>
+        <span class="section-eyebrow">MANAGEMENT</span>
+        <h2>Quick access</h2>
       </div>
 
-      <p>
-        Manage the main areas of your platform.
-      </p>
-
+      <p>Access your available admin workspaces.</p>
     </div>
 
-
     <div class="management-grid">
-
-
-      <a
-        routerLink="/admin/users"
-        class="management-card"
-      >
-
-        <span class="management-icon">
-          ◉
-        </span>
-
-        <div class="management-content">
-
-          <h3>
-            Users
-          </h3>
-
-          <p>
-            Manage customers and accounts
-          </p>
-
-        </div>
-
-        <span class="management-arrow">
-          →
-        </span>
-
-      </a>
-
-
       <a
         routerLink="/admin/providers"
         class="management-card"
       >
-
-        <span class="management-icon">
-          ♙
-        </span>
+        <span class="management-icon" aria-hidden="true">♙</span>
 
         <div class="management-content">
-
-          <h3>
-            Providers
-          </h3>
-
-          <p>
-            Verify and manage providers
-          </p>
-
+          <h3>Providers</h3>
+          <p>Review provider profiles and verification documents.</p>
         </div>
 
-        <span class="management-arrow">
-          →
-        </span>
-
+        <span class="management-arrow" aria-hidden="true">→</span>
       </a>
-
 
       <a
-        routerLink="/admin/services"
+        routerLink="/admin/categories"
         class="management-card"
       >
-
-        <span class="management-icon">
-          ◈
-        </span>
+        <span class="management-icon" aria-hidden="true">◈</span>
 
         <div class="management-content">
-
-          <h3>
-            Services
-          </h3>
-
-          <p>
-            Manage categories and services
-          </p>
-
+          <h3>Categories</h3>
+          <p>Manage service categories and subcategories.</p>
         </div>
 
-        <span class="management-arrow">
-          →
-        </span>
-
+        <span class="management-arrow" aria-hidden="true">→</span>
       </a>
-
 
       <a
-        routerLink="/admin/bookings"
+        routerLink="/admin/profile"
         class="management-card"
       >
-
-        <span class="management-icon">
-          ▣
-        </span>
+        <span class="management-icon" aria-hidden="true">○</span>
 
         <div class="management-content">
-
-          <h3>
-            Bookings
-          </h3>
-
-          <p>
-            Monitor platform bookings
-          </p>
-
+          <h3>Admin Profile</h3>
+          <p>View and update your personal account information.</p>
         </div>
 
-        <span class="management-arrow">
-          →
-        </span>
-
+        <span class="management-arrow" aria-hidden="true">→</span>
       </a>
 
+      <a
+        routerLink="/admin/settings"
+        class="management-card"
+      >
+        <span class="management-icon" aria-hidden="true">⚙</span>
 
+        <div class="management-content">
+          <h3>Settings</h3>
+          <p>Access account security and password settings.</p>
+        </div>
+
+        <span class="management-arrow" aria-hidden="true">→</span>
+      </a>
     </div>
-
   </section>
-
 </div>

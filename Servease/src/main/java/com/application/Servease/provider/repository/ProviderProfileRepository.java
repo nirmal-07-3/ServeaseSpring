@@ -17,4 +17,6 @@ public interface ProviderProfileRepository extends JpaRepository<ProviderProfile
     List<ProviderProfile> findByVerificationStatus(
             VerificationStatus verificationStatus
     );
+
+    long countByVerificationStatus(VerificationStatus verificationStatus);
 }
