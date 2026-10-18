@@ -1,0 +1,206 @@
+<section class="users-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">ADMINISTRATION</p>
+      <h1>Manage Users</h1>
+      <p class="page-description">
+        View registered accounts and manage their access to Servease.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadUsers()"
+    >
+      {{ loading ? 'Loading...' : '↻ Refresh' }}
+    </button>
+  </header>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span class="stat-label">Total Users</span>
+      <strong>{{ users.length }}</strong>
+    </article>
+
+    <article class="stat-card active-card">
+      <span class="stat-label">Active</span>
+      <strong>{{ activeCount }}</strong>
+    </article>
+
+    <article class="stat-card pending-card">
+      <span class="stat-label">Pending</span>
+      <strong>{{ pendingCount }}</strong>
+    </article>
+
+    <article class="stat-card blocked-card">
+      <span class="stat-label">Blocked</span>
+      <strong>{{ blockedCount }}</strong>
+    </article>
+  </div>
+
+  <div class="users-panel">
+    <div class="panel-header">
+      <div>
+        <h2>Registered Accounts</h2>
+        <p>Search users or filter by role and account status.</p>
+      </div>
+    </div>
+
+    <form class="filters" (ngSubmit)="loadUsers()">
+      <input
+        type="search"
+        name="search"
+        [(ngModel)]="search"
+        placeholder="Search name, email or phone..."
+        aria-label="Search users"
+      />
+
+      <select
+        name="role"
+        [(ngModel)]="selectedRole"
+        aria-label="Filter by role"
+      >
+        <option value="">All Roles</option>
+        <option value="CUSTOMER">Customer</option>
+        <option value="PROVIDER">Provider</option>
+        <option value="ADMIN">Admin</option>
+      </select>
+
+      <select
+        name="status"
+        [(ngModel)]="selectedStatus"
+        aria-label="Filter by status"
+      >
+        <option value="">All Statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="PENDING">Pending</option>
+        <option value="BLOCKED">Blocked</option>
+      </select>
+
+      <button type="submit" class="search-button" [disabled]="loading">
+        Search
+      </button>
+
+      <button
+        type="button"
+        class="reset-button"
+        (click)="search = ''; selectedRole = ''; selectedStatus = ''; loadUsers()"
+        [disabled]="loading"
+      >
+        Reset
+      </button>
+    </form>
+
+    <div *ngIf="errorMessage" class="alert error-alert" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert success-alert" role="status">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <span class="loader"></span>
+      <p>Loading users...</p>
+    </div>
+
+    <div *ngIf="!loading && !errorMessage && users.length === 0"
+         class="empty-state">
+      <span class="empty-icon">◎</span>
+      <h3>No users found</h3>
+      <p>Try changing your search or filter criteria.</p>
+    </div>
+
+    <div *ngIf="!loading && users.length > 0" class="table-wrapper">
+      <table>
+        <thead>
+        <tr>
+          <th>User</th>
+          <th>Contact</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Verification</th>
+          <th>Registered</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let user of users; trackBy: trackByUserId">
+          <td>
+            <div class="user-cell">
+                <span class="avatar">
+                  {{ (user.name || '?').charAt(0).toUpperCase() }}
+                </span>
+              <div>
+                <strong>{{ user.name || 'Unnamed user' }}</strong>
+                <small>ID: {{ user.id }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="contact-cell">
+              <span>{{ user.email }}</span>
+              <small>{{ user.phone }}</small>
+            </div>
+          </td>
+
+          <td>
+              <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                {{ user.role }}
+              </span>
+          </td>
+
+          <td>
+              <span class="status-badge" [ngClass]="getStatusClass(user.status)">
+                {{ user.status }}
+              </span>
+          </td>
+
+          <td>
+            <div class="verification-cell">
+                <span [class.verified]="user.emailVerified">
+                  Email {{ user.emailVerified ? '✓' : '—' }}
+                </span>
+              <span [class.verified]="user.phoneVerified">
+                  Phone {{ user.phoneVerified ? '✓' : '—' }}
+                </span>
+            </div>
+          </td>
+
+          <td>
+            {{ user.createdAt ? (user.createdAt | date:'dd MMM yyyy') : '—' }}
+          </td>
+
+          <td>
+            <button
+              *ngIf="user.role !== 'ADMIN'"
+              type="button"
+              class="status-action"
+              [class.block-action]="user.status === 'ACTIVE'"
+              [class.activate-action]="user.status !== 'ACTIVE'"
+              [disabled]="updatingUserId !== null"
+              (click)="updateStatus(user)"
+            >
+              {{
+              updatingUserId === user.id
+              ? 'Updating...'
+              : user.status === 'ACTIVE'
+              ? 'Block'
+              : 'Activate'
+              }}
+            </button>
+
+            <span *ngIf="user.role === 'ADMIN'" class="protected-label">
+                Protected
+              </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

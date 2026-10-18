@@ -165,6 +165,14 @@ export const routes: Routes = [
             .then(m => m.Providers)
       },
       {
+        path: 'admin/users',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/admin/users/users')
+            .then(m => m.Users)
+      },
+      {
         path: 'admin/categories',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },

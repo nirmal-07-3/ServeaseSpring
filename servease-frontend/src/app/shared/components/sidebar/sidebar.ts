@@ -39,7 +39,8 @@ export class Sidebar {
       this.navigationItems = [
         { label: 'Dashboard', icon: '⌂', route: '/admin/dashboard' },
         { label: 'Providers', icon: '♙', route: '/admin/providers' },
-        { label: 'Categories', icon: '◈', route: '/admin/categories' }
+        { label: 'Categories', icon: '◈', route: '/admin/categories' },
+        { label: 'Users', icon: '♙', route: '/admin/users' },
       ];
       return;
     }
